@@ -1,0 +1,70 @@
+.market-chart canvas {
+    width: 100% !important;
+}
+
+.circelBtnBx .btn{margin:0 2px;padding:0;width:36px;height:36px;line-height:38px;border-radius:100%;font-size:16px;border:1px solid #dee2e6;background:#fff;color:#ff8084;transition:all .5s ease-in-out;}
+.circelBtnBx .btn:hover{background:#ff8084;color:#fff;}
+
+.product_image_box{
+    aspect-ratio: 4/3;
+    border-radius: 8px;
+    border: 1px dashed #80808040;
+}
+.product_image_box_sm{
+    aspect-ratio: 4/3;
+    border-radius: 4px;
+    min-width: 70px;
+    max-width: 70px;
+    border: 1px dashed #ff8084;
+}
+.product-adding label {
+    font-weight: 600 !important;
+}
+.product-adding input::placeholder{
+    color: #80808080;
+    font-weight: 400;
+    font-size: 14px !important;
+}
+
+.product-adding .ql-container{
+    min-height: 160px;
+}
+
+.menu-dragItem{
+    padding: 10px 16px;
+    background: #80808010;
+    border-radius: 8px;
+}
+
+.sub-menu-dragItem{
+    padding: 10px 16px;
+    background: #80808010;
+    border-radius: 8px;
+}
+
+.sub-menu-add{
+    padding: 6px 16px;
+    cursor: pointer;
+    background: #80808010;
+    border: 1px dashed #00000060;
+    font-size: 14px;
+    text-align: center;
+    font-weight: 500;
+    transition: all ease 0.5s;
+    border-radius: 8px;
+}
+
+.sub-menu-add:hover , .sub-menu-dragItem:hover{
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+}
+
+.custom-drop-down-search {
+    position: absolute;
+    width: 100%;
+    border: 1px solid #00000030;
+    border-radius: 8px;
+    height: 150px;
+    max-height: 150px;
+    overflow-y: scroll ;
+    z-index: 50;
+}
