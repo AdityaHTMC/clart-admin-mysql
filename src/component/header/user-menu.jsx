@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 import { Link } from "react-router-dom";
 import { Fragment } from "react";
 import { useAuthContext } from "../../helper/AuthProvider";
-
+import userimg from '../../assets/profile.png'
 const UserMenu = () => {
   const { logout } = useAuthContext()
 
@@ -9,7 +10,7 @@ const UserMenu = () => {
     <Fragment>
       <li className="onhover-dropdown">
         <div className="media align-items-center">
-          <img className="align-self-center pull-right img-50 rounded-circle blur-up lazyloaded" src={`/assets/images/dashboard/man.png`} alt="header-user" />
+          <img className="align-self-center pull-right img-50 rounded-circle blur-up lazyloaded" src={userimg}  alt="header-user" />
           <div className="dotted-animation">
             <span className="animate-circle"></span>
             <span className="main-circle"></span>

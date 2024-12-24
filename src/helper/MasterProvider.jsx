@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 import axios from 'axios';
 import  { createContext, useContext, useState } from 'react';
 import { useAuthContext } from './AuthProvider';
-
+import { toast } from "react-toastify";
 const AppContext = createContext();
 
 // eslint-disable-next-line react/prop-types
@@ -18,6 +19,8 @@ export const MasterProvider = ({ children }) => {
     const [rackList, setRackList] = useState({total_page: 1, current_page: 1, loading: true, data: []})
     const [material, setMaterial] = useState({ loading: true, data: [] })
     const [packingBox, setPackingBox] = useState({ loading: true, data: [] })
+    const [smsSettingsList, setSmsSettingsList] = useState({loading: true,data: [],total: ""});
+    const [emailSettingsList, setEmailSettingsList] = useState({loading: true,data: [],total: ""});
     const { Authtoken } = useAuthContext()
 
     //  Unit fucntions
@@ -69,7 +72,7 @@ export const MasterProvider = ({ children }) => {
                 setAllUnit(data.data)
             }
         } catch (error) {
-            
+            console.log(error)
         }
     }
 
@@ -122,7 +125,7 @@ export const MasterProvider = ({ children }) => {
                 setAllRoom(data.data)
             }
         } catch (error) {
-            
+            console.log(error)
         }
     }
     //  Floor functions
@@ -174,7 +177,7 @@ export const MasterProvider = ({ children }) => {
                 setAllFloor(data.data)
             }
         } catch (error) {
-            
+            console.log(error)
         }
     }
     // rack function
@@ -288,8 +291,107 @@ export const MasterProvider = ({ children }) => {
         }
     }
 
+
+    const getSmsSettingsList = async () => {
+        try {
+            setSmsSettingsList({ data: [], loading: true });
+          const response = await axios.get(
+            `${base_url}/admin/sms-settings/list`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setSmsSettingsList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setSmsSettingsList({ data: [], loading: false });
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+            setSmsSettingsList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const editSMSSettingsList = async (id,formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/sms-settings/edit/${id}`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getSmsSettingsList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+
+      const getEmailSettingsList = async () => {
+        try {
+            setEmailSettingsList({ data: [], loading: true });
+          const response = await axios.get(
+            `${base_url}/admin/email-settings/list`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setEmailSettingsList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setEmailSettingsList({ data: [], loading: false });
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+            setEmailSettingsList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const editEmailSettingsList = async (id,formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/email-settings/edit/${id}`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getEmailSettingsList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      
+      
+    
+
     const values = {
-        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox
+        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList
     }
 
     return (

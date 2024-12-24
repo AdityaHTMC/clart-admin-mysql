@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import axios from 'axios';
 import { createContext, useContext, useState } from 'react';
 import { useAuthContext } from './AuthProvider';

@@ -52,6 +52,7 @@ import { NotFound } from './screen/404';
 import EventList from "./screen/EventList";
 import AddEvent from "./screen/AddEvent";
 import { FloorPage } from './screen/production/floor';
+import EmailSettings from './screen/EmailSettings';
 
 function App() {
   const { initialLoading } = useAuthContext()
@@ -74,7 +75,7 @@ function App() {
           <Route path="/currency" element={<CurrencyList />} />
           <Route path="/location-management" element={<Location />} />
           <Route path="/faqs" element={<FaqList />} />
-          <Route path="/sms-settings" element={<SmsSettings />} />
+          <Route path="/sms-setting" element={<SmsSettings />} />
           <Route path="/subscribed-email" element={<SubscribeEmail />} />
           <Route path="/subcategory-List/:id" element={<SubCategoryList />} />
           <Route path="/state-list/:id" element={<StateList />} />
@@ -106,7 +107,7 @@ function App() {
           <Route path="/bedding-materials" element={<BeddingMaterial />} />
           <Route path="/packing-box" element={<PackingBox />} />
           <Route path="/colony-management" element={<ColonyList />} />
-          <Route path="/store-settings" element={<StoreSetting />} />
+          <Route path="/email-settings" element={<EmailSettings />} />
           <Route path="/user-management" element={<SubAdminManagement />} />
           <Route path="/permission-management" element={<PermissionManagement />} />
           <Route path="/role-management" element={<RoleManagement />} />

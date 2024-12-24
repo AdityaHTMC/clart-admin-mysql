@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 
 import { Fragment } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
