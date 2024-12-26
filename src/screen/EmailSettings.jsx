@@ -30,7 +30,7 @@ import {
   
   const EmailSettings = () => {
     const navigate = useNavigate();
-    const { getEmailSettingsList,editEmailSettingsList,emailSettingsList } =
+    const { getEmailSettingsList,editEmailSettingsList,emailSettingsList, deleteEmailList } =
       useMasterContext();
   
     const [currentPage, setCurrentPage] = useState(1);
@@ -90,7 +90,7 @@ import {
     const handleDelete = (id) => {
       if (window.confirm("Are you sure you wish to delete this item?")) {
         // delete product logic here
-        // DeleteSpecies(id);
+        deleteEmailList(id);
       }
     };
   

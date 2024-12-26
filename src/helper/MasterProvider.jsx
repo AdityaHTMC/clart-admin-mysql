@@ -21,6 +21,11 @@ export const MasterProvider = ({ children }) => {
     const [packingBox, setPackingBox] = useState({ loading: true, data: [] })
     const [smsSettingsList, setSmsSettingsList] = useState({loading: true,data: [],total: ""});
     const [emailSettingsList, setEmailSettingsList] = useState({loading: true,data: [],total: ""});
+    const [whatsAppSettingsList, setWhatsAppSettingsList] = useState({loading: true,data: [],total: ""});
+    const [notificationSettingsList, setNotificationSettingsList] = useState({loading: true,data: [],total: ""});
+    const [ShippingAgencyList, setShippingAgencyList] = useState({loading: true,data: [],total: ""});
+    const [paymentMethodsList, setPaymentMethodsList] = useState({loading: true,data: [],total: ""});
+    const [storeSetting, setStoreSetting] = useState({ loading: false, data: {} })
     const { Authtoken } = useAuthContext()
 
     //  Unit fucntions
@@ -386,12 +391,403 @@ export const MasterProvider = ({ children }) => {
         }
       };
 
+
+      const getWhatsAppSettingsList = async () => {
+        try {
+            setWhatsAppSettingsList({ data: [], loading: true });
+          const response = await axios.get(
+            `${base_url}/admin/whatsapp-settings/list`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setWhatsAppSettingsList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setWhatsAppSettingsList({ data: [], loading: false });
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+            setWhatsAppSettingsList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const editWhatsAppSettingsList = async (id,formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/whatsapp-settings/edit/${id}`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getWhatsAppSettingsList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+
+      const getNotificationSettingsList = async () => {
+        try {
+            setNotificationSettingsList({ data: [], loading: true });
+          const response = await axios.get(
+            `${base_url}/admin/notification-settings/list`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setNotificationSettingsList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setNotificationSettingsList({ data: [], loading: false });
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+            setNotificationSettingsList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const editNotificationSettingsList = async (id,formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/notification-settings/edit/${id}`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getNotificationSettingsList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+      const getPaymentMethodsList = async () => {
+        try {
+            setPaymentMethodsList({ data: [], loading: true });
+          const response = await axios.get(
+            `${base_url}/admin/payment-methods/list`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setPaymentMethodsList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setPaymentMethodsList({ data: [], loading: false });
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+            setPaymentMethodsList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const editPaymentMethodsList = async (id,formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/payment-method/edit/${id}`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getPaymentMethodsList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+      const deletePaymentMethodsList = async (id) => {
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/payment-method/delete/${id}`,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getPaymentMethodsList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const deleteNotificationList = async (id) => {
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/notification-settings/delete/${id}`,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getNotificationSettingsList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const deleteWhatsAppList = async (id) => {
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/whatsapp-settings/delete/${id}`,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getWhatsAppSettingsList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+      const deleteSmsNotificationList = async (id) => {
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/sms-settings/delete/${id}`,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getSmsSettingsList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const deleteEmailList = async (id) => {
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/email-settings/delete/${id}`,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getEmailSettingsList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+      const getSettingDetails = async () => {
+        try {
+            setStoreSetting({...storeSetting, loading: true})
+          const response = await axios.get(
+            `${base_url}/admin/store/setting/details`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setStoreSetting({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setStoreSetting({ data: [], loading: false });
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+            setStoreSetting({ data: [], loading: false });
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+      const edit_store_setting = async (formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/store/setting/update`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getSettingDetails()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
       
+      const AddShipping_agency = async (formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/shipping-agency/add`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getShippingAgencyList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
       
+
+      const getShippingAgencyList = async () => {
+        try {
+            setShippingAgencyList({ data: [], loading: true });
+          const response = await axios.post(
+            `${base_url}/admin/shipping-agency/list`,{},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setShippingAgencyList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setShippingAgencyList({ data: [], loading: false });
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+            setShippingAgencyList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const editShippingAgencyList = async (id,formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/shipping-agency/edit/${id}`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getShippingAgencyList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const deleteShippingAgency = async (id) => {
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/shipping-agency/delete/${id}`,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getShippingAgencyList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
     
 
     const values = {
-        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList
+        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList,getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,getNotificationSettingsList,editNotificationSettingsList,notificationSettingsList,getPaymentMethodsList,paymentMethodsList, editPaymentMethodsList,deletePaymentMethodsList,deleteNotificationList,deleteWhatsAppList,deleteSmsNotificationList,deleteEmailList,getSettingDetails,storeSetting, edit_store_setting,getShippingAgencyList,ShippingAgencyList,AddShipping_agency,editShippingAgencyList,deleteShippingAgency
     }
 
     return (

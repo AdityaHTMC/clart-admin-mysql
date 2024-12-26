@@ -30,7 +30,7 @@ import CommonBreadcrumb from "../component/common/bread-crumb";
 
 const SmsSettings = () => {
   const navigate = useNavigate();
-  const { getSmsSettingsList,smsSettingsList,editSMSSettingsList } =
+  const { getSmsSettingsList,smsSettingsList,editSMSSettingsList, deleteSmsNotificationList } =
     useMasterContext();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,7 +90,7 @@ const SmsSettings = () => {
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you wish to delete this item?")) {
       // delete product logic here
-      // DeleteSpecies(id);
+      deleteSmsNotificationList(id);
     }
   };
 

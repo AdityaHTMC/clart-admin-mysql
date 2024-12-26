@@ -24,30 +24,32 @@ import {
   import { FaEdit } from "react-icons/fa";
   import { FaTrashAlt } from "react-icons/fa";
   import { Spinner } from "reactstrap";
-  import { Pagination, Stack } from "@mui/material";
+  import { Pagination, Stack, Switch } from "@mui/material";
   import { useMasterContext } from "../helper/MasterProvider";
   import CommonBreadcrumb from "../component/common/bread-crumb";
   
-  const WhatsAppSettings = () => {
+  const PaymentMethods = () => {
     const navigate = useNavigate();
-    const { getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,deleteWhatsAppList} =
+    const {getPaymentMethodsList,paymentMethodsList, editPaymentMethodsList,deletePaymentMethodsList} =
       useMasterContext();
   
     const [currentPage, setCurrentPage] = useState(1);
     const itemperPage = 8;
   
     const totalPages =
-    whatsAppSettingsList?.total &&
-      Math.ceil(whatsAppSettingsList?.total / itemperPage);
+    paymentMethodsList?.total &&
+      Math.ceil(paymentMethodsList?.total / itemperPage);
   
     const [modalOpen, setModalOpen] = useState(false);
   
     const [selectedvarity, setSelectedvarity] = useState({
-      api_key:'',
+    name:'',
+    api_key:'',
+    type:'',
     });
   
     useEffect(() => {
-      getWhatsAppSettingsList();
+        getPaymentMethodsList();
     }, [currentPage]);
   
     const onOpenModal2 = (product) => {
@@ -59,7 +61,9 @@ import {
     const onCloseModal2 = () => {
       setModalOpen(false);
       setSelectedvarity({
+        name:'',
         api_key:'',
+        type:'',
       });
     };
   
@@ -71,16 +75,21 @@ import {
         [name]: value,
       }));
     };
+
+    const handleStatusToggle = (promo) => {
+        const newStatus = promo.status === "Inactive" ? "Active" : "Inactive";
+        editPaymentMethodsList(promo.id, { status: newStatus });
+      };
   
     // Handle submit for updating the brand
     const handleSubmits = () => {
-      editWhatsAppSettingsList(selectedvarity.id, selectedvarity);
+        editPaymentMethodsList(selectedvarity.id, selectedvarity);
       onCloseModal2();
     };
   
     const handleDelete = (id) => {
       if (window.confirm("Are you sure you wish to delete this item?")) {
-        deleteWhatsAppList(id);
+        deletePaymentMethodsList(id);
       }
     };
   
@@ -90,7 +99,7 @@ import {
   
     return (
       <>
-        <CommonBreadcrumb title="WhatsApp Settings" />
+        <CommonBreadcrumb title="Payment Methods" />
         <Container fluid>
           <Row>
             <Col sm="12">
@@ -102,43 +111,39 @@ import {
                     <Table striped responsive>
                       <thead>
                         <tr>
-                          <th>Api Key</th>
+                          <th>name</th>
+                          <th>Api key</th>
+                          <th>type</th>
+                          <th>status</th>
                           <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {whatsAppSettingsList?.loading ? (
+                        {paymentMethodsList?.loading ? (
                           <tr>
                             <td colSpan="7" className="text-center">
                               <Spinner color="secondary" className="my-4" />
                             </td>
                           </tr>
-                        ) : whatsAppSettingsList?.data?.length === 0 ? (
+                        ) : paymentMethodsList?.data?.length === 0 ? (
                           <tr>
                             <td colSpan="7" className="text-center">
                               No Data Found
                             </td>
                           </tr>
                         ) : (
-                          whatsAppSettingsList?.data?.map((product, index) => (
+                            paymentMethodsList?.data?.map((product, index) => (
                             <tr key={index}>
-                                <td id={`api_key-${index}`}>
-                                  {product?.api_key
-                                    ? product?.api_key?.length > 20
-                                      ? `${product?.api_key?.slice(0, 20)}...`
-                                      : product?.api_key
-                                    : "NA"}
-                                  {product?.api_key && (
-                                    <UncontrolledTooltip
-                                      placement="top"
-                                      target={`api_key-${index}`}
-                                    >
-                                      {product?.api_key}
-                                    </UncontrolledTooltip>
-                                  )}
-                                </td>
-                               
-                         
+                                <td>{product?.name}</td>
+                                <td>{product?.api_key}</td>
+                                <td>{product?.type}</td>
+                                <td>
+                                <Switch
+                                  checked={product.status === "Active"}
+                                  onChange={() => handleStatusToggle(product)}
+                                  color="secondary"
+                                />
+                                  </td>
                               <td>
                                 <div className="circelBtnBx">
                                   <Button
@@ -181,7 +186,7 @@ import {
         <Modal isOpen={modalOpen} toggle={onCloseModal2} className="modal-lg">
           <ModalHeader toggle={onCloseModal2}>
             <h5 className="modal-title f-w-600" id="exampleModalLabel2">
-              Edit Email Settings
+              Edit Payment Methods Settings
             </h5>
           </ModalHeader>
           <ModalBody style={{ maxHeight: "450px", overflowY: "auto" }}>
@@ -189,8 +194,22 @@ import {
               <div className="row">
                 <div className="col-md-6">
                   <FormGroup>
+                    <Label htmlFor="name" className="col-form-label">
+                    Name:
+                    </Label>
+                    <Input
+                      type="text"
+                      name="name"
+                      value={selectedvarity.name}
+                      onChange={handleInputChanges}
+                      id="name"
+                    />
+                  </FormGroup>
+                </div>
+                <div className="col-md-6">
+                  <FormGroup>
                     <Label htmlFor="api_key" className="col-form-label">
-                     Api key:
+                    Api Key:
                     </Label>
                     <Input
                       type="text"
@@ -202,7 +221,22 @@ import {
                   </FormGroup>
                 </div>
               </div>
-            
+              <div className="row">
+               <div className="col-md-6">
+                 <FormGroup>
+                   <Label htmlFor="type" className="col-form-label">
+                    Type:
+                   </Label>
+                   <Input
+                     type="text"
+                     name="type"
+                     value={selectedvarity.type}
+                     onChange={handleInputChanges}
+                     id="type"
+                   />
+                 </FormGroup>
+               </div>
+              </div>
             </Form>
           </ModalBody>
           <ModalFooter>
@@ -218,5 +252,5 @@ import {
     );
   };
   
-  export default WhatsAppSettings;
+  export default PaymentMethods;
   

@@ -24,30 +24,30 @@ import {
   import { FaEdit } from "react-icons/fa";
   import { FaTrashAlt } from "react-icons/fa";
   import { Spinner } from "reactstrap";
-  import { Pagination, Stack } from "@mui/material";
+  import { Pagination, Stack, Switch } from "@mui/material";
   import { useMasterContext } from "../helper/MasterProvider";
   import CommonBreadcrumb from "../component/common/bread-crumb";
   
-  const WhatsAppSettings = () => {
+  const NotificationSettings = () => {
     const navigate = useNavigate();
-    const { getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,deleteWhatsAppList} =
+    const {getNotificationSettingsList,editNotificationSettingsList,notificationSettingsList,deleteNotificationList} =
       useMasterContext();
   
     const [currentPage, setCurrentPage] = useState(1);
     const itemperPage = 8;
   
     const totalPages =
-    whatsAppSettingsList?.total &&
-      Math.ceil(whatsAppSettingsList?.total / itemperPage);
+    notificationSettingsList?.total &&
+      Math.ceil(notificationSettingsList?.total / itemperPage);
   
     const [modalOpen, setModalOpen] = useState(false);
   
     const [selectedvarity, setSelectedvarity] = useState({
-      api_key:'',
+    notification_type:'',
     });
   
     useEffect(() => {
-      getWhatsAppSettingsList();
+        getNotificationSettingsList();
     }, [currentPage]);
   
     const onOpenModal2 = (product) => {
@@ -59,7 +59,7 @@ import {
     const onCloseModal2 = () => {
       setModalOpen(false);
       setSelectedvarity({
-        api_key:'',
+        notification_type:'',
       });
     };
   
@@ -71,16 +71,21 @@ import {
         [name]: value,
       }));
     };
+
+    const handleStatusToggle = (promo) => {
+        const newStatus = promo.enabled === "No" ? "Yes" : "No";
+        editNotificationSettingsList(promo.id, { enabled: newStatus });
+      };
   
     // Handle submit for updating the brand
     const handleSubmits = () => {
-      editWhatsAppSettingsList(selectedvarity.id, selectedvarity);
+        editNotificationSettingsList(selectedvarity.id, selectedvarity);
       onCloseModal2();
     };
   
     const handleDelete = (id) => {
       if (window.confirm("Are you sure you wish to delete this item?")) {
-        deleteWhatsAppList(id);
+        deleteNotificationList(id);
       }
     };
   
@@ -90,7 +95,7 @@ import {
   
     return (
       <>
-        <CommonBreadcrumb title="WhatsApp Settings" />
+        <CommonBreadcrumb title="Notification Settings" />
         <Container fluid>
           <Row>
             <Col sm="12">
@@ -102,43 +107,35 @@ import {
                     <Table striped responsive>
                       <thead>
                         <tr>
-                          <th>Api Key</th>
+                          <th>notification_type</th>
+                          <th>Enable</th>
                           <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {whatsAppSettingsList?.loading ? (
+                        {notificationSettingsList?.loading ? (
                           <tr>
                             <td colSpan="7" className="text-center">
                               <Spinner color="secondary" className="my-4" />
                             </td>
                           </tr>
-                        ) : whatsAppSettingsList?.data?.length === 0 ? (
+                        ) : notificationSettingsList?.data?.length === 0 ? (
                           <tr>
                             <td colSpan="7" className="text-center">
                               No Data Found
                             </td>
                           </tr>
                         ) : (
-                          whatsAppSettingsList?.data?.map((product, index) => (
+                            notificationSettingsList?.data?.map((product, index) => (
                             <tr key={index}>
-                                <td id={`api_key-${index}`}>
-                                  {product?.api_key
-                                    ? product?.api_key?.length > 20
-                                      ? `${product?.api_key?.slice(0, 20)}...`
-                                      : product?.api_key
-                                    : "NA"}
-                                  {product?.api_key && (
-                                    <UncontrolledTooltip
-                                      placement="top"
-                                      target={`api_key-${index}`}
-                                    >
-                                      {product?.api_key}
-                                    </UncontrolledTooltip>
-                                  )}
-                                </td>
-                               
-                         
+                                <td>{product.notification_type}</td>
+                                <td>
+                                <Switch
+                                  checked={product.enabled === "Yes"}
+                                  onChange={() => handleStatusToggle(product)}
+                                  color="secondary"
+                                />
+                                  </td>
                               <td>
                                 <div className="circelBtnBx">
                                   <Button
@@ -189,20 +186,19 @@ import {
               <div className="row">
                 <div className="col-md-6">
                   <FormGroup>
-                    <Label htmlFor="api_key" className="col-form-label">
-                     Api key:
+                    <Label htmlFor="notification_type" className="col-form-label">
+                     Notification Type:
                     </Label>
                     <Input
                       type="text"
-                      name="api_key"
-                      value={selectedvarity.api_key}
+                      name="notification_type"
+                      value={selectedvarity.notification_type}
                       onChange={handleInputChanges}
-                      id="api_key"
+                      id="notification_type"
                     />
                   </FormGroup>
                 </div>
               </div>
-            
             </Form>
           </ModalBody>
           <ModalFooter>
@@ -218,5 +214,5 @@ import {
     );
   };
   
-  export default WhatsAppSettings;
+  export default NotificationSettings;
   

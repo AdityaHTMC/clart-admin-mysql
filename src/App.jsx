@@ -40,7 +40,6 @@ import { RoomPage } from './screen/production/room';
 import { RackPage } from './screen/production/rack';
 import { BeddingMaterial } from './screen/non-stock/bedding-material';
 import { PackingBox } from './screen/non-stock/packing-box';
-import { StoreSetting } from './screen/setting/store-setting';
 import { AddProduct } from './screen/animals/add-product';
 import { EditProduct } from './screen/animals/edit-prouct';
 import { SubAdminManagement } from './screen/sub_admin/management';
@@ -53,6 +52,11 @@ import EventList from "./screen/EventList";
 import AddEvent from "./screen/AddEvent";
 import { FloorPage } from './screen/production/floor';
 import EmailSettings from './screen/EmailSettings';
+import WhatsAppSettings from './screen/WhatsAppSettings';
+import NotificationSettings from './screen/NotificationSettings';
+import PaymentMethods from './screen/PaymentMethods';
+import StoreSettings from './screen/StoreSettings';
+import ShippingAgency from './screen/Master/ShippingAgency';
 
 function App() {
   const { initialLoading } = useAuthContext()
@@ -108,6 +112,11 @@ function App() {
           <Route path="/packing-box" element={<PackingBox />} />
           <Route path="/colony-management" element={<ColonyList />} />
           <Route path="/email-settings" element={<EmailSettings />} />
+          <Route path="/whatsapp-settings" element={<WhatsAppSettings />} />
+          <Route path="/notification-settings" element={<NotificationSettings />} />
+          <Route path="/payment-methods" element={<PaymentMethods />} />
+          <Route path="/store-settings" element={<StoreSettings />} />
+          <Route path="/Shipping-Agency" element={<ShippingAgency />} />
           <Route path="/user-management" element={<SubAdminManagement />} />
           <Route path="/permission-management" element={<PermissionManagement />} />
           <Route path="/role-management" element={<RoleManagement />} />
