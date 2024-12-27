@@ -13,7 +13,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 
 export const AddProduct = () => {
     const { getCategoryList, category, addProduct, getproductList } = useCategoryContext();
-    const [formData, setFormData] = useState({ item_name: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', breed: '' })
+    const [formData, setFormData] = useState({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', species_id: '' })
     const [selectedImage, setSelectedImage] = useState(null);
     const [multipleImages, setMultipleImages] = useState([])
     const [files, setFiles] = useState([])
@@ -54,18 +54,18 @@ export const AddProduct = () => {
     }
 
     const onReset = () => {
-        setFormData({ item_name: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', breed: '' })
+        setFormData({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', species_id: '' })
         setSelectedImage(null);
         setMultipleImages([])
         setFiles([])
     }
 
     const onProductAdd = async () => {
-        if (!formData.item_name) return toast.info('Animal name required');
+        if (!formData.title) return toast.info('Animal name required');
         if (!formData.status) return toast.info('Status name required');
         if (!formData.winning) return toast.info('Winning name required');
         if (!formData.calling) return toast.info('Culling name required');
-        if (!formData.breed) return toast.info('Breed name required');
+        if (!formData.species_id) return toast.info('species required');
         // if (!formData.birth_cycle) return toast.info('Birth cycle name required');
 
         var filesArr = [...files]
@@ -157,19 +157,19 @@ export const AddProduct = () => {
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="category" className="col-form-label">
-                                                        Breed:
+                                                        species:
                                                     </Label>
                                                     <Input
                                                         type="select"
-                                                        name="breed"
-                                                        value={formData.breed}
+                                                        name="species_id"
+                                                        value={formData.species_id}
                                                         onChange={onChange}
-                                                        id="breed"
+                                                        id="species_id"
                                                     >
                                                         <option value="">-- Select --</option>
                                                         {category?.data?.map((cat) => (
-                                                            <option key={cat._id} value={cat._id}>
-                                                                {cat.title}
+                                                            <option key={cat.id} value={cat.id}>
+                                                                {cat.species}
                                                             </option>
                                                         ))}
                                                     </Input>
@@ -205,9 +205,9 @@ export const AddProduct = () => {
                                                     </Label>
                                                     <Input
                                                         type="text"
-                                                        name="item_name"
+                                                        name="title"
                                                         placeholder="Enter animal name"
-                                                        value={formData.item_name}
+                                                        value={formData.title}
                                                         onChange={onChange}
                                                     />
                                                 </FormGroup>

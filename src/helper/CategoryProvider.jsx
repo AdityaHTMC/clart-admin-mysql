@@ -111,7 +111,7 @@ export const CategoryProvider = ({ children }) => {
   const getproductList = async (body) => {
     try {
       setProductList({ ...productList, loading: true })
-      const { data } = await axios.post(`${base_url}/admin/species-list`, body || {}, {
+      const { data } = await axios.post(`${base_url}/admin/breed/list`, body || {}, {
         headers: {
           'Authorization': AuthToken
         }
@@ -146,10 +146,9 @@ export const CategoryProvider = ({ children }) => {
     }
   };
 
-
   const addProduct = async (formDataToSend) => {
     try {
-      const { data } = await axios.post(`${base_url}/species/add`, formDataToSend, { headers: { Authorization: AuthToken, 'Content-Type': 'multipart/form-data' } });
+      const { data } = await axios.post(`${base_url}/admin/breed/add`, formDataToSend, { headers: { Authorization: AuthToken, 'Content-Type': 'multipart/form-data' } });
       return data
     } catch (error) {
       console.error("Error adding Product:", error);
