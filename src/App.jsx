@@ -24,7 +24,6 @@ import FaqList from './screen/FaqList'
 import CmsList from './screen/CmsList'
 import CurrencyList from './screen/CurrencyList'
 import Location from './screen/Location'
-import Categories from './screen/Categories'
 import SmsSettings from './screen/SmsSettings'
 import SubscribeEmail from './screen/SubscribeEmail'
 import SubCategoryList from './screen/SubCategoryList'
@@ -57,6 +56,7 @@ import NotificationSettings from './screen/NotificationSettings';
 import PaymentMethods from './screen/PaymentMethods';
 import StoreSettings from './screen/StoreSettings';
 import ShippingAgency from './screen/Master/ShippingAgency';
+import SpeciesManagement from './screen/species_management';
 
 function App() {
   const { initialLoading } = useAuthContext()
@@ -70,7 +70,7 @@ function App() {
       <Routes>
         <Route element={<CommonLayout />}>
           <Route path="/" element={<DashboardContainer />} />
-          <Route path="/breed-management" element={<Categories />} />
+          <Route path="/species-management" element={<SpeciesManagement />} />
           <Route path="/product/sub-category" element={<SubCategoryPage />} />
           <Route path="/animal-list" element={<ProductList />} />
           <Route path="/product-edit/:id" element={<EditProduct />} />

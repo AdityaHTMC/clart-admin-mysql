@@ -30,7 +30,7 @@ export const Unit = () => {
         setIsProcessing(true)
         let res;
         if (isEditing) {
-            res = await edit_unit(unitDetail._id, { title })
+            res = await edit_unit(unitDetail.id, { title })
         } else {
             res = await create_unit({ title })
         }
@@ -67,7 +67,6 @@ export const Unit = () => {
                                                 <th>REF</th>
                                                 <th className="text-center">TITLE</th>
                                                 <th className="text-center">TOTAL ROOMS</th>
-                                                <th className="text-center">TOTAL RACKS</th>
                                                 <th className="text-end">ACTION</th>
                                             </tr>
                                         </thead>
@@ -77,7 +76,6 @@ export const Unit = () => {
                                                     <td><Badge >#{item?.ref}</Badge></td>
                                                     <td className="text-center">{item?.title}</td>
                                                     <td className="text-center">{item?.total_rooms}</td>
-                                                    <td className="text-center">{item?.total_racks}</td>
                                                     <td className="d-flex gap-2 justify-content-end align-items-center">
                                                         <Badge
                                                             color="danger"

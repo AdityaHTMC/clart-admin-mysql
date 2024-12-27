@@ -48,12 +48,10 @@ export const FloorPage = () => {
         e.preventDefault()
         if (floorData.title === '') return toast.info("Unit name can not be empty")
      
-
-
         setIsProcessing(true)
         let res;
         if (isEditing) {
-            res = await edit_floor(floorDetail._id, { title: floorData.title })
+            res = await edit_floor(floorDetail.id, { title: floorData.title, direction: floorData.direction })
         } else {
             res = await create_floor(floorData)
         }
@@ -62,6 +60,7 @@ export const FloorPage = () => {
             toast.success(res.message)
             setFloorData({
                 title: '',
+                direction: '',
                 room_id: ''
             })
             setIsOpen(false)
@@ -153,7 +152,7 @@ export const FloorPage = () => {
                                         select room
                                     </option>
                                     {allRoom.map((room) => (
-                                        <option key={room._id} value={room._id}>
+                                        <option key={room.id} value={room.id}>
                                             {room.title} ({room.ref})
                                         </option>
                                     ))}

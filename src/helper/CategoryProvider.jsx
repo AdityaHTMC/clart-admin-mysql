@@ -17,7 +17,7 @@ export const CategoryProvider = ({ children }) => {
 
   const create_category = async (data) => {
     try {
-      const response = await axios.post(`${base_url}/service/category/add`, data, { headers: { 'Authorization': AuthToken } });
+      const response = await axios.post(`${base_url}/species/add`, data, { headers: { 'Authorization': AuthToken } });
       return response.data
     } catch (error) {
       return error?.response?.data || null
@@ -28,7 +28,7 @@ export const CategoryProvider = ({ children }) => {
     try {
       setCategory({ data: [], loading: true });
       const response = await axios.post(
-        `${base_url}/admin/category/list`, {},
+        `${base_url}/admin/species-list`, {},
         { headers: { Authorization: AuthToken } }
       );
       const data = response.data;
@@ -41,7 +41,7 @@ export const CategoryProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error category List:', error);
-      // toast.error('An error occurred while fetching the Category');
+      setCategory({ ...category, loading: false });
     }
   }
 
@@ -68,7 +68,7 @@ export const CategoryProvider = ({ children }) => {
   const addCategory = async (formDataToSend) => {
     try {
       const response = await axios.post(
-        `${base_url}/category/add`,
+        `${base_url}/species/add`,
         formDataToSend,  // Pass FormData directly without spreading
         {
           headers: {
@@ -91,8 +91,8 @@ export const CategoryProvider = ({ children }) => {
 
   const categoryDelete = async (id) => {
     try {
-      const response = await axios.get(
-        `${base_url}/category/delete/${id}`,
+      const response = await axios.delete(
+        `${base_url}/admin/species/delete/${id}`,
         { headers: { Authorization: AuthToken } }
       );
 
@@ -126,7 +126,6 @@ export const CategoryProvider = ({ children }) => {
       setProductList({ ...productList, loading: false })
     }
   }
-
 
   const getproductDetails = async (id) => {
     try {
@@ -338,9 +337,22 @@ export const CategoryProvider = ({ children }) => {
     }
   }
 
+  const editCategory = async (id, body) => {
+    try {
+      const {data} = await axios.put(`${base_url}/admin/species/update/${id}`, body, {
+        headers: {
+          'Authorization': AuthToken
+        }
+      });
+      return data
+    } catch (error) {
+      return error?.response?.data || null
+    }
+  }
+
 
   const values = {
-    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,
+    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq, editCategory
   }
   return (
     <AppContext.Provider value={values}>

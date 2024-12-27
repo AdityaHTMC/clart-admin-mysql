@@ -10,18 +10,17 @@ import { Autocomplete, TextField } from "@mui/material"
 
 export const PackingBox = () => {
     const { getPackingBoxList, packingBox, create_packing_box, edit_packing_box } = useMasterContext()
-    const { allSpecies, getAllSpecies } = useColonyContext()
+    const { allBreeds, getAllBreeds } = useColonyContext()
+    // console.log(allBreeds)
     const [isProcessing, setIsProcessing] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
     const [packingDetail, setPackingDetail] = useState(null)
-    const [initialData, setInitialData] = useState({ title: '', stock: '', capacity: '', price: '', species_id: '', })
+    const [initialData, setInitialData] = useState({ title: '', stock: '', capacity: '', price: '', breed_id: '', })
 
     useEffect(() => {
-        if (allSpecies.length === 0) {
-            getAllSpecies()
-        }
-    }, [allSpecies])
+        getAllBreeds()
+    }, [])
 
     useEffect(() => {
         setInitialData({
@@ -29,7 +28,7 @@ export const PackingBox = () => {
             stock: packingDetail?.stock || '',
             capacity: packingDetail?.capacity || '',
             price: packingDetail?.price || '',
-            species_id: packingDetail?.species_id || '',
+            breed_id: packingDetail?.breed_id || '',
         })
     }, [packingDetail])
 
@@ -46,7 +45,7 @@ export const PackingBox = () => {
     const onSubmit = async (e) => {
         e.preventDefault()
         if (initialData.title === '') return toast.info("Packing box name can not be empty")
-        if (!initialData.species_id) return toast.info("species required")
+        if (!initialData.breed_id) return toast.info("species required")
         setIsProcessing(true)
         let res;
         if (isEditing) {
@@ -62,7 +61,7 @@ export const PackingBox = () => {
                 stock: '',
                 capacity: '',
                 price: '',
-                species_id: '',
+                breed_id: '',
             })
             setIsOpen(false)
             getPackingBoxList({ page: 1, limit: 20 })
@@ -92,7 +91,7 @@ export const PackingBox = () => {
                                             <tr>
                                                 <th className="">TITLE</th>
                                                 <th className="text-center">CAPACITY</th>
-                                                <th className="text-center">SPECIES</th>
+                                                <th className="text-center">Animal Name</th>
                                                 <th className="text-center">PRICE</th>
                                                 <th className="text-center">STOCK</th>
                                                 <th className="text-end">ACTION</th>
@@ -103,8 +102,8 @@ export const PackingBox = () => {
                                                 <tr key={i}>
                                                     <td className="">{item?.title}</td>
                                                     <td className="text-center">{item?.capacity}</td>
-                                                    <td className="text-center">{item?.capacity}</td>
-                                                    <td className="text-center">{item?.species_name}</td>
+                                                    <td className="text-center">{item?.breed_name}</td>
+                                                    <td className="text-center">{item?.price}</td>
                                                     <td className="text-center">{item?.stock}</td>
                                                     <td className="d-flex gap-2 justify-content-end align-items-center">
                                                         <Badge
@@ -137,22 +136,25 @@ export const PackingBox = () => {
                 </ModalHeader>
                 <ModalBody>
                     <Form onSubmit={onSubmit}>
-                        <Autocomplete
-                            disablePortal
-                            options={allSpecies}
-                            style={{ paddingTop: '16px' }}
-                            disabled={isProcessing}
-                            value={allSpecies?.find((sp) => sp._id === initialData.species_id) || ''}
-                            onChange={(event, newValue) => {
-                                if (newValue) {
-                                    setInitialData({ ...initialData, species_id: newValue._id });
-                                } else {
-                                    setInitialData({ ...initialData, species_id: '' });
-                                }
-                            }}
-                            sx={{ width: '100%' }}
-                            renderInput={(params) => <TextField {...params} label="Select animal" />}
-                        />
+                        {allBreeds && allBreeds.length > 0 && (
+                            <Autocomplete
+                                disablePortal
+                                options={allBreeds}
+                                style={{ paddingTop: '16px' }}
+                                disabled={isProcessing}
+                                getOptionLabel={(option) => option?.title || ""}
+                                value={allBreeds?.find((sp) => sp.id === initialData?.breed_id) || ''}
+                                onChange={(event, newValue) => {
+                                    if (newValue) {
+                                        setInitialData({ ...initialData, breed_id: newValue.id });
+                                    } else {
+                                        setInitialData({ ...initialData, breed_id: '' });
+                                    }
+                                }}
+                                sx={{ width: '100%' }}
+                                renderInput={(params) => <TextField {...params} label="Select animal" />}
+                            />
+                        )}
                         <FormGroup>
                             <Label htmlFor="recipient-name" className="col-form-label">
                                 Packing box name :
