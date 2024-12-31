@@ -130,7 +130,7 @@ export const CategoryProvider = ({ children }) => {
   const getproductDetails = async (id) => {
     try {
       const response = await axios.get(
-        `${base_url}/admin/species/details/${id}`,
+        `${base_url}/admin/breed/details/${id}`,
         { headers: { Authorization: AuthToken } }
       );
       const data = response.data;
