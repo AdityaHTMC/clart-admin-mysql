@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Fragment } from "react";
 import { Container, Row } from "reactstrap";
 import LoginSlider from "./component/login-slider";

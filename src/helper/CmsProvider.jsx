@@ -31,122 +31,97 @@ export const CMsProvider = ({ children }) => {
         }
     }
 
-    const getCmsList = async (data) => {
-        try {
-          const response = await axios.post(
-            `${base_url}/cms/list`,
-            {},
-            { headers: { 'Authorization': Authtoken } }
-          );
-          const data = response.data;
-          if (response.status === 200) {
-            setCmsList({ data: response?.data?.data || [], loading: false });
-          } else {
-            setCmsList({...cmsList, loading: false});
-            toast.error("Failed to fetch Bag Type list");
-          }
-        } catch (error) {
-            setCmsList({...cmsList, loading: false});
-          toast.error(error.response?.data?.message || 'Server error');
+    const getCmsList = async (dataToSend) => {
+      try {
+        const response = await axios.post(
+          `${base_url}/cms/list`,
+          {...dataToSend},
+          { headers: { 'Authorization': Authtoken } }
+        );
+        const data = response.data;
+        if (response.status === 200) {
+          setCmsList({ data: response?.data?.data || [], total:response.data.total, loading: false });
+        } else {
+          setCmsList({data: [],total:'', loading: false});
+          toast.error(response?.data?.message)
         }
-      };
+      } catch (error) {
+          setCmsList({data: [], loading: false});
+        toast.error(error.response?.data?.message || 'Server error');
+      }
+    };
 
 
 
-      const addCms = async (formDataToSend) => {
-        try {
-          const response = await axios.post(
-            `${base_url}/cms/add`,
-            formDataToSend,  // Pass FormData directly without spreading
-            { 
-              headers: { 
-                Authorization: AuthToken,
-                'Content-Type': 'application/json' 
-              }
+    const addCms = async (formDataToSend) => {
+      try {
+        const response = await axios.post(
+          `${base_url}/cms/add`,
+          formDataToSend,  
+          { 
+            headers: { 
+              Authorization: AuthToken,
             }
-          );
-          if (response.status === 200) {
-            toast.success('CMS added successfully');
-            getCmsList();  // Refresh the banner list after success
-          } else {
-            toast.error("Failed to add CMS ");
           }
-        } catch (error) {
-          console.error("Error adding CMS:", error);
-          toast.error("An error occurred while adding the CMS ");
+        );
+        if (response.status === 200) {
+          toast.success(response?.data?.message)
+          getCmsList();  
+        } else {
+          toast.error(response?.data?.message)
         }
-      };
+      } catch (error) {
+        
+        toast.error(error.response?.data?.message || 'Server error');
+      }
+    };
 
-      const updateCms = async (formDataToSend, id) => {
-        try {
-          const response = await axios.put(
-            `${base_url}/cms/update/${id}`,
-            formDataToSend,  // Pass FormData directly without spreading
-            { 
-              headers: { 
-                Authorization: AuthToken,
-                'Content-Type': 'application/json' 
-              }
-            }
-          );
-          if (response.status === 200) {
-            toast.success('CMS updated successfully');
-            getCmsList();  // Refresh the banner list after success
-          } else {
-            toast.error("Failed to update CMS ");
-          }
-        } catch (error) {
-          console.error("Error updating CMS:", error);
-          toast.error("An error occurred while updating the CMS ");
-        }
-      };
 
-      const deleteCms = async (id) => {
-        try {
-          const response = await axios.delete(
-            `${base_url}/cms/delete/${id}`,
-            { 
-              headers: { 
-                Authorization: AuthToken 
-              }
+    const deleteCms = async (id) => {
+      try {
+        const response = await axios.delete(
+          `${base_url}/cms/delete/${id}`,
+          { 
+            headers: { 
+              Authorization: AuthToken 
             }
-          );
-          if (response.status === 200) {
-            toast.success('CMS deleted successfully');
-            getCmsList();  // Refresh the banner list after success
-          } else {
-            toast.error("Failed to delete CMS ");
           }
-        } catch (error) {
-          console.error("Error deleting CMS:", error);
-          toast.error("An error occurred while deleting the CMS ");
+        );
+        if (response.status === 200) {
+          toast.success(response?.data?.message)
+          getCmsList();  // Refresh the banner list after success
+        } else {
+          toast.error(response?.data?.message)
         }
-      };
+      } catch (error) {
+        console.error("Error deleting CMS:", error);
+        toast.error(error.response?.data?.message || 'Server error');
+      }
+    };
 
-      const editcms = async (id, formData) => {
-        try {
-          const response = await axios.post(
-            `${base_url}/cms/update/${id}`,
-            formData,
-            {
-              headers: {
-                Authorization: AuthToken,
-                'Content-Type': 'application/json' 
-              },
-            }
-          );
-          const data = response.data;
-          if (response.status === 200) {
-            toast.success('CMS updated successfully');
-            getCmsList();  // Refresh the brand list after success
-          } else {
-            toast.error('Failed to update the CMS');
+    const editcms = async (id, formData) => {
+      try {
+        const response = await axios.post(
+          `${base_url}/cms/update/${id}`,
+          formData,
+          {
+            headers: {
+              Authorization: AuthToken,
+            },
           }
-        } catch (error) {
-          console.error('Error updating CMS:', error);
-          toast.error('An error occurred while updating the CMS');
+        );
+        const data = response.data;
+        if (response.status === 200) {
+          toast.success(response?.data?.message)
+          getCmsList();  // Refresh the brand list after success
+        } else {
+          toast.error('Failed to update the CMS');
         }
-      };
+      } catch (error) {
+        console.error('Error updating CMS:', error);
+        toast.error(error.response?.data?.message || 'Server error');
+      }
+    };
 
       const getCurrencyList = async (data) => {
         try {

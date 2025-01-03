@@ -26,6 +26,11 @@ export const MasterProvider = ({ children }) => {
     const [ShippingAgencyList, setShippingAgencyList] = useState({loading: true,data: [],total: ""});
     const [paymentMethodsList, setPaymentMethodsList] = useState({loading: true,data: [],total: ""});
     const [storeSetting, setStoreSetting] = useState({ loading: false, data: {} })
+    const [stateList, setstateList] = useState({loading: true,data: [],total: ""});
+    const [orgTypeList, setOrgTypeList] = useState({loading: true,data: [],total: ""});
+    const [orgList, setOrgList] = useState({loading: true,data: [],total: ""});
+    const [allorgtypeList, setallOrgTypeList] = useState({loading: true,data: [],total: ""});
+    const [districtList, setdistrictList] = useState({loading: true,data: [],total: ""});
     const { Authtoken } = useAuthContext()
 
     //  Unit fucntions
@@ -784,10 +789,354 @@ export const MasterProvider = ({ children }) => {
           toast.error(error.response?.data?.message || 'Server error');
         }
       };
+
+
+      const getStateList = async () => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/states/list`,{},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setstateList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setstateList({ data: [], loading: false });
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          setstateList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || "Server error");
+        }
+      };
+
+      const addState = async (formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/state/add`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getStateList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+    
+
+      const editState = async (id,formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/state/edit/${id}`,
+            {...formDataToSend},
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getStateList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const StateDelete = async (id) => { 
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/state/delete/${id}`,
+            { headers: { Authorization: Authtoken } }
+          );
+          
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getStateList(); 
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      }
+
+      const getdistrictList = async (dataTosend) => {
+        try {
+          setdistrictList({ data: [], loading: true });
+          const response = await axios.post(
+            `${base_url}/admin/state/district/list`,{...dataTosend},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setdistrictList({
+              data: response?.data?.data || [],
+              total: response?.data?.total,
+              loading: false,
+            });
+          } else {
+            setdistrictList({ data: [],total:'', loading: false });
+            toast.error(response?.data?.message);
+          }
+        } catch (error) {
+          setdistrictList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+
+      const addDistrict = async (formDataToSend) => {
+        try {
+          const { state_id} = formDataToSend
+          const response = await axios.post(
+            `${base_url}/admin/district/add`,
+            {...formDataToSend},
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getdistrictList(state_id)
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+    
+      const editDistrict = async (formDataToSend) => {
+        try {
+          const { state_id ,district_id} = formDataToSend
+          const response = await axios.post(
+            `${base_url}/admin/district/edit/${district_id}`,
+            {...formDataToSend},
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getdistrictList(state_id)
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+      const DistrictDelete = async (dataToDelete) => { 
+        try {
+          const { district_id,state_id } = dataToDelete;
+          const response = await axios.delete(
+            `${base_url}/admin/district/delete/${district_id}`,
+            { headers: { Authorization: Authtoken } }
+          );
+          
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getdistrictList(state_id); 
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      }
+
+
+      const getOrgTypeList = async () => {
+        try {
+          setOrgTypeList({ data: [], loading: true });
+          const response = await axios.post(
+            `${base_url}/admin/org-type/list`,{},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setOrgTypeList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setOrgTypeList({ data: [], loading: false });
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          setOrgTypeList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || "Server error");
+        }
+      };
+
+      const addOrgType = async (formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/org-type/add`,
+            {...formDataToSend},
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getOrgTypeList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const editOrgType = async (id,formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/org-type/update/${id}`,
+            {...formDataToSend},
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getOrgTypeList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+      const deleteOrgType = async (id) => { 
+        try {
+          const response = await axios.delete(
+            `${base_url}/org-type/delete/${id}`,
+            { headers: { Authorization: Authtoken } }
+          );
+          
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getOrgTypeList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      }
+
+      const getAllOrgTypeList = async () => {
+        try {
+          const response = await axios.post(
+            `${base_url}/org-type/list`,{},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setallOrgTypeList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setallOrgTypeList({ data: [], loading: false });
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          setallOrgTypeList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || "Server error");
+        }
+      };
+
+
+      const getOrgList = async () => {
+        try {
+          setOrgList({ data: [], loading: true });
+          const response = await axios.post(
+            `${base_url}/admin/organization/list`,{},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setOrgList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setOrgList({ data: [], loading: false });
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          setOrgList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || "Server error");
+        }
+      };
+
+      const addOrg = async (formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/organization/add`,
+            {...formDataToSend},
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getOrgList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+     
     
 
     const values = {
-        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList,getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,getNotificationSettingsList,editNotificationSettingsList,notificationSettingsList,getPaymentMethodsList,paymentMethodsList, editPaymentMethodsList,deletePaymentMethodsList,deleteNotificationList,deleteWhatsAppList,deleteSmsNotificationList,deleteEmailList,getSettingDetails,storeSetting, edit_store_setting,getShippingAgencyList,ShippingAgencyList,AddShipping_agency,editShippingAgencyList,deleteShippingAgency
+        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList,getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,getNotificationSettingsList,editNotificationSettingsList,notificationSettingsList,getPaymentMethodsList,paymentMethodsList, editPaymentMethodsList,deletePaymentMethodsList,deleteNotificationList,deleteWhatsAppList,deleteSmsNotificationList,deleteEmailList,getSettingDetails,storeSetting, edit_store_setting,getShippingAgencyList,ShippingAgencyList,AddShipping_agency,editShippingAgencyList,deleteShippingAgency,getStateList,stateList,addState,editState,StateDelete,addDistrict,editDistrict,getdistrictList,districtList,DistrictDelete,getOrgTypeList,orgTypeList,addOrgType,editOrgType,deleteOrgType,getAllOrgTypeList,allorgtypeList,addOrg,getOrgList,orgList
     }
 
     return (

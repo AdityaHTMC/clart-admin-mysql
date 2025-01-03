@@ -135,14 +135,14 @@ const ShippingAgency = () => {
                   <Table striped responsive>
                     <thead>
                       <tr>
-                        <th>agency_name</th>
-                        <th>contact_person</th>
-                        <th>phone_number</th>
-                        <th>email</th>
-                        <th>address</th>
-                        <th>city</th>
-                        <th>state</th>
-                        <th>pincode</th>
+                        <th>Agency Name</th>
+                        <th>Contact Person</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Pincode</th>
                         <th>Action</th>
                       </tr>
                     </thead>

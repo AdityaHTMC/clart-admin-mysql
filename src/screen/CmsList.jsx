@@ -1,20 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
-import {
-  ArcElement,
-  BarController,
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Filler,
-  Legend,
-  LineElement,
-  LinearScale,
-  PointElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-} from "chart.js";
+
 import CommonBreadcrumb from "../component/common/bread-crumb";
 import {
   Badge,
@@ -42,26 +28,12 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { FaTrashAlt } from "react-icons/fa";
 import { HexColorPicker } from "react-colorful";
 // Register the necessary Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  BarController,
-  BarElement,
-  ArcElement,
-  Filler,
-  RadialLinearScale
-);
 
 import { Spinner } from "reactstrap";
 import { useCmsContext } from "../helper/CmsProvider";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { LoadingComponent } from "../component/common/loading";
+import { Pagination, Stack } from "@mui/material";
 const CmsList = () => {
   const navigate = useNavigate();
 
@@ -70,43 +42,79 @@ const CmsList = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    images: "",
   });
 
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const itemperPage = 12;
+
+  const totalPages = cmsList?.total && Math.ceil(cmsList?.total / itemperPage);
+
   const [selectedvarity, setSelectedvarity] = useState({
     title: "",
     description: "",
-    status: "",
-    _id: "",
+    id: "",
+    images: [],
   });
 
+  const [deletedImages, setDeletedImages] = useState([]); // For removed images
+  const [newImages, setNewImages] = useState([]); // For newly added images
+
   useEffect(() => {
-    getCmsList();
-  }, []);
+    const dataToSend = {
+      page: currentPage,
+      limit: itemperPage,
+    };
+    getCmsList(dataToSend);
+  }, [currentPage]);
 
   const onOpenModal = () => {
     setOpen(true);
   };
   const onOpenModal2 = (product) => {
-    setSelectedvarity(product);
+    setSelectedvarity({
+      ...product,
+      images: product.images || [],
+    });
+    setDeletedImages([]);
+    setNewImages([]);
     setModalOpen(true);
+  };
+
+  const handleRemoveExistingImage = (image) => {
+    setDeletedImages((prev) => [...prev, image]);
+    setSelectedvarity((prev) => ({
+      ...prev,
+      images: prev.images.filter((img) => img !== image),
+    }));
+  };
+
+  const handleAddNewImages = (event) => {
+    const files = Array.from(event.target.files);
+    setNewImages((prev) => [...prev, ...files]);
   };
 
   // Close the modal
   const onCloseModal2 = () => {
     setModalOpen(false);
-    setSelectedvarity({ title: "", image: "", _id: "" });
+    setSelectedvarity({ title: "", image: "", id: "" });
   };
 
   const onCloseModal = () => {
     setOpen(false);
+    setFormData({ title: "", description: "",images: [] });
   };
 
-  const handleStatusToggle = async (product) => {
-    const newStatus = product.status === "Active" ? "Inactive" : "Active";
-    // await switchBagtype(product._id, newStatus); // Your API call here
+  const handleImageChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setFormData((prevData) => ({
+      ...prevData,
+      images: [...prevData.images, ...selectedFiles],
+    }));
   };
 
   // Handle form input change
@@ -119,10 +127,37 @@ const CmsList = () => {
   };
 
   // Handle submit for updating the brand
-  const handleSubmits = () => {
-    editcms(selectedvarity._id, selectedvarity);
-    onCloseModal2();
+  // const handleSubmits = () => {
+  //   editcms(selectedvarity.id, selectedvarity);
+  //   onCloseModal2();
+  // };
+
+  console.log(newImages,'new images')
+
+  const handleSubmits = async () => {
+    const formData = new FormData();
+    formData.append("title", selectedvarity.title);
+    formData.append("description", selectedvarity.description);
+  
+    // Pass deleted images with indices
+    deletedImages.forEach((image, index) => {
+      formData.append(`deleted_images[${index}]`, image);
+    });
+  
+    // Pass new images with indices
+    newImages.forEach((image, index) => {
+      formData.append(`images[${index}]`, image);
+    });
+  
+    // Call your API function here
+    await editcms(selectedvarity.id,formData);
+  
+    // Close modal and refresh the list
+    setModalOpen(false);
   };
+  
+
+
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you wish to delete this item?")) {
@@ -150,13 +185,29 @@ const CmsList = () => {
   // Handle form submission
   const handleSubmit = () => {
     // Send formData to the backend
-    addCms(formData);
+
+    const dataToSend = new FormData();
+
+    dataToSend.append("title", formData.title);
+    dataToSend.append("description", formData.description);
+
+    if (formData.images) {
+      formData.images.forEach((image, index) => {
+        dataToSend.append(`images[${index}]`, image);
+      });
+    }
+
+    addCms(dataToSend);
     onCloseModal(); // Close modal after saving
+  };
+
+  const handlepagechange = (newpage) => {
+    setCurrentPage(newpage);
   };
 
   return (
     <>
-      <CommonBreadcrumb title="CMS List" parent="Physical" />
+      <CommonBreadcrumb title="CMS List" />
       <Container fluid>
         <Row>
           <Col sm="12">
@@ -170,50 +221,83 @@ const CmsList = () => {
                 </div>
                 <div className="clearfix"></div>
                 <div id="basicScenario" className="product-physical">
-                  <Table responsive hover borderless align="center">
-                    <thead className="border-bottom border-top py-4" >
+                  <Table striped responsive>
+                    <thead>
                       <tr>
                         <th>Title</th>
-                        {/* <th>Description</th> */}
-                        {/* <th>status</th> */}
-                        <th className="text-start">Action</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {cmsList?.data?.map((product, index) => (
-                        <tr key={index}>
-                          <td>
-                            <Badge color="danger">{product.title}</Badge>
-                          </td>
-                          <td>
-                            <div className="d-flex justify-content-start align-items-center gap-2">
-                              <Badge 
-                                onClick={() => onOpenModal2(product)}
-                                style={{
-                                  cursor: "pointer",
-                                }}>
-                                <FaEdit
-                                  size={16}
-                                />
-                              </Badge>
-                              <Badge color="warning" onClick={() => handleDelete(product._id)} style={{ cursor: "pointer" }}>
-                                <AiOutlineDelete
-                                  size={16}
-                                />
-                              </Badge>
-                            </div>
+                      {cmsList?.loading ? (
+                        <tr>
+                          <td colSpan="4" className="text-center">
+                            <Spinner color="secondary" className="my-4" />
                           </td>
                         </tr>
-                      ))
-                      }
+                      ) : cmsList?.data?.length === 0 ? (
+                        <tr>
+                          <td colSpan="4" className="text-center">
+                            No Data Found
+                          </td>
+                        </tr>
+                      ) : (
+                        cmsList?.data?.map((product, index) => (
+                          <tr key={index}>
+                            <td>{product.title}</td>
+                            {/* <td>{product.description}</td> */}
+                            {/* <td>
+                                <div className="form-check form-switch">
+                                  <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    role="switch"
+                                    id={`flexSwitchCheckChecked-${index}`}
+                                    checked={product.status === "Active"}
+                                    onChange={() => handleStatusToggle(product)}
+                                  />
+                                  <label
+                                    className="form-check-label"
+                                    htmlFor={`flexSwitchCheckChecked-${index}`}
+                                  >
+                                    {product.status === "Active"
+                                      ? "Active"
+                                      : "Inactive"}
+                                  </label>
+                                </div>
+                              </td> */}
+                            <td>
+                              <div className="circelBtnBx">
+                                <Button
+                                  className="btn"
+                                  color="link"
+                                  onClick={() => onOpenModal2(product)}
+                                >
+                                  <FaEdit />
+                                </Button>
+                                <Button
+                                  className="btn"
+                                  color="link"
+                                  onClick={() => handleDelete(product.id)}
+                                >
+                                  <FaTrashAlt />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
-
                   </Table>
-                  {!cmsList.loading && cmsList?.data?.length === 0 && (
-                    <p className="text-muted text-center my-4" style={{ fontSize: 14 }}>No Data found</p>
-                  )}
-
-                  {cmsList.loading && <LoadingComponent />}
+                  <Stack className="rightPagination mt10" spacing={2}>
+                    <Pagination
+                      color="primary"
+                      count={totalPages}
+                      page={currentPage}
+                      shape="rounded"
+                      onChange={(event, value) => handlepagechange(value)}
+                    />
+                  </Stack>
                 </div>
               </CardBody>
             </Card>
@@ -247,6 +331,23 @@ const CmsList = () => {
                 id="title"
               />
             </FormGroup>
+
+            <div className="row">
+              <div className="col-md-6">
+                <FormGroup>
+                  <Label htmlFor="images" className="col-form-label">
+                    Upload Images:
+                  </Label>
+                  <Input
+                    type="file"
+                    name="images "
+                    id="images "
+                    onChange={handleImageChange}
+                    multiple
+                  />
+                </FormGroup>
+              </div>
+            </div>
 
             <FormGroup>
               <div className="mb-4">
@@ -284,7 +385,12 @@ const CmsList = () => {
         </ModalFooter>
       </Modal>
 
-      <Modal isOpen={modalOpen} toggle={onCloseModal2} className="modal-lg" style={{ maxWidth: "800px" }} >
+      <Modal
+        isOpen={modalOpen}
+        toggle={onCloseModal2}
+        className="modal-lg"
+        style={{ maxWidth: "800px" }}
+      >
         <ModalHeader toggle={onCloseModal2}>
           <h5 className="modal-title f-w-600" id="exampleModalLabel2">
             Edit CMS
@@ -306,7 +412,7 @@ const CmsList = () => {
             </FormGroup>
 
             <FormGroup>
-              <div className="mb-4" >
+              <div className="mb-4">
                 <label htmlFor="description" className="form-label mb-1">
                   Description:
                 </label>
@@ -322,7 +428,7 @@ const CmsList = () => {
                   placeholder="Enter a detailed description"
                   style={{
                     borderRadius: "8px",
-                    height: "300px",
+                    height: "350px",
                     boxShadow: "0 0 5px rgba(0, 0, 0, 0.1)",
                     overflow: "hidden",
                   }}
@@ -334,34 +440,76 @@ const CmsList = () => {
             </FormGroup>
 
             <FormGroup>
-              <Label htmlFor="title" className="col-form-label">
-                Status:
-              </Label>
-              <div className="d-flex justify-content-start mt-2">
-                <FormGroup check className="me-3">
-                  <Label check>
-                    <Input
-                      type="radio"
-                      name="status"
-                      value="Active"
-                      checked={selectedvarity.status === "Active"} // Check if the value matches 'Active'
-                      onChange={handleInputChanges}
+              <Label htmlFor="images">Images:</Label>
+              <div className="d-flex flex-wrap">
+                {selectedvarity?.images?.map((image, index) => (
+                  <div key={index} className="position-relative m-2">
+                    <img
+                      src={image}
+                      alt="Preview"
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                      }}
                     />
-                    Active
-                  </Label>
-                </FormGroup>
-                <FormGroup check className="me-3">
-                  <Label check>
-                    <Input
-                      type="radio"
-                      name="status"
-                      value="Inactive"
-                      checked={selectedvarity.status === "Inactive"}
-                      onChange={handleInputChanges}
+                    <button
+                      type="button"
+                    
+                      style={{
+                        position: "absolute",
+                        top: "5px",
+                        right: "5px",
+                        background: "rgba(255, 0, 0, 0.8)",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "50%",
+                        width: "24px",
+                        height: "24px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleRemoveExistingImage(image)}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <Input
+                type="file"
+                multiple
+                onChange={handleAddNewImages}
+                className="form-control mt-2"
+              />
+              <div className="d-flex flex-wrap">
+                {newImages?.map((image, index) => (
+                  <div key={index} className="position-relative m-2">
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt="Preview"
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                      }}
                     />
-                    Inactive
-                  </Label>
-                </FormGroup>
+                    <button
+                      type="button"
+                      className="btn btn-danger btn-sm position-absolute"
+                      style={{ top: 0, right: 0 }}
+                      onClick={() =>
+                        setNewImages((prev) =>
+                          prev.filter((_, idx) => idx !== index)
+                        )
+                      }
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
               </div>
             </FormGroup>
           </Form>

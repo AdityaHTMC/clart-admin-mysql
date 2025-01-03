@@ -28,7 +28,6 @@ import Categories from './screen/Categories'
 import SmsSettings from './screen/SmsSettings'
 import SubscribeEmail from './screen/SubscribeEmail'
 import SubCategoryList from './screen/SubCategoryList'
-import StateList from './screen/StateList'
 import CityList from './screen/CityList'
 import UserList from './screen/UserList'
 import OrderList from './screen/OrderList';
@@ -57,6 +56,10 @@ import NotificationSettings from './screen/NotificationSettings';
 import PaymentMethods from './screen/PaymentMethods';
 import StoreSettings from './screen/StoreSettings';
 import ShippingAgency from './screen/Master/ShippingAgency';
+import StateList from './screen/LocationManagement/StateList';
+import DistrictList from './screen/LocationManagement/DistrictList';
+import OrgType from './screen/Master/OrgType/OrgType';
+import Organization from './screen/Organization/Organization';
 
 function App() {
   const { initialLoading } = useAuthContext()
@@ -77,12 +80,10 @@ function App() {
           <Route path="/banner-list" element={<BannerList />} />
           <Route path="/cms" element={<CmsList />} />
           <Route path="/currency" element={<CurrencyList />} />
-          <Route path="/location-management" element={<Location />} />
           <Route path="/faqs" element={<FaqList />} />
           <Route path="/sms-setting" element={<SmsSettings />} />
           <Route path="/subscribed-email" element={<SubscribeEmail />} />
           <Route path="/subcategory-List/:id" element={<SubCategoryList />} />
-          <Route path="/state-list/:id" element={<StateList />} />
           <Route path="/city-list/:id" element={<CityList />} />
           <Route path="/customer" element={<UserList />} />
           <Route path="/orders" element={<OrderList />} />
@@ -123,6 +124,12 @@ function App() {
           <Route path="/store-menu" element={<StoreMenu />} />
           <Route path="/event-list" element={<EventList />} />
           <Route path="/add-event" element={<AddEvent />} />
+          <Route path="/cms-list" element={<CmsList />} />
+          <Route path="/location-management" element={<StateList />} />
+          <Route path="/district-management/:id" element={<DistrictList />} />
+          <Route path="/faq-management" element={<FaqList />} />
+          <Route path="/org-type" element={<OrgType />} />
+          <Route path="/organization" element={<Organization />} />
 
           <Route path="*" element={<NotFound />} />
 

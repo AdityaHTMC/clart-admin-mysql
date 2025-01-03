@@ -1,3 +1,6 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import axios from 'axios';
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -294,6 +297,7 @@ export const CategoryProvider = ({ children }) => {
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   const getFaqList = async (data) => {
     try {
       const response = await axios.post(
@@ -327,20 +331,65 @@ export const CategoryProvider = ({ children }) => {
         }
       );
       if (response.status === 200) {
-        toast.success('FAQ added successfully');
+        toast.success(response?.data?.message);
         getFaqList();
       } else {
-        toast.error("Failed to add FAQ ");
+        toast.error(response?.data?.message);
       }
     } catch (error) {
       console.error("Error adding FAQ:", error);
-      toast.error("An error occurred while adding the FAQ ");
+      toast.error(error.response?.data?.message || 'Server error');
+    }
+  }
+
+
+  const editFaq = async (id,formDataToSend) => {
+    try {
+      const response = await axios.put(
+        `${base_url}/faq/update/${id}`,
+        {...formDataToSend},  
+        { 
+          headers: { 
+            Authorization: AuthToken,
+            'Content-Type': 'application/json' 
+          }
+        }
+      );
+      if (response.status === 200) {
+        toast.success(response?.data?.message);
+        getFaqList();  
+      } else {
+        toast.error(response?.data?.message);
+      }
+    } catch (error) {
+      console.error("Error edited FAQ:", error);
+      toast.error(error.response?.data?.message || 'Server error');
+    }
+  };
+
+
+  const faqDelete = async (id) => { 
+    try {
+      const response = await axios.delete(
+        `${base_url}/faq/delete/${id}`,
+        { headers: { Authorization: AuthToken } }
+      );
+      
+      if (response.status === 200) {
+        toast.success(response?.data?.message);
+        getFaqList(); 
+      } else {
+        toast.error(response?.data?.message);
+      }
+    } catch (error) {
+      console.error('Error deleting Brand:', error);
+      toast.error(error.response?.data?.message || 'Server error');
     }
   }
 
 
   const values = {
-    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,
+    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,editFaq,faqDelete
   }
   return (
     <AppContext.Provider value={values}>

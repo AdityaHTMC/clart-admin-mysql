@@ -1,8 +1,10 @@
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
+
 import CommonBreadcrumb from "../component/common/bread-crumb";
 import {
+  Badge,
   Button,
   Card,
   CardBody,
@@ -18,21 +20,27 @@ import {
   ModalHeader,
   Row,
   Spinner,
+  Table,
 } from "reactstrap";
 import { useEffect, useState } from "react";
 import { useCategoryContext } from "../helper/CategoryProvider";
 import { useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
-import { AiOutlineDelete } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineDown, AiOutlineUp } from "react-icons/ai";
+import { FaTrashAlt } from "react-icons/fa";
+import { HexColorPicker } from "react-colorful";
+// Register the necessary Chart.js components
+
 import { Collapse, CardHeader } from "reactstrap";
 import { FaChevronRight } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
 
 
+
 const FaqList = () => {
   const navigate = useNavigate();
 
-  const { getFaqList, FaqList,addFaq } = useCategoryContext();
+  const { getFaqList, FaqList,addFaq,editFaq,faqDelete } = useCategoryContext();
 
   const [activeIndex, setActiveIndex] = useState(null);
 
@@ -51,7 +59,6 @@ const FaqList = () => {
   const [selectedvarity, setSelectedvarity] = useState({
     question: "",
     answer: "",
-    status: "",
     _id: "",
   });
 
@@ -70,19 +77,14 @@ const FaqList = () => {
   // Close the modal
   const onCloseModal2 = () => {
     setModalOpen(false);
-    setSelectedvarity({ title: "", image: "", _id: "" });
+    setSelectedvarity({ question: "", answer: "", _id: "" });
   };
 
   const onCloseModal = () => {
     setOpen(false);
   };
 
-  const handleStatusToggle = async (product) => {
-    const newStatus = product.status === "Active" ? "Inactive" : "Active";
 
-    console.log(product._id, newStatus, "mew status: ");
-    // await switchVarity(product._id, newStatus); // Your API call here
-  };
 
   // Handle form input change
   const handleInputChanges = (e) => {
@@ -95,14 +97,14 @@ const FaqList = () => {
 
   // Handle submit for updating the brand
   const handleSubmits = () => {
-    // editvarity(selectedvarity._id, selectedvarity);
+    editFaq(selectedvarity.id, selectedvarity);
     onCloseModal2();
   };
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you wish to delete this item?")) {
-      // delete product logic here
-      //   varityDelete(id);
+      // delete logic here
+      faqDelete(id);
     }
   };
 
@@ -124,7 +126,7 @@ const FaqList = () => {
 
   return (
     <>
-      <CommonBreadcrumb title="FAQ List" parent="Home" />
+      <CommonBreadcrumb title="FAQ List" parent="Physical" />
       <Container fluid>
         <Row>
           <Col sm="12">
@@ -138,6 +140,7 @@ const FaqList = () => {
                 </div>
                 <div className="clearfix"></div>
                 <div id="basicScenario" className="product-physical">
+                 
                   {FaqList?.loading && (
                     <div className="d-flex justify-content-center align-items-center">
                       <div
@@ -219,7 +222,7 @@ const FaqList = () => {
                               size={20}
                               onClick={(e) => {
                                 e.stopPropagation(); // Prevent collapse
-                                handleDelete(faq._id);
+                                handleDelete(faq.id);
                               }}
                               style={{
                                 marginRight: "10px",
@@ -309,17 +312,17 @@ const FaqList = () => {
         </ModalFooter>
       </Modal>
 
-      <Modal isOpen={modalOpen} toggle={onCloseModal2}>
+      <Modal isOpen={modalOpen} toggle={onCloseModal2}  className="modal-lg" >
         <ModalHeader toggle={onCloseModal2}>
           <h5 className="modal-title f-w-600" id="exampleModalLabel2">
-            Edit Varity Master
+            Edit FAQ
           </h5>
         </ModalHeader>
         <ModalBody>
           <Form>
             <FormGroup>
               <Label htmlFor="question" className="col-form-label">
-                Title:
+              Question:
               </Label>
               <Input
                 type="text"
@@ -332,7 +335,7 @@ const FaqList = () => {
 
             <FormGroup>
               <Label htmlFor="answer" className="col-form-label">
-                Description:
+                Answer:
               </Label>
               <Input
                 type="textarea"
@@ -340,9 +343,11 @@ const FaqList = () => {
                 value={selectedvarity.answer}
                 onChange={handleInputChanges}
                 id="answer"
-                style={{ minHeight: "80px" }} 
+                style={{ minHeight: "180px" }} 
               />
             </FormGroup>
+
+       
           </Form>
         </ModalBody>
         <ModalFooter>
