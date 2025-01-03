@@ -11,6 +11,7 @@ export const ColonyProvider = ({ children }) => {
     const base_url = import.meta.env.VITE_API_URL
     const [colonyList, setColonyList] = useState({total_page: 1, current_page: 1, loading: true, data: []})
     const [allSpecies, setAllSpecies] = useState([])
+    const [allBreeds, setAllBreeds] = useState([])
     const { Authtoken } = useAuthContext()
     const [colonyData, setColonyData] = useState({loading: false, data: []})
 
@@ -55,6 +56,20 @@ export const ColonyProvider = ({ children }) => {
             })
             if(data.success){
                 setAllSpecies(data.data)
+            }
+        } catch (error) {
+            // return error?.response?.data || null
+        }
+    }
+    const getAllBreeds = async (body) => {
+        try {
+            const { data }  = await axios.get(`${base_url}/admin/all/breeds/list`, {
+                headers: {
+                    'Authorization': Authtoken
+                }
+            })
+            if(data.success){
+                setAllBreeds(data.data)
             }
         } catch (error) {
             // return error?.response?.data || null
@@ -147,7 +162,7 @@ export const ColonyProvider = ({ children }) => {
     
 
     const values = {
-        getColonyList, colonyList, newStockEntry, getAllSpecies, allSpecies, newBirthEntry, removeColonyItem, removeBirthItem, transferItem, colonyData, searchColony, birthTransferItem
+        getColonyList, colonyList, newStockEntry, getAllSpecies, allSpecies, newBirthEntry, removeColonyItem, removeBirthItem, transferItem, colonyData, searchColony, birthTransferItem, getAllBreeds, allBreeds
     }
 
     return (

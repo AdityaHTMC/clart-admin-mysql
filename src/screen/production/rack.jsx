@@ -13,7 +13,7 @@ export const RackPage = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
     const [rackDetail, setRackDetail] = useState(null)
-    const [state, setState] = useState({title: '', rows: '', columns: '', type: 'sell'})
+    const [state, setState] = useState({title: '', rows_no: '', col_no: '', type: 'sell'})
     const [floor, setFloor] = useState('')
 
     useEffect(() => {
@@ -43,14 +43,14 @@ export const RackPage = () => {
         setIsProcessing(true)
         let res;
         if (isEditing) {
-            res = await edit_rack(rackDetail._id, { title: state.title, type: state.type })
+            res = await edit_rack(rackDetail.id, { title: state.title, type: state.type })
         } else {
             res = await create_rack({...state, floor_id: floor})
         }
         setIsProcessing(false)
         if (res?.success === true) {
             toast.success(res.message)
-            setState({title: '', columns: '', rows: '', type: ''})
+            setState({title: '', col_no: '', rows_no: '', type: ''})
             setIsOpen(false)
             getRacksList({ page: 1, limit: 20 })
         } else {
@@ -91,12 +91,12 @@ export const RackPage = () => {
                                                 <tr key={i}>
                                                     <td><Badge>#{item?.ref}</Badge></td>
                                                     <td className="text-center">{item?.title}</td>
-                                                    <td className="text-center">{item?.total_colony}</td>
+                                                    <td className="text-center">{item?.rows_no * item?.col_no}</td>
                                                     <td className="text-center">
                                                         <Badge color="danger">{item?.type}</Badge>    
                                                     </td>
-                                                    <td className="text-center">{item?.rows}</td>
-                                                    <td className="text-center">{item?.columns}</td>
+                                                    <td className="text-center">{item?.rows_no}</td>
+                                                    <td className="text-center">{item?.col_no}</td>
                                                     <td className="d-flex gap-2 align-items-center justify-content-end">
                                                         <Badge color="danger" style={{ cursor: 'pointer' }} onClick={() => { setIsEditing(true); setIsOpen(true); setRackDetail(item); }}>
                                                             <FaEdit style={{ fontSize: 14 }} />
@@ -143,7 +143,7 @@ export const RackPage = () => {
                                         select floor
                                     </option>
                                     {allFloor.map((rm) => (
-                                        <option key={rm._id} value={rm._id}>
+                                        <option key={rm.id} value={rm.id}>
                                             {rm.title} ({rm.ref})
                                         </option>
                                     ))}
@@ -161,7 +161,7 @@ export const RackPage = () => {
                                 <Label htmlFor="" className="col-form-label" >
                                     Rows
                                 </Label>
-                                <Input type="number" required placeholder="Enter rows" min={1} onChange={onChange} name="rows" value={state.rows} disabled={isProcessing} />
+                                <Input type="number" required placeholder="Enter rows_no" min={1} onChange={onChange} name="rows_no" value={state.rows_no} disabled={isProcessing} />
                             </FormGroup>
                         )}
                         {!isEditing && (
@@ -169,7 +169,7 @@ export const RackPage = () => {
                                 <Label htmlFor="" className="col-form-label">
                                     Columns
                                 </Label>
-                                <Input type="number" required placeholder="Enter columns" min={1} onChange={onChange} name="columns" value={state.columns} disabled={isProcessing} />
+                                <Input type="number" required placeholder="Enter col_no" min={1} onChange={onChange} name="col_no" value={state.col_no} disabled={isProcessing} />
                             </FormGroup>
                         )}
                         <FormGroup className="m-checkbox-inline mb-0 custom-radio-ml d-flex radio-animated">

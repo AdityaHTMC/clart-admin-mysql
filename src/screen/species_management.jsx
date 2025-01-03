@@ -1,20 +1,4 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react-hooks/rules-of-hooks */
-import {
-  ArcElement,
-  BarController,
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Filler,
-  Legend,
-  LineElement,
-  LinearScale,
-  PointElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-} from "chart.js";
+
 import CommonBreadcrumb from "../component/common/bread-crumb";
 import {
   Badge,
@@ -36,79 +20,52 @@ import {
 } from "reactstrap";
 import { useEffect, useState } from "react";
 import { useCategoryContext } from "../helper/CategoryProvider";
-import { useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { AiOutlineDelete } from "react-icons/ai";
-import { FaTrashAlt } from "react-icons/fa";
-import { HexColorPicker } from "react-colorful";
-// Register the necessary Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  BarController,
-  BarElement,
-  ArcElement,
-  Filler,
-  RadialLinearScale
-);
-
-import { Spinner } from "reactstrap";
-import { BsFillEyeFill } from "react-icons/bs";
 import { LoadingComponent } from "../component/common/loading";
 
-const Categories = () => {
-  const navigate = useNavigate();
+const SpeciesManagement = () => {
 
-  const { getCategoryList, category, categoryDelete, addCategory } = useCategoryContext();
+  const { getCategoryList, category, categoryDelete, addCategory, editCategory } = useCategoryContext();
 
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    image: ''
+    species: "",
+    type: "",
   });
 
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
   const [selectedvarity, setSelectedvarity] = useState({
-    title: "",
-    description: "",
+    species: "",
+    type: "",
     status: "",
-    _id: "",
+    id: "",
   });
 
   useEffect(() => {
-    if(category?.data?.length === 0 && category?.loading === true){
+    if (category?.loading === true) {
       getCategoryList();
     }
-  }, [category.data]);
+  }, [category.loading]);
 
   const onOpenModal = () => {
     setOpen(true);
   };
+
   const onOpenModal2 = (product) => {
-    setSelectedvarity(product);
+    setSelectedvarity({ species: product.species, type: product.type, id: product.id, status: product.status });
     setModalOpen(true);
   };
 
   // Close the modal
   const onCloseModal2 = () => {
     setModalOpen(false);
-    setSelectedvarity({ title: "", image: "", _id: "" });
+    setSelectedvarity({ species: "", type: "", id: "" });
   };
 
   const onCloseModal = () => {
     setOpen(false);
-  };
-
-  const handleStatusToggle = async (product) => {
-    const newStatus = product.status === "Active" ? "Inactive" : "Active";
-    // await switchUnittype(product._id, newStatus); // Your API call here
   };
 
   // Handle form input change
@@ -121,9 +78,13 @@ const Categories = () => {
   };
 
   // Handle submit for updating the brand
-  const handleSubmits = () => {
-    //   editpack(selectedvarity._id, selectedvarity);
-    onCloseModal2();
+  const handleSubmits = async () => {
+    const res = await editCategory(selectedvarity.id, selectedvarity);
+    if(res.success){
+      getCategoryList()
+      onCloseModal2();
+      setSelectedvarity({ species: "", type: "", id: "", status: "" });
+    }
   };
 
   const handleDelete = (id) => {
@@ -142,27 +103,17 @@ const Categories = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      image: e.target.files[0], // Store file object
-    }));
-  };
-
   // Handle form submission
   const handleSubmit = () => {
-    // Send formData to the backend
     addCategory(formData);
-    onCloseModal(); // Close modal after saving
+    onCloseModal(); 
+    setFormData({ species: "", type: "" });
   };
 
-  const handleSubcategory = (id) => {
-    navigate(`/subcategory-List/${id}`);
-  }
 
   return (
     <>
-      <CommonBreadcrumb title="Category List" parent="Physical" />
+      <CommonBreadcrumb title="Species List" parent="Home" />
       <Container fluid>
         <Row>
           <Col sm="12">
@@ -171,7 +122,7 @@ const Categories = () => {
               <CardBody>
                 <div className="btn-popup pull-right">
                   <Button color="primary" onClick={onOpenModal}>
-                    Add Category
+                    Add Species
                   </Button>
                 </div>
                 <div className="clearfix"></div>
@@ -181,7 +132,7 @@ const Categories = () => {
                 >
                   <thead className="border-bottom border-top py-4" >
                     <tr >
-                      <th >Breed Name</th>
+                      <th >Species Name</th>
                       {/* <th
                           style={{ textAlign: "center", padding: "12px 15px" }}
                         >
@@ -196,7 +147,7 @@ const Categories = () => {
                       <tr key={i}>
                         <td>
                           <Badge color="danger">
-                            {item.title}
+                            {item.species}
                           </Badge>
                         </td>
                         <td>
@@ -214,7 +165,7 @@ const Categories = () => {
                               role="switch"
                               id={`flexSwitchCheckChecked-${i}`}
                               checked={item.status === "Active"}
-                              onChange={() => handleStatusToggle(item)}
+                              disabled
                               style={{ cursor: "pointer" }}
                             />
                             <label
@@ -246,7 +197,7 @@ const Categories = () => {
                           <Badge
                             color="warning"
                             style={{ cursor: 'pointer' }}
-                            onClick={() => handleDelete(item._id)}
+                            onClick={() => handleDelete(item.id)}
                           >
                             <AiOutlineDelete
                               size={14}
@@ -276,7 +227,7 @@ const Categories = () => {
       >
         <ModalHeader toggle={onCloseModal}>
           <h5 className="modal-title f-w-600" id="exampleModalLabel2">
-            Add Category
+            Add Species
           </h5>
         </ModalHeader>
         <ModalBody>
@@ -285,40 +236,29 @@ const Categories = () => {
           <Form>
             <FormGroup>
               <Label htmlFor="title" className="col-form-label">
-                Category Name :
+                Species Name :
               </Label>
               <Input
                 type="text"
-                name="title"
-                value={formData.title}
+                name="species"
+                value={formData.species}
                 onChange={handleInputChange}
-                id="title"
+                id="species"
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="title" className="col-form-label">
+                Type :
+              </Label>
+              <Input
+                type="text"
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
+                id="type"
               />
             </FormGroup>
 
-            <FormGroup>
-              <Label htmlFor="title" className="col-form-label">
-                Category Description :
-              </Label>
-              <Input
-                type="text"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                id="description"
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="banner-image" className="col-form-label">
-                Category Image :
-              </Label>
-              <Input
-                id="category-image"
-                type="file"
-                name="image"
-                onChange={handleFileChange}
-              />
-            </FormGroup>
           </Form>
         </ModalBody>
         <ModalFooter>
@@ -334,7 +274,7 @@ const Categories = () => {
       <Modal isOpen={modalOpen} toggle={onCloseModal2}>
         <ModalHeader toggle={onCloseModal2}>
           <h5 className="modal-title f-w-600" id="exampleModalLabel2">
-            Edit Category
+            Edit Species
           </h5>
         </ModalHeader>
         <ModalBody>
@@ -345,8 +285,8 @@ const Categories = () => {
               </Label>
               <Input
                 type="text"
-                name="title"
-                value={selectedvarity.title}
+                name="species"
+                value={selectedvarity.species}
                 onChange={handleInputChanges}
                 id="title"
               />
@@ -354,14 +294,14 @@ const Categories = () => {
 
             <FormGroup>
               <Label htmlFor="title" className="col-form-label">
-                Description:
+                Type:
               </Label>
               <Input
                 type="text"
-                name="description"
-                value={selectedvarity.description}
+                name="type"
+                value={selectedvarity.type}
                 onChange={handleInputChanges}
-                id="description"
+                id="type"
               />
             </FormGroup>
 
@@ -411,4 +351,4 @@ const Categories = () => {
   );
 };
 
-export default Categories;
+export default SpeciesManagement;

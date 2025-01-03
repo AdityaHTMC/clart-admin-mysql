@@ -20,7 +20,7 @@ export const CategoryProvider = ({ children }) => {
 
   const create_category = async (data) => {
     try {
-      const response = await axios.post(`${base_url}/service/category/add`, data, { headers: { 'Authorization': AuthToken } });
+      const response = await axios.post(`${base_url}/species/add`, data, { headers: { 'Authorization': AuthToken } });
       return response.data
     } catch (error) {
       return error?.response?.data || null
@@ -31,7 +31,7 @@ export const CategoryProvider = ({ children }) => {
     try {
       setCategory({ data: [], loading: true });
       const response = await axios.post(
-        `${base_url}/admin/category/list`, {},
+        `${base_url}/admin/species-list`, {},
         { headers: { Authorization: AuthToken } }
       );
       const data = response.data;
@@ -44,7 +44,7 @@ export const CategoryProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error category List:', error);
-      // toast.error('An error occurred while fetching the Category');
+      setCategory({ ...category, loading: false });
     }
   }
 
@@ -71,7 +71,7 @@ export const CategoryProvider = ({ children }) => {
   const addCategory = async (formDataToSend) => {
     try {
       const response = await axios.post(
-        `${base_url}/category/add`,
+        `${base_url}/species/add`,
         formDataToSend,  // Pass FormData directly without spreading
         {
           headers: {
@@ -94,8 +94,8 @@ export const CategoryProvider = ({ children }) => {
 
   const categoryDelete = async (id) => {
     try {
-      const response = await axios.get(
-        `${base_url}/category/delete/${id}`,
+      const response = await axios.delete(
+        `${base_url}/admin/species/delete/${id}`,
         { headers: { Authorization: AuthToken } }
       );
 
@@ -114,7 +114,7 @@ export const CategoryProvider = ({ children }) => {
   const getproductList = async (body) => {
     try {
       setProductList({ ...productList, loading: true })
-      const { data } = await axios.post(`${base_url}/admin/species-list`, body || {}, {
+      const { data } = await axios.post(`${base_url}/admin/breed/list`, body || {}, {
         headers: {
           'Authorization': AuthToken
         }
@@ -130,11 +130,10 @@ export const CategoryProvider = ({ children }) => {
     }
   }
 
-
   const getproductDetails = async (id) => {
     try {
       const response = await axios.get(
-        `${base_url}/admin/species/details/${id}`,
+        `${base_url}/admin/breed/details/${id}`,
         { headers: { Authorization: AuthToken } }
       );
       const data = response.data;
@@ -150,10 +149,9 @@ export const CategoryProvider = ({ children }) => {
     }
   };
 
-
   const addProduct = async (formDataToSend) => {
     try {
-      const { data } = await axios.post(`${base_url}/species/add`, formDataToSend, { headers: { Authorization: AuthToken, 'Content-Type': 'multipart/form-data' } });
+      const { data } = await axios.post(`${base_url}/admin/breed/add`, formDataToSend, { headers: { Authorization: AuthToken, 'Content-Type': 'multipart/form-data' } });
       return data
     } catch (error) {
       console.error("Error adding Product:", error);
@@ -338,58 +336,26 @@ export const CategoryProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error adding FAQ:", error);
-      toast.error(error.response?.data?.message || 'Server error');
+      toast.error("An error occurred while adding the FAQ ");
     }
   }
 
-
-  const editFaq = async (id,formDataToSend) => {
+  const editCategory = async (id, body) => {
     try {
-      const response = await axios.put(
-        `${base_url}/faq/update/${id}`,
-        {...formDataToSend},  
-        { 
-          headers: { 
-            Authorization: AuthToken,
-            'Content-Type': 'application/json' 
-          }
+      const {data} = await axios.put(`${base_url}/admin/species/update/${id}`, body, {
+        headers: {
+          'Authorization': AuthToken
         }
-      );
-      if (response.status === 200) {
-        toast.success(response?.data?.message);
-        getFaqList();  
-      } else {
-        toast.error(response?.data?.message);
-      }
+      });
+      return data
     } catch (error) {
-      console.error("Error edited FAQ:", error);
-      toast.error(error.response?.data?.message || 'Server error');
-    }
-  };
-
-
-  const faqDelete = async (id) => { 
-    try {
-      const response = await axios.delete(
-        `${base_url}/faq/delete/${id}`,
-        { headers: { Authorization: AuthToken } }
-      );
-      
-      if (response.status === 200) {
-        toast.success(response?.data?.message);
-        getFaqList(); 
-      } else {
-        toast.error(response?.data?.message);
-      }
-    } catch (error) {
-      console.error('Error deleting Brand:', error);
-      toast.error(error.response?.data?.message || 'Server error');
+      return error?.response?.data || null
     }
   }
 
 
   const values = {
-    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,editFaq,faqDelete
+    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,editFaq,faqDelete editCategory
   }
   return (
     <AppContext.Provider value={values}>

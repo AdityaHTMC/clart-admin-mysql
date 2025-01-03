@@ -115,7 +115,7 @@ export const RoomPage = () => {
                                                 <th>REF</th>
                                                 <th className="text-center">TITLE</th>
                                                 <th className="text-center">Unit Name</th>
-                                                <th className="text-center">TOTAL RACKS</th>
+                                                <th className="text-center">TOTAL Floors</th>
                                                 <th className="text-center">TOTAL Managers</th>
                                                 <th className="text-end">ACTION</th>
                                             </tr>
@@ -125,8 +125,8 @@ export const RoomPage = () => {
                                                 <tr key={i}>
                                                     <td><Badge >#{item?.ref}</Badge></td>
                                                     <td className="text-center">{item?.title}</td>
-                                                    <td className="text-center">{item?.unit_title}</td>
-                                                    <td className="text-center">{item?.total_racks}</td>
+                                                    <td className="text-center">{item?.unit_name}</td>
+                                                    <td className="text-center">{item?.total_floor}</td>
                                                     <td className="text-center">{item?.managers?.length || 0}</td>
                                                     <td className="d-flex gap-2 justify-content-end align-items-center">
                                                         <Badge
@@ -175,7 +175,7 @@ export const RoomPage = () => {
                                         select unit
                                     </option>
                                     {allUnit.map((unit) => (
-                                        <option key={unit._id} value={unit._id}>
+                                        <option key={unit.id} value={unit.id}>
                                             {unit.title} ({unit.ref})
                                         </option>
                                     ))}

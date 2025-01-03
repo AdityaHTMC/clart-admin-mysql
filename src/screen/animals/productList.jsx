@@ -61,8 +61,8 @@ const ProductList = () => {
                     <thead className="border-bottom border-top py-4" >
                       <tr>
                         <th>Product Image</th>
-                        <th className="text-center">Species Name</th>
-                        <th className="text-center">Breed Name</th>
+                        <th className="text-center">Breed</th>
+                        <th className="text-center">Species</th>
                         <th className="text-center">Winning Period</th>
                         <th className="text-center">Culling Period</th>
                         <th className="text-center">For</th>
@@ -77,9 +77,9 @@ const ProductList = () => {
                       {productList?.data?.map((product, index) => (
                         <tr key={index}>
                           <th>
-                            {product?.images?.length > 1 && (
+                            {product?.images && (
                               <img
-                                src={product?.images[0]}
+                                src={product?.image}
                                 alt="img"
                                 style={{
                                   width: "40px",
@@ -90,9 +90,9 @@ const ProductList = () => {
                               />
                             )}
                           </th>
-                          <td className="text-center"> {product.item_name} </td>
+                          <td className="text-center"> {product?.title} </td>
                           <td className="text-center">
-                              <Badge color="danger">{product.breed_name}</Badge>
+                              <Badge color="danger">{product?.species}</Badge>
                           </td>
                           <td className="text-center"> {product.winning} </td>
                           <td className="text-center"> {product.calling} </td>
@@ -107,10 +107,10 @@ const ProductList = () => {
                           {/* <td className="text-center"> {product.birth_cycle} </td> */}
                           <td>
                             <div className="d-flex justify-content-end align-items-center gap-2">
-                              <Badge color="danger" onClick={() => handleEdit(product?._id)} style={{cursor: 'pointer'}}>
+                              <Badge color="danger" onClick={() => handleEdit(product?.id)} style={{cursor: 'pointer'}}>
                                 <FaEdit size={14} />
                               </Badge>
-                              <Badge color="warning" onClick={() => handleDelete(product?._id)} style={{cursor: 'pointer'}}>
+                              <Badge color="warning" onClick={() => handleDelete(product?.id)} style={{cursor: 'pointer'}}>
                                 <AiOutlineDelete size={14} />
                               </Badge>
                             </div>

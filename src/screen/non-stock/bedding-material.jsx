@@ -32,7 +32,7 @@ export const BeddingMaterial = () => {
         setIsProcessing(true)
         let res;
         if (isEditing) {
-            res = await edit_material(materialDetail._id, { title, stock })
+            res = await edit_material(materialDetail.id, { title, stock })
         } else {
             res = await create_material({ title, stock })
         }
