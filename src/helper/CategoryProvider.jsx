@@ -353,9 +353,51 @@ export const CategoryProvider = ({ children }) => {
     }
   }
 
+const editFaq = async (id, formDataToSend) => {
+    try {
+      const response = await axios.put(
+        `${base_url}/faq/update/${id}`,
+        { ...formDataToSend },
+        {
+          headers: {
+            Authorization: AuthToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 200) {
+        toast.success(response?.data?.message);
+        getFaqList();
+      } else {
+        toast.error(response?.data?.message);
+      }
+    } catch (error) {
+      console.error("Error edited FAQ:", error);
+      toast.error(error.response?.data?.message || "Server error");
+    }
+  };
+
+  const faqDelete = async (id) => {
+    try {
+      const response = await axios.delete(`${base_url}/faq/delete/${id}`, {
+        headers: { Authorization: AuthToken },
+      });
+
+      if (response.status === 200) {
+        toast.success(response?.data?.message);
+        getFaqList();
+      } else {
+        toast.error(response?.data?.message);
+      }
+    } catch (error) {
+      console.error("Error deleting Brand:", error);
+      toast.error(error.response?.data?.message || "Server error");
+    }
+  }
+
 
   const values = {
-    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,editFaq,faqDelete editCategory
+    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,editFaq,faqDelete , editCategory
   }
   return (
     <AppContext.Provider value={values}>
