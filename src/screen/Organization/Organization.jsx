@@ -27,12 +27,18 @@ import { FaEdit } from "react-icons/fa";
 import { FaTrashAlt } from "react-icons/fa";
 import { useMasterContext } from "../../helper/MasterProvider";
 import CommonBreadcrumb from "../../component/common/bread-crumb";
-
+import { Pagination, Stack } from "@mui/material";
 
 const Organization = () => {
   const navigate = useNavigate();
   const {
-    getAllOrgTypeList,allorgtypeList,addOrg,getOrgList,orgList
+    getAllOrgTypeList,
+    allorgtypeList,
+    addOrg,
+    getOrgList,
+    orgList,
+    editOrg,
+    deleteOrg,
   } = useMasterContext();
 
   const [formData, setFormData] = useState({
@@ -46,6 +52,11 @@ const Organization = () => {
 
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const itemperPage = 15;
+
+  const totalPages = orgList?.total && Math.ceil(orgList?.total / itemperPage);
 
   const [editFormData, setEditFormData] = useState({
     name: "",
@@ -54,12 +65,18 @@ const Organization = () => {
     affiliation_by: "",
     roc: "",
     affiliation_certificate: "",
+    status: "",
   });
 
   useEffect(() => {
+    const dataToSend = {
+      page: currentPage,
+      limit: itemperPage,
+      keyword_search: searchTerm,
+    };
     getAllOrgTypeList();
-    getOrgList();
-  }, []);
+    getOrgList(dataToSend);
+  }, [currentPage, searchTerm]);
 
   const onOpenModal = () => {
     setOpen(true);
@@ -87,6 +104,13 @@ const Organization = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      affiliation_certificate: e.target.files[0],
+    }));
+  };
+
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setEditFormData((prevData) => ({
@@ -96,19 +120,49 @@ const Organization = () => {
   };
 
   const handleSubmit = () => {
-    // addOrgType(formData);
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("org_type", formData.org_type);
+    formDataToSend.append("affiliation_by", formData.affiliation_by);
+    formDataToSend.append("roc", formData.roc);
+    if (formData.affiliation_certificate) {
+      formDataToSend.append(
+        "affiliation_certificate",
+        formData.affiliation_certificate
+      );
+    }
+    addOrg(formDataToSend);
+
     onCloseModal();
   };
 
   const handleSubmits = () => {
-    // editOrgType(editFormData.id, editFormData);
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", editFormData.name);
+    formDataToSend.append("description", editFormData.description);
+    formDataToSend.append("org_type", editFormData.org_type);
+    formDataToSend.append("affiliation_by", editFormData.affiliation_by);
+    formDataToSend.append("roc", editFormData.roc);
+    if (editFormData.affiliation_certificate) {
+      formDataToSend.append(
+        "affiliation_certificate",
+        editFormData.affiliation_certificate
+      );
+    }
+    formDataToSend.append("status", editFormData.status);
+    editOrg(editFormData.id, formDataToSend);
     onCloseModal2();
   };
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you wish to delete this item?")) {
-    //   deleteOrgType(id);
+      deleteOrg(id);
     }
+  };
+
+  const handlepagechange = (newpage) => {
+    setCurrentPage(newpage);
   };
 
   return (
@@ -132,6 +186,7 @@ const Organization = () => {
                         <th>Name</th>
                         <th>Affiliation By</th>
                         <th>ROC</th>
+                        <th> Organization Type </th>
                         <th>status</th>
                         <th>Action</th>
                       </tr>
@@ -153,10 +208,23 @@ const Organization = () => {
                         orgList?.data?.map((product, index) => (
                           <tr key={index}>
                             <td>{product.name}</td>
-                            <td>{product.affiliation_by || 'NA'}</td>
-                            <td>{product.roc || "NA" }</td>
+                            <td>{product.affiliation_by || "NA"}</td>
+                            <td>{product.roc || "NA"}</td>
+                            <td>{product.organization_type || "NA"}</td>
                             <td>
-                              <Badge color="success"> {product.status || "NA"} </Badge>
+                              <Badge
+                                color={
+                                  product.status === "Approved"
+                                    ? "success"
+                                    : product.status === "Not Approved"
+                                    ? "danger"
+                                    : product.status === "Pending"
+                                    ? "warning"
+                                    : "secondary" // default color if none match
+                                }
+                              >
+                                {product.status || "NA"}
+                              </Badge>
                             </td>
                             <td>
                               <div className="circelBtnBx">
@@ -180,6 +248,15 @@ const Organization = () => {
                         ))
                       )}
                     </tbody>
+                    <Stack className="rightPagination mt10" spacing={2}>
+                      <Pagination
+                        color="primary"
+                        count={totalPages}
+                        page={currentPage}
+                        shape="rounded"
+                        onChange={(event, value) => handlepagechange(value)}
+                      />
+                    </Stack>
                   </Table>
                 </div>
               </CardBody>
@@ -199,53 +276,100 @@ const Organization = () => {
             <div className="row gy-3">
               {/* Title Input */}
               <FormGroup className="col-md-6">
-                <Label htmlFor="title" className="form-label">
-                  Title:
+                <Label htmlFor="name" className="form-label">
+                  Name:
                 </Label>
                 <Input
                   type="text"
-                  name="title"
-                  value={formData.title}
+                  name="name"
+                  value={formData.name}
                   onChange={handleInputChange}
-                  id="title"
+                  id="name"
                   className="form-control"
-                  placeholder="Enter title"
+                  placeholder="Enter name"
                 />
               </FormGroup>
-
               <FormGroup className="col-md-6">
-                <Label className="form-label">Type:</Label>
-                <div className="d-flex flex-column gap-2">
-                  <Label
-                    check
-                    className="form-check-label d-flex align-items-center gap-2"
-                  >
-                    <Input
-                      type="radio"
-                      name="type"
-                      value="Government"
-                      checked={formData.type === "Government"}
-                      onChange={handleInputChange}
-                      className="form-check-input"
-                    />
-                    <span>Government</span>
-                  </Label>
-                  <Label
-                    check
-                    className="form-check-label d-flex align-items-center gap-2"
-                  >
-                    <Input
-                      type="radio"
-                      name="type"
-                      value="Private"
-                      checked={formData.type === "Private"}
-                      onChange={handleInputChange}
-                      className="form-check-input"
-                    />
-                    <span>Private</span>
-                  </Label>
-                </div>
+                <Label htmlFor="description" className="form-label">
+                  Description:
+                </Label>
+                <Input
+                  type="text"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  id="description"
+                  className="form-control"
+                  placeholder="Enter description"
+                />
               </FormGroup>
+            </div>
+            <div className="row gy-3">
+              <FormGroup className="col-md-6">
+                <Label htmlFor="org_type" className="col-form-label">
+                  Org Type:
+                </Label>
+                <Input
+                  type="select"
+                  name="org_type"
+                  value={formData.org_type}
+                  onChange={handleInputChange}
+                  id="org_type"
+                >
+                  <option value="">Select Org Type</option>
+                  {allorgtypeList?.data?.map((variety) => (
+                    <option key={variety.id} value={variety.id}>
+                      {variety.title}
+                    </option>
+                  ))}
+                </Input>
+              </FormGroup>
+              <FormGroup className="col-md-6">
+                <Label htmlFor="affiliation_by" className="form-label">
+                  Affiliation By:
+                </Label>
+                <Input
+                  type="text"
+                  name="affiliation_by"
+                  value={formData.affiliation_by}
+                  onChange={handleInputChange}
+                  id="affiliation_by"
+                  className="form-control"
+                  placeholder="Enter affiliation by"
+                />
+              </FormGroup>
+            </div>
+            <div className="row gy-3">
+              <FormGroup className="col-md-6">
+                <Label htmlFor="roc" className="form-label">
+                  ROC:
+                </Label>
+                <Input
+                  type="text"
+                  name="roc"
+                  value={formData.roc}
+                  onChange={handleInputChange}
+                  id="roc"
+                  className="form-control"
+                  placeholder="Enter roc by"
+                />
+              </FormGroup>
+              <div className="col-md-6">
+                <FormGroup>
+                  <Label
+                    htmlFor="affiliation_certificate"
+                    className="col-form-label"
+                  >
+                    Upload Affiliation Certificate :
+                  </Label>
+                  <Input
+                    id="affiliation_certificate"
+                    type="file"
+                    name="affiliation_certificate"
+                    onChange={handleFileChange}
+                  />
+                </FormGroup>
+              </div>
             </div>
           </Form>
         </ModalBody>
@@ -269,51 +393,121 @@ const Organization = () => {
           <Form>
             <div className="row">
               <FormGroup className="col-md-6">
-                <Label htmlFor="title" className="form-label">
-                  Title:
+                <Label htmlFor="name" className="form-label">
+                  Name:
                 </Label>
                 <Input
                   type="text"
-                  name="title"
-                  value={editFormData.title}
+                  name="name"
+                  value={editFormData.name}
                   onChange={handleEditInputChange}
-                  id="title"
+                  id="name"
                   className="form-control"
-                  placeholder="Enter title"
+                  placeholder="Enter name"
                 />
               </FormGroup>
               <FormGroup className="col-md-6">
-                <Label className="form-label">Type:</Label>
-                <div className="d-flex flex-column gap-2">
+                <Label htmlFor="description" className="form-label">
+                  Description:
+                </Label>
+                <Input
+                  type="text"
+                  name="description"
+                  value={editFormData.description}
+                  onChange={handleEditInputChange}
+                  id="description"
+                  className="form-control"
+                  placeholder="Enter description"
+                />
+              </FormGroup>
+            </div>
+
+            <div className="row gy-3">
+              <FormGroup className="col-md-6">
+                <Label htmlFor="org_type" className="col-form-label">
+                  Org Type:
+                </Label>
+                <Input
+                  type="select"
+                  name="org_type"
+                  value={editFormData.org_type}
+                  onChange={handleEditInputChange}
+                  id="org_type"
+                >
+                  <option value="">Select Org Type</option>
+                  {allorgtypeList?.data?.map((variety) => (
+                    <option key={variety.id} value={variety.id}>
+                      {variety.title}
+                    </option>
+                  ))}
+                </Input>
+              </FormGroup>
+              <FormGroup className="col-md-6">
+                <Label htmlFor="affiliation_by" className="form-label">
+                  Affiliation By:
+                </Label>
+                <Input
+                  type="text"
+                  name="affiliation_by"
+                  value={editFormData.affiliation_by}
+                  onChange={handleEditInputChange}
+                  id="affiliation_by"
+                  className="form-control"
+                  placeholder="Enter affiliation by"
+                />
+              </FormGroup>
+            </div>
+
+            <div className="row gy-3">
+              <FormGroup className="col-md-6">
+                <Label htmlFor="roc" className="form-label">
+                  ROC:
+                </Label>
+                <Input
+                  type="text"
+                  name="roc"
+                  value={editFormData.roc}
+                  onChange={handleEditInputChange}
+                  id="roc"
+                  className="form-control"
+                  placeholder="Enter roc by"
+                />
+              </FormGroup>
+              <div className="col-md-6">
+                <FormGroup>
                   <Label
-                    check
-                    className="form-check-label d-flex align-items-center gap-2"
+                    htmlFor="affiliation_certificate"
+                    className="col-form-label"
                   >
-                    <Input
-                      type="radio"
-                      name="type"
-                      value="Government"
-                      checked={editFormData.type === "Government"}
-                      onChange={handleEditInputChange}
-                      className="form-check-input"
-                    />
-                    <span>Government</span>
+                    Upload Affiliation Certificate :
                   </Label>
-                  <Label
-                    check
-                    className="form-check-label d-flex align-items-center gap-2"
-                  >
-                    <Input
-                      type="radio"
-                      name="type"
-                      value="Private"
-                      checked={editFormData.type === "Private"}
-                      onChange={handleEditInputChange}
-                      className="form-check-input"
-                    />
-                    <span>Private</span>
-                  </Label>
-                </div>
+                  <Input
+                    id="affiliation_certificate"
+                    type="file"
+                    name="affiliation_certificate"
+                    onChange={handleFileChange}
+                  />
+                </FormGroup>
+              </div>
+            </div>
+
+            <div className="row gy-3">
+              <FormGroup className="col-md-6">
+                <Label htmlFor="status" className="col-form-label">
+                  Status:
+                </Label>
+                <Input
+                  type="select"
+                  name="status"
+                  value={editFormData.status}
+                  onChange={handleEditInputChange}
+                  id="status"
+                >
+                  <option value="">Select Status</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Not Approved">Not Approved</option>
+                </Input>
               </FormGroup>
             </div>
           </Form>

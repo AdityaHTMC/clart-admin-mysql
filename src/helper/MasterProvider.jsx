@@ -1113,7 +1113,7 @@ export const MasterProvider = ({ children }) => {
         try {
           const response = await axios.post(
             `${base_url}/admin/organization/add`,
-            {...formDataToSend},
+            formDataToSend,
             {
               headers: {
                 Authorization: Authtoken,
@@ -1132,11 +1132,55 @@ export const MasterProvider = ({ children }) => {
         }
       };
 
+
+      const editOrg = async (id,formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/organization/edit/${id}`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getOrgList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+      const deleteOrg = async (id) => { 
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/organization/delete/${id}`,
+            { headers: { Authorization: Authtoken } }
+          );
+          
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getOrgList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      }
+
      
     
 
     const values = {
-        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList,getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,getNotificationSettingsList,editNotificationSettingsList,notificationSettingsList,getPaymentMethodsList,paymentMethodsList, editPaymentMethodsList,deletePaymentMethodsList,deleteNotificationList,deleteWhatsAppList,deleteSmsNotificationList,deleteEmailList,getSettingDetails,storeSetting, edit_store_setting,getShippingAgencyList,ShippingAgencyList,AddShipping_agency,editShippingAgencyList,deleteShippingAgency,getStateList,stateList,addState,editState,StateDelete,addDistrict,editDistrict,getdistrictList,districtList,DistrictDelete,getOrgTypeList,orgTypeList,addOrgType,editOrgType,deleteOrgType,getAllOrgTypeList,allorgtypeList,addOrg,getOrgList,orgList
+        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList,getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,getNotificationSettingsList,editNotificationSettingsList,notificationSettingsList,getPaymentMethodsList,paymentMethodsList, editPaymentMethodsList,deletePaymentMethodsList,deleteNotificationList,deleteWhatsAppList,deleteSmsNotificationList,deleteEmailList,getSettingDetails,storeSetting, edit_store_setting,getShippingAgencyList,ShippingAgencyList,AddShipping_agency,editShippingAgencyList,deleteShippingAgency,getStateList,stateList,addState,editState,StateDelete,addDistrict,editDistrict,getdistrictList,districtList,DistrictDelete,getOrgTypeList,orgTypeList,addOrgType,editOrgType,deleteOrgType,getAllOrgTypeList,allorgtypeList,addOrg,getOrgList,orgList,editOrg,deleteOrg
     }
 
     return (
