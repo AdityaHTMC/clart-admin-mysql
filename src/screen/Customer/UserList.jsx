@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
-import CommonBreadcrumb from "../component/common/bread-crumb";
 import {
   Button,
   Card,
@@ -12,25 +11,36 @@ import {
 } from "reactstrap";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-
 import { Spinner } from "reactstrap";
-import { useCommonContext } from "../helper/CommonProvider";
-import avtar from '../../src/assets/profile.png'
-import { LoadingComponent } from "../component/common/loading";
+import avtar from '../../../src/assets/profile.png'
+import { useCommonContext } from "../../helper/CommonProvider";
+import CommonBreadcrumb from "../../component/common/bread-crumb";
+import { LoadingComponent } from "../../component/common/loading";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 const UserList = () => {
   const navigate = useNavigate();
 
-  const { getUserList, userList,switchUser } = useCommonContext();
-
-  
+  const { getUserList, userList,switchUser,deleteCustomer } = useCommonContext();
 
   useEffect(() => {
     getUserList();
   }, []);
 
-  
+  const handleaddUser = () => {
+    navigate("/add-customer");
+  };
 
+  const handleEdit = (id) => {
+    // navigate(`/editphlebotomist/${id}`);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you wish to delete this item?")) {
+        deleteCustomer(id);
+    }
+  };
+
+  
   const handleStatusToggle = async (product) => {
     const newStatus = product.status === "Active" ? "Inactive" : "Active";
     await switchUser(product._id, newStatus); // Your API call here
@@ -45,7 +55,7 @@ const UserList = () => {
             <Card>
               <CardBody>
               <div className="btn-popup pull-right">
-                    <Button color="primary" >
+                    <Button color="primary" onClick={handleaddUser} >
                       Add
                     </Button>
                   </div>
@@ -54,32 +64,20 @@ const UserList = () => {
                   <Table striped responsive>
                     <thead>
                       <tr>
-                        <th>Image</th>
                         <th>User Name</th>
                         <th>Email</th>
                         <th>Mobile</th>
                         <th>Status</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {!userList?.loading && (
                         userList?.data?.map((product, index) => (
                           <tr key={index}>
-                            <td>
-                              <img
-                                src={product.image || avtar}
-                                alt="img"
-                                style={{
-                                  width: "80px",
-                                  height: "80px",
-                                  objectFit: "cover",
-                                  borderRadius: "5px",
-                                }}
-                              />
-                            </td>
-                            <td>{product.name}</td>
-                            <td> {product.email} </td>
-                            <td> {product.mobile}</td>
+                            <td>{product.name || "NA"}</td>
+                            <td> {product.email || "NA"} </td>
+                            <td> {product.mobile || "NA"}</td>
                             <td>
                               <div className="form-check form-switch">
                                 <input
@@ -100,6 +98,24 @@ const UserList = () => {
                                 </label>
                               </div>
                             </td>
+                            <td>
+                                <div className="circelBtnBx">
+                                  <Button
+                                    className="btn"
+                                    color="link"
+                                    onClick={() => handleEdit(product?.id)}
+                                  >
+                                    <FaEdit />
+                                  </Button>
+                                  <Button
+                                    className="btn"
+                                    color="link"
+                                    onClick={() => handleDelete(product?.id)}
+                                  >
+                                    <FaTrashAlt />
+                                  </Button>
+                                </div>
+                              </td>
                           </tr>
                         ))
                       )}

@@ -22,6 +22,9 @@ export const CommonProvider = ({ children }) => {
     const [orderDetails, setOrderDetails] = useState({ loading: true, data: [] })
     const [promoCode, setPromoCode] = useState({ loading: true, data: [] })
     const [eventList, setEventList] = useState({ loading: true, data: [] })
+    const [orgList, setOrgList] = useState({ loading: true, data: [] })
+    const [ allstateList , setallStateList] = useState({ loading: true, data: []  })
+    const [ alldistrictList , setallDristrictList] = useState({ loading: true, data: []  })
     const { Authtoken } = useAuthContext()
 
     const getMenuList = async () => {
@@ -141,7 +144,7 @@ export const CommonProvider = ({ children }) => {
 
     const getUserList = async () => {
         try {
-            const response = await axios.post(`${base_url}/admin/users/list`, {}, { headers: { 'Authorization': Authtoken } });
+            const response = await axios.post(`${base_url}/admin/user/list`, {}, { headers: { 'Authorization': Authtoken } });
             if (response.status === 200) {
                 setUserList({ data: response?.data?.data || [], loading: false })
             } else {
@@ -149,7 +152,7 @@ export const CommonProvider = ({ children }) => {
                 setUserList({ data: [], loading: false })
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Server error');
+
             setUserList({ data: [], loading: false })
         }
     }
@@ -309,11 +312,107 @@ export const CommonProvider = ({ children }) => {
         }
     }
 
+    const getorgList = async (dataToSend) => {
+        try {
+            setOrgList({ data: [], loading: true });
+          const response = await axios.post(
+            `${base_url}/organization/list`, {...dataToSend},
+            { headers: { Authorization: Authtoken } }
+          );
+          if (response.status === 200) {
+            setOrgList({ data: response?.data?.data || [], total: response.data.total , loading: false });
+          } else {
+            setOrgList({ data: [], total:'', loading: false });
+          }
+        } catch (error) {
+            setOrgList({ data: [], loading: false });
+        }
+      };
 
+
+      const addCustomer  = async (formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/user/add`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            navigate('/customer')
+            getUserList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+
+
+      const getallstateList = async (data) => {
+        try {
+          const response = await axios.get(
+            `${base_url}/admin/state/list`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setallStateList({ data: response?.data?.data || [] , loading: false });
+          } else {
+            setallStateList({ data:[],  loading: false });
+            toast.error("server errors");
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+    
+    
+      const getallDistrictList = async (state) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/state/district/list`,
+            {state_id: state},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setallDristrictList({ data: response?.data?.data || [] , loading: false });
+          } else {
+            setallDristrictList({ data:[],  loading: false });
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+
+
+      const deleteCustomer = async (id) => { 
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/user/delete/${id}`,
+            { headers: { Authorization: Authtoken } }
+          );
+          
+          if (response.status === 200) {
+            toast.success(response?.data?.message)
+            getUserList(); 
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      }
 
     const values = {
         getMenuList, menuList, countryList, getCountryList, getStateList, stateList, getCityList, cityList,
-        getSmsSetting, smsData, SmsUpdateSetting, getEmailSubscribeList, mailList, getUserList, userList, switchUser, getOrderList, orderList, getOrderDetails, orderDetails, promoCode, getPromoCodeList, addPromoCode, addEvent, eventDelete, getEventList, eventList
+        getSmsSetting, smsData, SmsUpdateSetting, getEmailSubscribeList, mailList, getUserList, userList, switchUser, getOrderList, orderList, getOrderDetails, orderDetails, promoCode, getPromoCodeList, addPromoCode, addEvent, eventDelete, getEventList, eventList,getorgList,orgList,addCustomer,getallstateList,getallDistrictList,allstateList,alldistrictList,deleteCustomer
     }
     return (
         <AppContext.Provider value={values} >

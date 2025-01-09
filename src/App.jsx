@@ -28,7 +28,7 @@ import SmsSettings from './screen/SmsSettings'
 import SubscribeEmail from './screen/SubscribeEmail'
 import SubCategoryList from './screen/SubCategoryList'
 import CityList from './screen/CityList'
-import UserList from './screen/UserList'
+
 import OrderList from './screen/OrderList';
 import OrderDetails from './screen/OrderDetails';
 import AddCoupon from './screen/AddCoupon';
@@ -60,6 +60,8 @@ import DistrictList from './screen/LocationManagement/DistrictList';
 import OrgType from './screen/Master/OrgType/OrgType';
 import Organization from './screen/Organization/Organization';
 import SpeciesManagement from './screen/species_management';
+import UserList from './screen/Customer/UserList';
+import AddUser from './screen/Customer/AddUser';
 
 function App() {
   const { initialLoading } = useAuthContext()
@@ -86,6 +88,7 @@ function App() {
           <Route path="/subcategory-List/:id" element={<SubCategoryList />} />
           <Route path="/city-list/:id" element={<CityList />} />
           <Route path="/customer" element={<UserList />} />
+          <Route path="/add-customer" element={<AddUser />} />
           <Route path="/orders" element={<OrderList />} />
 
           <Route path="/orders-details/:id" element={<OrderDetails />} />
