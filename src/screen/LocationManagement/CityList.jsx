@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
 
-
 import {
     Badge,
     Button,
@@ -21,67 +20,68 @@ import {
     Table,
   } from "reactstrap";
   import { useEffect, useState } from "react";
-
-  import { useNavigate } from "react-router-dom";
+  import { useNavigate, useParams } from "react-router-dom";
   import { FaEdit } from "react-icons/fa";
-  import { BsFillEyeFill } from "react-icons/bs";
   import { FaTrashAlt } from "react-icons/fa";
-
+  import { FaArrowLeft } from "react-icons/fa";
   import { Spinner } from "reactstrap";
+  import ReactQuill from "react-quill";
+  import "react-quill/dist/quill.snow.css";
+
+import { Pagination, Stack } from "@mui/material";
 import { useMasterContext } from "../../helper/MasterProvider";
 import CommonBreadcrumb from "../../component/common/bread-crumb";
 
 
-
-
-
-  const StateList = () => {
+  const CityList = () => {
     const navigate = useNavigate();
+
+    const {id} = useParams();
   
-    const {  getStateList,stateList,addState,editState,StateDelete } = useMasterContext();
+    const { getCityList,cityList,addCity,editCity,cityDelete} = useMasterContext();
+
+    
   
     const [formData, setFormData] = useState({
-      state: "",
+     title: "",
     });
   
     const [open, setOpen] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
-  
-    const [selectedvarity, setSelectedvarity] = useState({
-      state: "",
-      id: "",
-    });
-
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
-    const itemperPage = 8;
-    
+    const itemperPage = 15;
+
+    const totalPages = cityList?.total && Math.ceil(cityList?.total / itemperPage);
+  
+    const [selectedvarity, setSelectedvarity] = useState({
+      title: "",
+      id: "",
+    });
   
     useEffect(() => {
-     getStateList();
-    }, []);
+      if(id){
+        const dataTosend ={
+          state_id: id,
+          page: currentPage,
+          limit: itemperPage,
+        }
+        getCityList(dataTosend);
+      }
+    }, [currentPage]);
   
     const onOpenModal = () => {
       setOpen(true);
     };
-
-    const onOpenModal1 = (product) => {
-       setModalOpen(true);
-       setSelectedvarity(product);
-    };
-
-    const handledistrict = (id) => {
-      navigate(`/district-management/${id}`); 
-    };
-
-    const handleCity = (id) => {
-      navigate(`/city-list/${id}`); 
+    const onOpenModal2 = (product) => {
+      setSelectedvarity(product);
+      setModalOpen(true);
     };
   
     // Close the modal
     const onCloseModal2 = () => {
       setModalOpen(false);
-      setSelectedvarity({ title: "", image: "", _id: "" });
+      setSelectedvarity({ title: "", id: "" });
     };
   
     const onCloseModal = () => {
@@ -101,13 +101,22 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
   
     // Handle submit for updating the brand
     const handleSubmits = () => {
-      editState(selectedvarity.id, selectedvarity);
+      const dataToSend ={
+        state_id: id,
+        title:selectedvarity.title,
+        city_id: selectedvarity.id,
+      }
+      editCity(dataToSend);
       onCloseModal2();
     };
   
-    const handleDelete = (id) => {
-      if (window.confirm("Are you sure you wish to delete this ?")) {
-        StateDelete(id);
+    const handleDelete = (city_id) => {
+      if (window.confirm("Are you sure you wish to delete this item?")) {
+        const dataToDelete = {
+          state_id: id,
+          city_id: city_id,
+        }
+        cityDelete(dataToDelete);
       }
     };
   
@@ -124,76 +133,88 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
   
     // Handle form submission
     const handleSubmit = () => {
-      addState(formData);
+      const dataToSend ={
+        state_id: id,
+        title:formData.title
+      }
+      addCity(dataToSend);
       onCloseModal(); 
     };
+
+    const handlepagechange = (newpage) => {
+      setCurrentPage(newpage);
+    };
+  
   
     return (
       <>
-        <CommonBreadcrumb title="State List"  />
+        <CommonBreadcrumb title="City List"  />
         <Container fluid>
           <Row>
             <Col sm="12">
               <Card>
-                {/* <CommonCardHeader title="Product Sub Categoty" /> */}
                 <CardBody>
-                  <div className="btn-popup pull-right">
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => navigate(-1)} 
+                  >
+                    <FaArrowLeft size={20} color="#007bff" />
+                    <span style={{ marginLeft: "5px", color: "#007bff" }}>
+                      Back
+                    </span>
+                  </div>
+
+                  <div className="mb-2">
                     <Button color="primary" onClick={onOpenModal}>
-                      Add State
+                    Add City
                     </Button>
                   </div>
+                </div>
+                  
                   <div className="clearfix"></div>
                   <div id="basicScenario" className="product-physical">
                     <Table striped responsive>
                       <thead>
                         <tr>
-                          <th>State List</th>
-                          <th>View District</th>
-                          <th>View City</th>
+                          <th>City List</th>
                           <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {stateList?.loading ? (
+                        {cityList?.loading ? (
                           <tr>
                             <td colSpan="4" className="text-center">
                               <Spinner color="secondary" className="my-4" />
                             </td>
                           </tr>
-                        ) : stateList?.data?.length === 0 ? (
+                        ) : cityList?.data?.length === 0 ? (
                           <tr>
                             <td colSpan="4" className="text-center">
                               No Data Found
                             </td>
                           </tr>
                         ) : (
-                            stateList?.data?.map((product, index) => (
+                            cityList?.data?.map((product, index) => (
                             <tr key={index}>
-                              <td>{product.state}</td>
-                              <td>   <div className="circelBtnBx">
-                                  <Button
-                                    className="btn"
-                                    color="link"
-                                    onClick={() => handledistrict(product.id)}
-                                  >
-                                    <BsFillEyeFill />
-                                  </Button>
-                                </div></td>
-                                <td>   <div className="circelBtnBx">
-                                  <Button
-                                    className="btn"
-                                    color="link"
-                                    onClick={() => handleCity(product.id)}
-                                  >
-                                    <BsFillEyeFill />
-                                  </Button>
-                                </div></td>
+                              <td>{product.title}</td>
                               <td>
                                 <div className="circelBtnBx">
                                   <Button
                                     className="btn"
                                     color="link"
-                                    onClick={() => onOpenModal1(product)}
+                                    onClick={() => onOpenModal2(product)}
                                   >
                                     <FaEdit />
                                   </Button>
@@ -211,6 +232,15 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
                         )}
                       </tbody>
                     </Table>
+                    <Stack className="rightPagination mt10" spacing={2}>
+                      <Pagination
+                        color="primary"
+                        count={totalPages}
+                        page={currentPage}
+                        shape="rounded"
+                        onChange={(event, value) => handlepagechange(value)}
+                      />
+                    </Stack>
                   </div>
                 </CardBody>
               </Card>
@@ -225,7 +255,7 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
         >
           <ModalHeader toggle={onCloseModal}>
             <h5 className="modal-title f-w-600" id="exampleModalLabel2">
-             Add State
+             Add City
             </h5>
           </ModalHeader>
           <ModalBody>
@@ -233,15 +263,15 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
             {/* Scroll in Y-axis */}
             <Form>
               <FormGroup>
-                <Label htmlFor="state" className="col-form-label">
-                 state
+                <Label htmlFor="title" className="col-form-label">
+                City
                 </Label>
                 <Input
                   type="text"
-                  name="state"
-                  value={formData.state}
+                  name="title"
+                  value={formData.title}
                   onChange={handleInputChange}
-                  id="state"
+                  id="title"
                 />
               </FormGroup>
             </Form>
@@ -260,24 +290,25 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
           isOpen={modalOpen}
           toggle={onCloseModal2}
           className="modal-xg"
+
         >
           <ModalHeader toggle={onCloseModal2}>
             <h5 className="modal-title f-w-600" id="exampleModalLabel2">
-              Edit state
+              Edit City
             </h5>
           </ModalHeader>
           <ModalBody style={{ maxHeight: "450px", overflowY: "auto" }}>
             <Form>
               <FormGroup>
-                <Label htmlFor="state" className="col-form-label">
-                  state
+                <Label htmlFor="title" className="col-form-label">
+                City:
                 </Label>
                 <Input
                   type="text"
-                  name="state"
-                  value={selectedvarity.state}
+                  name="title"
+                  value={selectedvarity.title}
                   onChange={handleInputChanges}
-                  id="state"
+                  id="title"
                 />
               </FormGroup>
             </Form>
@@ -295,5 +326,5 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
     );
   };
   
-  export default StateList;
+  export default CityList;
   

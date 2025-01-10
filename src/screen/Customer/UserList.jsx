@@ -31,7 +31,7 @@ const UserList = () => {
   };
 
   const handleEdit = (id) => {
-    // navigate(`/editphlebotomist/${id}`);
+    navigate(`/edit-customer/${id}`);
   };
 
   const handleDelete = (id) => {
@@ -43,7 +43,7 @@ const UserList = () => {
   
   const handleStatusToggle = async (product) => {
     const newStatus = product.status === "Active" ? "Inactive" : "Active";
-    await switchUser(product._id, newStatus); // Your API call here
+    await switchUser(product.id, newStatus); // Your API call here
   };
 
   return (

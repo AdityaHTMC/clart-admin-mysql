@@ -25,6 +25,7 @@ export const CommonProvider = ({ children }) => {
     const [orgList, setOrgList] = useState({ loading: true, data: [] })
     const [ allstateList , setallStateList] = useState({ loading: true, data: []  })
     const [ alldistrictList , setallDristrictList] = useState({ loading: true, data: []  })
+    const [ customerDetails , setCustomerDetails] = useState({ loading: true, data: []  })
     const { Authtoken } = useAuthContext()
 
     const getMenuList = async () => {
@@ -166,14 +167,13 @@ export const CommonProvider = ({ children }) => {
             );
             const data = response.data;
             if (response.status === 200) {
-                toast.success('status updated successfully');
-                getUserList();  // Refresh the brand list after success
+                toast.success(response?.data?.message);
+                getUserList(); 
             } else {
-                toast.error('Failed to update the status');
+                toast.error(response?.data?.message);
             }
         } catch (error) {
-            console.error('Error updating status:', error);
-            toast.error('An error occurred while updating the status');
+            toast.success(error?.response?.data?.message);
         }
     };
 
@@ -410,9 +410,54 @@ export const CommonProvider = ({ children }) => {
         }
       }
 
+      const getCustomerDetails = async (id) => {
+        try {
+          const response = await axios.get(
+            `${base_url}/admin/user/details/${id}`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setCustomerDetails({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setCustomerDetails({ data: [], loading: false });
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+            setCustomerDetails({ data: [], total: "", loading: false });
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+
+      const editCustomer = async (id, formData) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/user/edit/${id}`,
+            formData,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            navigate('/customer')
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+
     const values = {
         getMenuList, menuList, countryList, getCountryList, getStateList, stateList, getCityList, cityList,
-        getSmsSetting, smsData, SmsUpdateSetting, getEmailSubscribeList, mailList, getUserList, userList, switchUser, getOrderList, orderList, getOrderDetails, orderDetails, promoCode, getPromoCodeList, addPromoCode, addEvent, eventDelete, getEventList, eventList,getorgList,orgList,addCustomer,getallstateList,getallDistrictList,allstateList,alldistrictList,deleteCustomer
+        getSmsSetting, smsData, SmsUpdateSetting, getEmailSubscribeList, mailList, getUserList, userList, switchUser, getOrderList, orderList, getOrderDetails, orderDetails, promoCode, getPromoCodeList, addPromoCode, addEvent, eventDelete, getEventList, eventList,getorgList,orgList,addCustomer,getallstateList,getallDistrictList,allstateList,alldistrictList,deleteCustomer,getCustomerDetails,customerDetails,editCustomer
     }
     return (
         <AppContext.Provider value={values} >

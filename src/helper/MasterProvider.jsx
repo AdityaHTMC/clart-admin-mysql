@@ -31,9 +31,17 @@ export const MasterProvider = ({ children }) => {
     const [orgList, setOrgList] = useState({loading: true,data: [],total: ""});
     const [allorgtypeList, setallOrgTypeList] = useState({loading: true,data: [],total: ""});
     const [districtList, setdistrictList] = useState({loading: true,data: [],total: ""});
+    const [cityList, setcityList] = useState({loading: true,data: [],total: ""});
+    const [speciesMasterList, setSpeciesMasterList] = useState({loading: true,data: [],total: ""});
+    const [orderMasterList, setorderMasterList] = useState({loading: true,data: [],total: ""});
+    const [allspecies, setallspecies] = useState({loading: true,data: []});
     const { Authtoken } = useAuthContext()
 
     //  Unit fucntions
+
+
+
+
     const create_unit = async (body) => {
         try {
             const {data} = await axios.post(`${base_url}/unit/add`, body, { headers: { 'Authorization': Authtoken }});
@@ -1176,11 +1184,297 @@ export const MasterProvider = ({ children }) => {
         }
       }
 
+
+
+
+      const getCityList = async (dataTosend) => {
+        try {
+          setcityList({ data: [], loading: true });
+          const response = await axios.post(
+            `${base_url}/admin/city/list`,{...dataTosend},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setcityList({
+              data: response?.data?.data || [],
+              total: response?.data?.total,
+              loading: false,
+            });
+          } else {
+            setcityList({ data: [],total:'', loading: false });
+            toast.error(response?.data?.message);
+          }
+        } catch (error) {
+          setcityList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+
+      const addCity = async (dataToSend) => {
+        try {
+          const { state_id} = dataToSend
+          const response = await axios.post(
+            `${base_url}/city/add`,
+            {...dataToSend},
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            const dataToSend = {
+              state_id: state_id
+            }
+            getCityList(dataToSend)
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+    
+      const editCity = async (formDataToSend) => {
+        try {
+          const { state_id ,city_id} = formDataToSend
+          const response = await axios.put(
+            `${base_url}/city/update/${city_id}`,
+            {...formDataToSend},
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            const dataToSend = {
+              state_id: state_id
+            }
+            getCityList(dataToSend)
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      };
+
+
+      const cityDelete = async (dataToDelete) => { 
+        try {
+          const { city_id,state_id } = dataToDelete;
+          const response = await axios.delete(
+            `${base_url}/admin/city/delete/${city_id}`,
+            { headers: { Authorization: Authtoken } }
+          );
+          
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            const dataToSend = {
+              state_id: state_id
+            }
+            getCityList(dataToSend); 
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || 'Server error');
+        }
+      }
+
+
+
+      const getSpeciesMasterList = async (dataToSend) => {
+        try {
+          setSpeciesMasterList({ data: [], loading: true });
+          const response = await axios.post(
+            `${base_url}/admin/species-list`,{...dataToSend},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setSpeciesMasterList({
+              data: response?.data?.data || [],
+              total: response.data.total,
+              loading: false,
+            });
+          } else {
+            setSpeciesMasterList({ data: [], loading: false });
+          }
+        } catch (error) {
+          setSpeciesMasterList({ data: [], loading: false });
+        }
+      };
+    
+      const getAllSpeciesList = async () => {
+        try {
+          const response = await axios.post(
+            `${base_url}/species/list `,{},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setallspecies({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setallspecies({ data: [], loading: false });
+
+          }
+        } catch (error) {
+          setallspecies({ data: [], loading: false });
+        }
+      };
+    
+      const addSpeciesMasterList = async (formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/species/add`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getSpeciesMasterList()
+          } else {
+            toast.error(response?.data?.message);
+          }
+        } catch (error) {
+          toast.success(error.response?.data?.message);
+        }
+      };
+    
+    
+      const editSpeciesMasterList = async (id,dataToSend) => {
+        try {
+          const response = await axios.put(
+            `${base_url}/admin/species/update/${id}`,
+            dataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response.data.message);
+            getSpeciesMasterList()
+          } else {
+            toast.error("server errors");
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+    
+      const DeleteSpecies = async (id) => {
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/species/delete/${id}`,
+            
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getSpeciesMasterList()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+
      
+
+      const getOrderMasterList = async () => {
+        try {
+          const response = await axios.get(
+            `${base_url}/order/status/list`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setorderMasterList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setorderMasterList({ data: [], loading: false });
+    
+          }
+        } catch (error) {
+          setorderMasterList({ data: [], loading: false });
+        }
+      };
+
+
+      const addOrderMasterList = async (formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/order/status/add`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response.data.message);
+            getOrderMasterList()
+          } else {
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          toast.success(error.response.data.message);
+        }
+      };
+    
+    
+      const editOrderStatus = async (id,dataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/order/status/edit/${id}`,
+            dataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response.data.message);
+            getOrderMasterList()
+          } else {
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+    
     
 
     const values = {
-        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList,getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,getNotificationSettingsList,editNotificationSettingsList,notificationSettingsList,getPaymentMethodsList,paymentMethodsList, editPaymentMethodsList,deletePaymentMethodsList,deleteNotificationList,deleteWhatsAppList,deleteSmsNotificationList,deleteEmailList,getSettingDetails,storeSetting, edit_store_setting,getShippingAgencyList,ShippingAgencyList,AddShipping_agency,editShippingAgencyList,deleteShippingAgency,getStateList,stateList,addState,editState,StateDelete,addDistrict,editDistrict,getdistrictList,districtList,DistrictDelete,getOrgTypeList,orgTypeList,addOrgType,editOrgType,deleteOrgType,getAllOrgTypeList,allorgtypeList,addOrg,getOrgList,orgList,editOrg,deleteOrg
+        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList,getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,getNotificationSettingsList,editNotificationSettingsList,notificationSettingsList,getPaymentMethodsList,paymentMethodsList, editPaymentMethodsList,deletePaymentMethodsList,deleteNotificationList,deleteWhatsAppList,deleteSmsNotificationList,deleteEmailList,getSettingDetails,storeSetting, edit_store_setting,getShippingAgencyList,ShippingAgencyList,AddShipping_agency,editShippingAgencyList,deleteShippingAgency,getStateList,stateList,addState,editState,StateDelete,addDistrict,editDistrict,getdistrictList,districtList,DistrictDelete,getOrgTypeList,orgTypeList,addOrgType,editOrgType,deleteOrgType,getAllOrgTypeList,allorgtypeList,addOrg,getOrgList,orgList,editOrg,deleteOrg,getCityList,cityList,addCity,editCity,cityDelete,getSpeciesMasterList,speciesMasterList,addSpeciesMasterList,editSpeciesMasterList,DeleteSpecies,allspecies,getOrderMasterList,orderMasterList,addOrderMasterList,editOrderStatus
     }
 
     return (

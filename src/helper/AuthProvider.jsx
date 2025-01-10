@@ -113,7 +113,6 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (error) {
             setSubAdminList({...subAdminList, loading: false})
-            API_ERROR(error)
         }
     }
 

@@ -27,8 +27,6 @@ import Location from './screen/Location'
 import SmsSettings from './screen/SmsSettings'
 import SubscribeEmail from './screen/SubscribeEmail'
 import SubCategoryList from './screen/SubCategoryList'
-import CityList from './screen/CityList'
-
 import OrderList from './screen/OrderList';
 import OrderDetails from './screen/OrderDetails';
 import AddCoupon from './screen/AddCoupon';
@@ -62,6 +60,10 @@ import Organization from './screen/Organization/Organization';
 import SpeciesManagement from './screen/species_management';
 import UserList from './screen/Customer/UserList';
 import AddUser from './screen/Customer/AddUser';
+import EditUser from './screen/Customer/EditUser';
+import CityList from './screen/LocationManagement/CityList';
+import SpeciesList from './screen/Master/SpeciesManagement/SpeciesList';
+import OrderStatusList from './screen/Master/OrderStatus';
 
 function App() {
   const { initialLoading } = useAuthContext()
@@ -75,7 +77,7 @@ function App() {
       <Routes>
         <Route element={<CommonLayout />}>
           <Route path="/" element={<DashboardContainer />} />
-          <Route path="/species-management" element={<SpeciesManagement />} />
+          <Route path="/species-management" element={<SpeciesList />} />
           <Route path="/product/sub-category" element={<SubCategoryPage />} />
           <Route path="/animal-list" element={<ProductList />} />
           <Route path="/product-edit/:id" element={<EditProduct />} />
@@ -89,6 +91,7 @@ function App() {
           <Route path="/city-list/:id" element={<CityList />} />
           <Route path="/customer" element={<UserList />} />
           <Route path="/add-customer" element={<AddUser />} />
+          <Route path="/edit-customer/:id" element={<EditUser />} />
           <Route path="/orders" element={<OrderList />} />
 
           <Route path="/orders-details/:id" element={<OrderDetails />} />
@@ -133,6 +136,8 @@ function App() {
           <Route path="/faq-management" element={<FaqList />} />
           <Route path="/org-type" element={<OrgType />} />
           <Route path="/organization" element={<Organization />} />
+          <Route path="/order-status" element={<OrderStatusList />} />
+          
 
           <Route path="*" element={<NotFound />} />
 

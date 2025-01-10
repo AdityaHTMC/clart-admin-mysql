@@ -21,71 +21,66 @@ import {
     Table,
   } from "reactstrap";
   import { useEffect, useState } from "react";
-
   import { useNavigate } from "react-router-dom";
   import { FaEdit } from "react-icons/fa";
-  import { BsFillEyeFill } from "react-icons/bs";
   import { FaTrashAlt } from "react-icons/fa";
-
   import { Spinner } from "reactstrap";
-import { useMasterContext } from "../../helper/MasterProvider";
-import CommonBreadcrumb from "../../component/common/bread-crumb";
 
+import { Pagination, Stack } from "@mui/material";
+import { useMasterContext } from "../../../helper/MasterProvider";
+import CommonBreadcrumb from "../../../component/common/bread-crumb";
 
-
-
-
-  const StateList = () => {
+  const SpeciesList = () => {
     const navigate = useNavigate();
   
-    const {  getStateList,stateList,addState,editState,StateDelete } = useMasterContext();
+    const {  getSpeciesMasterList,speciesMasterList,addSpeciesMasterList,editSpeciesMasterList,DeleteSpecies,allspecies } = useMasterContext();
+   
+    const [currentPage, setCurrentPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState("");
+    const itemperPage = 8;
   
+    const totalPages =
+    speciesMasterList?.total && Math.ceil(speciesMasterList?.total / itemperPage);
+
     const [formData, setFormData] = useState({
-      state: "",
+      species: "",
+      type: "",
     });
   
     const [open, setOpen] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
   
     const [selectedvarity, setSelectedvarity] = useState({
-      state: "",
+      species: "",
+      type: "",
       id: "",
     });
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const [searchTerm, setSearchTerm] = useState("");
-    const itemperPage = 8;
-    
   
     useEffect(() => {
-     getStateList();
-    }, []);
+      const dataToSend = {
+        page: currentPage,
+        limit: itemperPage,
+      };
+    getSpeciesMasterList(dataToSend);
+    }, [currentPage]);
   
     const onOpenModal = () => {
       setOpen(true);
     };
-
-    const onOpenModal1 = (product) => {
-       setModalOpen(true);
-       setSelectedvarity(product);
-    };
-
-    const handledistrict = (id) => {
-      navigate(`/district-management/${id}`); 
-    };
-
-    const handleCity = (id) => {
-      navigate(`/city-list/${id}`); 
+    const onOpenModal2 = (product) => {
+      setSelectedvarity(product);
+      setModalOpen(true);
     };
   
     // Close the modal
     const onCloseModal2 = () => {
       setModalOpen(false);
-      setSelectedvarity({ title: "", image: "", _id: "" });
+      setSelectedvarity({ species: "", type: "", id: "", });
     };
   
     const onCloseModal = () => {
       setOpen(false);
+      setFormData({ species: "" , type:""  });
     };
   
 
@@ -101,13 +96,14 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
   
     // Handle submit for updating the brand
     const handleSubmits = () => {
-      editState(selectedvarity.id, selectedvarity);
+      editSpeciesMasterList(selectedvarity.id, selectedvarity);
       onCloseModal2();
     };
   
     const handleDelete = (id) => {
-      if (window.confirm("Are you sure you wish to delete this ?")) {
-        StateDelete(id);
+      if (window.confirm("Are you sure you wish to delete this item?")) {
+        // delete product logic here
+        DeleteSpecies(id);
       }
     };
   
@@ -124,13 +120,18 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
   
     // Handle form submission
     const handleSubmit = () => {
-      addState(formData);
-      onCloseModal(); 
+      // Send formData to the backend
+      addSpeciesMasterList(formData);
+      onCloseModal(); // Close modal after saving
+    };
+
+    const handlepagechange = (newpage) => {
+      setCurrentPage(newpage);
     };
   
     return (
       <>
-        <CommonBreadcrumb title="State List"  />
+        <CommonBreadcrumb title="Species List"  />
         <Container fluid>
           <Row>
             <Col sm="12">
@@ -139,7 +140,7 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
                 <CardBody>
                   <div className="btn-popup pull-right">
                     <Button color="primary" onClick={onOpenModal}>
-                      Add State
+                      Add Species
                     </Button>
                   </div>
                   <div className="clearfix"></div>
@@ -147,53 +148,35 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
                     <Table striped responsive>
                       <thead>
                         <tr>
-                          <th>State List</th>
-                          <th>View District</th>
-                          <th>View City</th>
+                          <th>Species</th>
+                          <th>Type</th>
                           <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {stateList?.loading ? (
+                        {speciesMasterList?.loading ? (
                           <tr>
                             <td colSpan="4" className="text-center">
                               <Spinner color="secondary" className="my-4" />
                             </td>
                           </tr>
-                        ) : stateList?.data?.length === 0 ? (
+                        ) : speciesMasterList?.data?.length === 0 ? (
                           <tr>
                             <td colSpan="4" className="text-center">
                               No Data Found
                             </td>
                           </tr>
                         ) : (
-                            stateList?.data?.map((product, index) => (
+                            speciesMasterList?.data?.map((product, index) => (
                             <tr key={index}>
-                              <td>{product.state}</td>
-                              <td>   <div className="circelBtnBx">
-                                  <Button
-                                    className="btn"
-                                    color="link"
-                                    onClick={() => handledistrict(product.id)}
-                                  >
-                                    <BsFillEyeFill />
-                                  </Button>
-                                </div></td>
-                                <td>   <div className="circelBtnBx">
-                                  <Button
-                                    className="btn"
-                                    color="link"
-                                    onClick={() => handleCity(product.id)}
-                                  >
-                                    <BsFillEyeFill />
-                                  </Button>
-                                </div></td>
+                              <td>{product.species}</td>
+                              <td>{product.type}</td>
                               <td>
                                 <div className="circelBtnBx">
                                   <Button
                                     className="btn"
                                     color="link"
-                                    onClick={() => onOpenModal1(product)}
+                                    onClick={() => onOpenModal2(product)}
                                   >
                                     <FaEdit />
                                   </Button>
@@ -210,7 +193,17 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
                           ))
                         )}
                       </tbody>
+                 
                     </Table>
+                    <Stack className="rightPagination mt10" spacing={2}>
+                      <Pagination
+                        color="primary"
+                        count={totalPages}
+                        page={currentPage}
+                        shape="rounded"
+                        onChange={(event, value) => handlepagechange(value)}
+                      />
+                    </Stack>
                   </div>
                 </CardBody>
               </Card>
@@ -225,25 +218,39 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
         >
           <ModalHeader toggle={onCloseModal}>
             <h5 className="modal-title f-w-600" id="exampleModalLabel2">
-             Add State
+              Add Species
             </h5>
           </ModalHeader>
           <ModalBody>
             {" "}
             {/* Scroll in Y-axis */}
-            <Form>
-              <FormGroup>
-                <Label htmlFor="state" className="col-form-label">
-                 state
+            <Form onSubmit={(e) => e.preventDefault()}>
+              <div className="row">
+              <FormGroup className="col-md-6">
+                <Label htmlFor="species" className="col-form-label">
+                  Species Name :
                 </Label>
                 <Input
                   type="text"
-                  name="state"
-                  value={formData.state}
+                  name="species"
+                  value={formData.species}
                   onChange={handleInputChange}
-                  id="state"
+                  id="species"
                 />
               </FormGroup>
+              <FormGroup className="col-md-6">
+                <Label htmlFor="type" className="col-form-label">
+                  Type :
+                </Label>
+                <Input
+                  type="text"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleInputChange}
+                  id="type"
+                />
+              </FormGroup>
+              </div>
             </Form>
           </ModalBody>
           <ModalFooter>
@@ -260,26 +267,41 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
           isOpen={modalOpen}
           toggle={onCloseModal2}
           className="modal-xg"
+       
         >
           <ModalHeader toggle={onCloseModal2}>
             <h5 className="modal-title f-w-600" id="exampleModalLabel2">
-              Edit state
+              Edit Species
             </h5>
           </ModalHeader>
           <ModalBody style={{ maxHeight: "450px", overflowY: "auto" }}>
-            <Form>
-              <FormGroup>
-                <Label htmlFor="state" className="col-form-label">
-                  state
+            <Form onSubmit={(e) => e.preventDefault()}>
+              <div className="row">
+              <FormGroup className="col-md-6">
+                <Label htmlFor="species" className="col-form-label">
+                  Species
                 </Label>
                 <Input
                   type="text"
-                  name="state"
-                  value={selectedvarity.state}
+                  name="species"
+                  value={selectedvarity.species}
                   onChange={handleInputChanges}
-                  id="state"
+                  id="species"
                 />
               </FormGroup>
+              <FormGroup className="col-md-6">
+                <Label htmlFor="type" className="col-form-label">
+                  Type :
+                </Label>
+                <Input
+                  type="text"
+                  name="type"
+                  value={selectedvarity.type}
+                  onChange={handleInputChanges}
+                  id="type"
+                />
+              </FormGroup>
+              </div>
             </Form>
           </ModalBody>
           <ModalFooter>
@@ -295,5 +317,5 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
     );
   };
   
-  export default StateList;
+  export default SpeciesList;
   
