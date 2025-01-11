@@ -49,7 +49,7 @@ export const PackingBox = () => {
         setIsProcessing(true)
         let res;
         if (isEditing) {
-            res = await edit_packing_box(packingDetail._id, initialData)
+            res = await edit_packing_box(packingDetail.id, initialData)
         } else {
             res = await create_packing_box(initialData)
         }

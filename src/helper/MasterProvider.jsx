@@ -95,23 +95,56 @@ export const MasterProvider = ({ children }) => {
     }
 
     //  Rooms functions
-    const create_room = async (body) => {
-        try {
-            const {data} = await axios.post(`${base_url}/room/add`, body, { headers: { 'Authorization': Authtoken }});
-            return data
-        } catch (error) {
-            return error?.response?.data || null
-        }
-    }
 
-    const edit_room = async (id, body) => {
-        try {
-            const {data} = await axios.put(`${base_url}/room/update/${id}`, body, { headers: { 'Authorization': Authtoken }});
-            return data
-        } catch (error) {
-            return error?.response?.data || null
+    const create_room = async (formDataToSend) => {
+      try {
+        const response = await axios.post(
+          `${base_url}/room/add`,
+          formDataToSend,
+          {
+            headers: {
+              Authorization: Authtoken,
+            },
+          }
+        );
+        if (response.status === 200) {
+          toast.success(response.data.message);
+          getRoomList()
+        } else {
+          toast.success(response.data.message);
         }
-    }
+      } catch (error) {
+        toast.success(error.response.data.message);
+      }
+    };
+
+
+
+
+    const edit_room = async (dataToSend) => {
+      try {
+        const { id } = dataToSend;
+        const response = await axios.put(
+          `${base_url}/room/update/${id}`,
+          dataToSend,
+          {
+            headers: {
+              Authorization: Authtoken,
+            },
+          }
+        );
+        if (response.status === 200) {
+          toast.success(response.data.message);
+          getRoomList()
+        } else {
+          toast.error(response.data.message);
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
+    };
+
+
 
     const getRoomList = async (body) => {
         try {
@@ -147,14 +180,30 @@ export const MasterProvider = ({ children }) => {
         }
     }
     //  Floor functions
-    const create_floor = async (body) => {
-        try {
-            const {data} = await axios.post(`${base_url}/floor/add`, body, { headers: { 'Authorization': Authtoken }});
-            return data
-        } catch (error) {
-            return error?.response?.data || null
+
+    const create_floor = async (formDataToSend) => {
+      try {
+        const response = await axios.post(
+          `${base_url}/floor/add`,
+          formDataToSend,
+          {
+            headers: {
+              Authorization: Authtoken,
+            },
+          }
+        );
+        if (response.status === 200) {
+          toast.success(response.data.message);
+          getFloorList()
+        } else {
+          toast.success(response.data.message);
         }
-    }
+      } catch (error) {
+        toast.success(error.response.data.message);
+      }
+    };
+
+
 
     const edit_floor = async (id, body) => {
         try {

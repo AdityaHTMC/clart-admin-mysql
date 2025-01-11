@@ -64,6 +64,7 @@ import EditUser from './screen/Customer/EditUser';
 import CityList from './screen/LocationManagement/CityList';
 import SpeciesList from './screen/Master/SpeciesManagement/SpeciesList';
 import OrderStatusList from './screen/Master/OrderStatus';
+import RoomList from './screen/production/RoomList';
 
 function App() {
   const { initialLoading } = useAuthContext()
@@ -112,7 +113,7 @@ function App() {
           <Route path="/add-animal" element={<AddProduct />} />
 
           <Route path="/production-unit" element={<Unit />} />
-          <Route path="/production-room" element={<RoomPage />} />
+          <Route path="/production-room" element={<RoomList />} />
           <Route path="/production-floor" element={<FloorPage />} />
           <Route path="/production-rack" element={<RackPage />} />
           <Route path="/bedding-materials" element={<BeddingMaterial />} />
