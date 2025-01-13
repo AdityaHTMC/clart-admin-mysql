@@ -3,14 +3,16 @@
 /* eslint-disable react/prop-types */
 import axios from 'axios';
 import React, { createContext, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const AppContext = createContext();
 
 export const CategoryProvider = ({ children }) => {
+  const navigate = useNavigate();
   const [category, setCategory] = useState({ loading: true, data: [] })
   const [subcategory, setSubCategory] = useState([{ loading: true, data: [] }])
-  const [productList, setProductList] = useState({ total_page: 1, current_page: 1, loading: true, data: [] })
+  const [productList, setProductList] = useState({loading: true,data: [],total: ""})
   const [prouctDetails, setProuctDetails] = useState({})
   const [BannerList, setBannerList] = useState({ data: [], loading: true })
   const [FaqList, setFaqList] = useState({ loading: true, data: [] })
@@ -111,24 +113,28 @@ export const CategoryProvider = ({ children }) => {
     }
   }
 
-  const getproductList = async (body) => {
+
+  const getproductList = async (dataToSend) => {
     try {
-      setProductList({ ...productList, loading: true })
-      const { data } = await axios.post(`${base_url}/admin/breed/list`, body || {}, {
-        headers: {
-          'Authorization': AuthToken
-        }
-      })
-      if (data.success) {
-        setProductList({ loading: false, data: data.data, total_page: data.pages, current_page: data.page })
+      setProductList({ data: [], loading: true });
+      const response = await axios.post(
+        `${base_url}/admin/breed/list`,dataToSend,
+        { headers: { Authorization: AuthToken } }
+      );
+      const data = response.data;
+      if (response.status === 200) {
+        setProductList({
+          data: response?.data?.data || [],
+          loading: false,
+        });
       } else {
-        setProductList({ ...productList, loading: false })
-        console.error(data.message)
+        setProductList({ data: [], loading: false });
+
       }
     } catch (error) {
-      setProductList({ ...productList, loading: false })
+      setProductList({ data: [], loading: false });
     }
-  }
+  };
 
   const getproductDetails = async (id) => {
     try {
@@ -137,25 +143,41 @@ export const CategoryProvider = ({ children }) => {
         { headers: { Authorization: AuthToken } }
       );
       const data = response.data;
-      if (data.success) {
-        setProuctDetails(data.data);
+      if (response.status === 200) {
+        setProuctDetails(data);
       } else {
         setProuctDetails(null);
         toast.error(res.message);
       }
-      return data
     } catch (error) {
-      toast.error("An error occurent while fetching product detail")
+      toast.error(error.response.data.message);
     }
   };
 
+
+  
+
+
+
   const addProduct = async (formDataToSend) => {
     try {
-      const { data } = await axios.post(`${base_url}/admin/breed/add`, formDataToSend, { headers: { Authorization: AuthToken, 'Content-Type': 'multipart/form-data' } });
-      return data
+      const response = await axios.post(
+        `${base_url}/admin/breed/add`,
+        formDataToSend,
+        {
+          headers: {
+            Authorization: AuthToken,
+          },
+        }
+      );
+      if (response.status === 200) {
+        toast.success(response.data.message);
+        navigate('/animal-list')
+      } else {
+        toast.error(response.data.message);
+      }
     } catch (error) {
-      console.error("Error adding Product:", error);
-      return error?.response?.data || null
+      toast.error(error.response.data.message);
     }
   };
 

@@ -18,7 +18,6 @@ import MenuList from './screen/menu-list'
 
 import CommonLayout from './component/common/common-layout'
 import { useAuthContext } from './helper/AuthProvider'
-import ProductList from './screen/animals/productList'
 import BannerList from './screen/setting/BannerList'
 import FaqList from './screen/FaqList'
 import CmsList from './screen/CmsList'
@@ -36,7 +35,7 @@ import { RoomPage } from './screen/production/room';
 import { RackPage } from './screen/production/rack';
 import { BeddingMaterial } from './screen/non-stock/bedding-material';
 import { PackingBox } from './screen/non-stock/packing-box';
-import { AddProduct } from './screen/animals/add-product';
+import { AddAnimal } from './screen/animals/AddAnimal';
 import { EditProduct } from './screen/animals/edit-prouct';
 import { SubAdminManagement } from './screen/sub_admin/management';
 import { PermissionManagement } from './screen/sub_admin/permission_management';
@@ -65,6 +64,8 @@ import CityList from './screen/LocationManagement/CityList';
 import SpeciesList from './screen/Master/SpeciesManagement/SpeciesList';
 import OrderStatusList from './screen/Master/OrderStatus';
 import RoomList from './screen/production/RoomList';
+import AnimalList from './screen/animals/AnimalList';
+import EditAnimal from './screen/animals/EditAnimal';
 
 function App() {
   const { initialLoading } = useAuthContext()
@@ -80,8 +81,8 @@ function App() {
           <Route path="/" element={<DashboardContainer />} />
           <Route path="/species-management" element={<SpeciesList />} />
           <Route path="/product/sub-category" element={<SubCategoryPage />} />
-          <Route path="/animal-list" element={<ProductList />} />
-          <Route path="/product-edit/:id" element={<EditProduct />} />
+          <Route path="/animal-list" element={<AnimalList/>} />
+          <Route path="/product-edit/:id" element={<EditAnimal/>} />
           <Route path="/banner-list" element={<BannerList />} />
           <Route path="/cms" element={<CmsList />} />
           <Route path="/currency" element={<CurrencyList />} />
@@ -110,7 +111,7 @@ function App() {
           <Route path="/menu-list" element={<MenuList />} />
 
           <Route path="/profile" element={<Profile />} />
-          <Route path="/add-animal" element={<AddProduct />} />
+          <Route path="/add-animal" element={<AddAnimal />} />
 
           <Route path="/production-unit" element={<Unit />} />
           <Route path="/production-room" element={<RoomList />} />

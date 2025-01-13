@@ -21,6 +21,8 @@ const ProductList = () => {
     }
   }, [productList.data]);
 
+  console.log(productList, 'productList')
+
   const onOpenModal = () => {
     navigate('/add-animal')
   };

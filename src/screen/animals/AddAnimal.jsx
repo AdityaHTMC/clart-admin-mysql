@@ -10,10 +10,12 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import CommonCardHeader from "../../component/common/card-header";
 import { AiOutlineDelete } from "react-icons/ai";
+import { useMasterContext } from "../../helper/MasterProvider";
 
-export const AddProduct = () => {
-    const { getCategoryList, category, addProduct, getproductList } = useCategoryContext();
-    const [formData, setFormData] = useState({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', species_id: '' })
+export const AddAnimal = () => {
+    const { addProduct, getproductList } = useCategoryContext();
+    const { getAllSpeciesList , allspecies} = useMasterContext();
+    const [formData, setFormData] = useState({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', species_id: '', birth_cycle: '',})
     const [selectedImage, setSelectedImage] = useState(null);
     const [multipleImages, setMultipleImages] = useState([])
     const [files, setFiles] = useState([])
@@ -22,7 +24,7 @@ export const AddProduct = () => {
     const Navigate = useNavigate()
 
     useEffect(() => {
-        getCategoryList()
+        getAllSpeciesList()
     }, [])
 
     const onChange = (e) => {
@@ -81,9 +83,10 @@ export const AddProduct = () => {
 
         if (filesArr.length > 0) {
             for (let i = 0; i < filesArr.length; i++) {
-                bodyData.append('image', filesArr[i])
+                bodyData.append(`images[${i}]`, filesArr[i]);
             }
         }
+        
 
         setIsProcessing(true)
         const res = await addProduct(bodyData)
@@ -112,9 +115,20 @@ export const AddProduct = () => {
                                                 <input type="file" className="position-absolute top-0 z-3" style={{ opacity: 0, left: 0, width: '100%', height: '100%' }} onChange={handleImageChange} />
 
                                                 {selectedImage ? (
-                                                    <div className="p-2" style={{ width: '100%', height: '100%' }}>
-                                                        <img src={selectedImage} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8 }} />
-                                                    </div>
+                                                       <div className="p-2 position-relative" style={{ width: '100%', height: '100%' }}>
+                                                       <img 
+                                                           src={selectedImage} 
+                                                           style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8 }} 
+                                                       />
+                                                       <Badge 
+                                                           className="position-absolute" 
+                                                           color="warning" 
+                                                           onClick={() => setSelectedImage(null)} 
+                                                           style={{ cursor: 'pointer', top: 10, right: 10, zIndex:'9999' }}
+                                                       >
+                                                           <AiOutlineDelete size={16} />
+                                                       </Badge>
+                                                   </div>
                                                 ) : (
                                                     <>
                                                         <Upload size={32} color="#000" />
@@ -167,7 +181,7 @@ export const AddProduct = () => {
                                                         id="species_id"
                                                     >
                                                         <option value="">-- Select --</option>
-                                                        {category?.data?.map((cat) => (
+                                                        {allspecies?.data?.map((cat) => (
                                                             <option key={cat.id} value={cat.id}>
                                                                 {cat.species}
                                                             </option>
@@ -229,6 +243,18 @@ export const AddProduct = () => {
                                                             Describe your content in detail to attract viewers.
                                                         </small>
                                                     </div>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="birth_cycle" className="col-form-label">
+                                                      Birth Cycle :
+                                                    </Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="birth_cycle"
+                                                        placeholder="Enter Birth Cycle"
+                                                        value={formData.birth_cycle}
+                                                        onChange={onChange}
+                                                    />
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="title" className="col-form-label">

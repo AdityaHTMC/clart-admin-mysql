@@ -21,16 +21,10 @@ import {
     Table,
   } from "reactstrap";
   import { useEffect, useState } from "react";
-
   import { useNavigate } from "react-router-dom";
   import { FaEdit } from "react-icons/fa";
-
   import { FaTrashAlt } from "react-icons/fa";
-
-
   import { Spinner } from "reactstrap";
-  import ReactQuill from "react-quill";
-  import "react-quill/dist/quill.snow.css";
 import { useMasterContext } from "../../helper/MasterProvider";
 import CommonBreadcrumb from "../../component/common/bread-crumb";
 
