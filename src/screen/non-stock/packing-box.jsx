@@ -1,195 +1,337 @@
-import { Badge, Button, Card, CardBody, Col, Container, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from "reactstrap"
-import CommonBreadcrumb from "../../component/common/bread-crumb"
-import { useMasterContext } from "../../helper/MasterProvider"
-import { useEffect, useState } from "react"
-import { toast } from "react-toastify"
-import { FaEdit } from "react-icons/fa"
-import { LoadingComponent } from "../../component/common/loading"
-import { useColonyContext } from "../../helper/ColonyProvider"
-import { Autocomplete, TextField } from "@mui/material"
+/* eslint-disable no-unused-vars */
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  Col,
+  Container,
+  Form,
+  FormGroup,
+  Input,
+  Label,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Row,
+  Spinner,
+  Table,
+} from "reactstrap";
+import CommonBreadcrumb from "../../component/common/bread-crumb";
+import { useMasterContext } from "../../helper/MasterProvider";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { LoadingComponent } from "../../component/common/loading";
+import { useColonyContext } from "../../helper/ColonyProvider";
+import { Autocomplete, TextField } from "@mui/material";
+import { useCategoryContext } from "../../helper/CategoryProvider";
 
 export const PackingBox = () => {
-    const { getPackingBoxList, packingBox, create_packing_box, edit_packing_box } = useMasterContext()
-    const { allBreeds, getAllBreeds } = useColonyContext()
-    // console.log(allBreeds)
-    const [isProcessing, setIsProcessing] = useState(false)
-    const [isOpen, setIsOpen] = useState(false)
-    const [isEditing, setIsEditing] = useState(false)
-    const [packingDetail, setPackingDetail] = useState(null)
-    const [initialData, setInitialData] = useState({ title: '', stock: '', capacity: '', price: '', breed_id: '', })
+  const {
+    getPackingBoxList,
+    packingBox,
+    create_packing_box,
+    edit_packing_box,
+  } = useMasterContext();
 
-    useEffect(() => {
-        getAllBreeds()
-    }, [])
+  const { getallproductList, allproductList } = useCategoryContext();
+  // console.log(allBreeds)
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [packingDetail, setPackingDetail] = useState(null);
+  const [initialData, setInitialData] = useState({
+    title: "",
+    stock: "",
+    capacity: "",
+    price: "",
+    breed_id: "",
+  });
 
-    useEffect(() => {
-        setInitialData({
-            title: packingDetail?.title || '',
-            stock: packingDetail?.stock || '',
-            capacity: packingDetail?.capacity || '',
-            price: packingDetail?.price || '',
-            breed_id: packingDetail?.breed_id || '',
-        })
-    }, [packingDetail])
+  useEffect(() => {
+    getallproductList();
+  }, []);
 
-    const onChange = (e) => {
-        setInitialData({ ...initialData, [e.target.name]: e.target.value })
+  console.log(allproductList.data, "product list");
+
+  useEffect(() => {
+    setInitialData({
+      title: packingDetail?.title || "",
+      stock: packingDetail?.stock || "",
+      capacity: packingDetail?.capacity || "",
+      price: packingDetail?.price || "",
+      breed_id: packingDetail?.breed_id || "",
+    });
+  }, [packingDetail]);
+
+  const onChange = (e) => {
+    setInitialData({ ...initialData, [e.target.name]: e.target.value });
+  };
+
+  useEffect(() => {
+    if (packingBox.data.length === 0 && packingBox.loading === true) {
+      getPackingBoxList();
     }
+  }, [packingBox.data]);
 
-    useEffect(() => {
-        if (packingBox.data.length === 0 && packingBox.loading === true) {
-            getPackingBoxList()
-        }
-    }, [packingBox.data])
-
-    const onSubmit = async (e) => {
-        e.preventDefault()
-        if (initialData.title === '') return toast.info("Packing box name can not be empty")
-        if (!initialData.breed_id) return toast.info("species required")
-        setIsProcessing(true)
-        let res;
-        if (isEditing) {
-            res = await edit_packing_box(packingDetail.id, initialData)
-        } else {
-            res = await create_packing_box(initialData)
-        }
-        setIsProcessing(false)
-        if (res?.success === true) {
-            toast.success(res.message)
-            setInitialData({
-                title: '',
-                stock: '',
-                capacity: '',
-                price: '',
-                breed_id: '',
-            })
-            setIsOpen(false)
-            getPackingBoxList({ page: 1, limit: 20 })
-        } else {
-            toast.error(res?.message || "Packing box can not be created")
-        }
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (initialData.title === "")
+      return toast.info("Packing box name can not be empty");
+    if (!initialData.breed_id) return toast.info("species required");
+    setIsProcessing(true);
+    let res;
+    if (isEditing) {
+      res = await edit_packing_box(packingDetail.id, initialData);
+    } else {
+      res = await create_packing_box(initialData);
     }
+    setIsProcessing(false);
+    if (res?.success === true) {
+      toast.success(res.message);
+      setInitialData({
+        title: "",
+        stock: "",
+        capacity: "",
+        price: "",
+        breed_id: "",
+      });
+      setIsOpen(false);
+      getPackingBoxList({ page: 1, limit: 20 });
+    } else {
+      toast.error(res?.message || "Packing box can not be created");
+    }
+  };
 
-    return (
-        <>
-            <CommonBreadcrumb title="Packing Box" parent="Home" />
-            <Container fluid>
-                <Row>
-                    <Col sm="12">
-                        <Card>
-                            {/* <CommonCardHeader title="Unit Management" /> */}
-                            <CardBody>
-                                <div className="btn-popup pull-right">
-                                    <Button color="primary" onClick={() => { setIsOpen(true); setIsEditing(false); setPackingDetail(null); }}>
-                                        Add Packing Box
-                                    </Button>
-                                </div>
-                                <div className="clearfix"></div>
-                                <div className="px-sm-3">
-                                    <Table responsive hover borderless align="center" >
-                                        <thead className="border-bottom border-top py-4" >
-                                            <tr>
-                                                <th className="">TITLE</th>
-                                                <th className="text-center">CAPACITY</th>
-                                                <th className="text-center">Animal Name</th>
-                                                <th className="text-center">PRICE</th>
-                                                <th className="text-center">STOCK</th>
-                                                <th className="text-end">ACTION</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {!packingBox.loading && packingBox?.data?.map((item, i) => (
-                                                <tr key={i}>
-                                                    <td className="">{item?.title}</td>
-                                                    <td className="text-center">{item?.capacity}</td>
-                                                    <td className="text-center">{item?.breed_name}</td>
-                                                    <td className="text-center">{item?.price}</td>
-                                                    <td className="text-center">{item?.stock}</td>
-                                                    <td className="d-flex gap-2 justify-content-end align-items-center">
-                                                        <Badge
-                                                            color="danger"
-                                                            style={{ cursor: 'pointer' }}
-                                                            onClick={() => { setIsEditing(true); setPackingDetail(item); setIsOpen(true); }}
-                                                        >
-                                                            <FaEdit style={{ fontSize: 14 }} />
-                                                        </Badge>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                    {!packingBox.loading && packingBox?.data?.length === 0 && (
-                                        <p className="text-muted text-center my-4" style={{ fontSize: 14 }}>No Data found</p>
-                                    )}
-                                    {packingBox.loading && <LoadingComponent />}
-                                </div>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
-            </Container>
-            <Modal isOpen={isOpen} toggle={setIsOpen}>
-                <ModalHeader toggle={() => setIsOpen(false)}>
-                    <h5 className="modal-title f-w-600" id="exampleModalLabel2">
-                        {isEditing ? `Edit Bedding Material` : "Add New Bedding Material"}
-                    </h5>
-                </ModalHeader>
-                <ModalBody>
-                    <Form onSubmit={onSubmit}>
-                        {allBreeds && allBreeds.length > 0 && (
-                            <Autocomplete
-                                disablePortal
-                                options={allBreeds}
-                                style={{ paddingTop: '16px' }}
-                                disabled={isProcessing}
-                                getOptionLabel={(option) => option?.title || ""}
-                                value={allBreeds?.find((sp) => sp.id === initialData?.breed_id) || ''}
-                                onChange={(event, newValue) => {
-                                    if (newValue) {
-                                        setInitialData({ ...initialData, breed_id: newValue.id });
-                                    } else {
-                                        setInitialData({ ...initialData, breed_id: '' });
-                                    }
-                                }}
-                                sx={{ width: '100%' }}
-                                renderInput={(params) => <TextField {...params} label="Select animal" />}
-                            />
-                        )}
-                        <FormGroup>
-                            <Label htmlFor="recipient-name" className="col-form-label">
-                                Packing box name :
-                            </Label>
-                            <Input type="text" required min={3} placeholder="Enter packing box name" onChange={onChange} value={initialData.title} name="title" disabled={isProcessing} />
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="recipient-name" className="col-form-label">
-                                Stock :
-                            </Label>
-                            <Input type="number" required min={0} placeholder="Enter stock" onChange={onChange} name="stock" value={initialData.stock} disabled={isProcessing} />
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="recipient-name" className="col-form-label">
-                                Packing box capacity :
-                            </Label>
-                            <Input type="number" required min={1} placeholder="Enter packing box capacity" onChange={onChange} value={initialData.capacity} name="capacity" disabled={isProcessing} />
-                        </FormGroup>
-                        <FormGroup>
-                            <Label htmlFor="recipient-name" className="col-form-label">
-                                Packing box price :
-                            </Label>
-                            <Input type="number" required min={0} placeholder="Enter packing box price" onChange={onChange} name="price" value={initialData.price} disabled={isProcessing} />
-                        </FormGroup>
-                        <ModalFooter className="px-0">
-                            <Button size="sm" type="submit" color="primary" disabled={isProcessing}>
-                                Save
-                            </Button>
-                            <Button size="sm" type="button" color="secondary" onClick={() => setIsOpen(false)} disabled={isProcessing}>
-                                Close
-                            </Button>
-                        </ModalFooter>
-                    </Form>
-                </ModalBody>
-            </Modal>
-        </>
-    )
-}
+  return (
+    <>
+      <CommonBreadcrumb title="Packing Box" parent="Home" />
+      <Container fluid>
+        <Row>
+          <Col sm="12">
+            <Card>
+              {/* <CommonCardHeader title="Unit Management" /> */}
+              <CardBody>
+                <div className="btn-popup pull-right">
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      setIsOpen(true);
+                      setIsEditing(false);
+                      setPackingDetail(null);
+                    }}
+                  >
+                    Add Packing Box
+                  </Button>
+                </div>
+                <div className="clearfix"></div>
+                <div className="px-sm-3">
+                  <Table hover responsive className="align-middle">
+                    <thead>
+                      <tr>
+                        <th>TITLE</th>
+                        <th >CAPACITY</th>
+                        <th >Animal Name</th>
+                        <th >PRICE</th>
+                        <th >STOCK</th>
+                        <th >ACTION</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {packingBox?.loading ? (
+                        <tr>
+                          <td colSpan="10" className="text-center">
+                            <Spinner color="secondary" className="my-4" />
+                          </td>
+                        </tr>
+                      ) : packingBox?.data?.length === 0 ? (
+                        <tr>
+                          <td colSpan="10" className="text-center">
+                            No List Found
+                          </td>
+                        </tr>
+                      ) : (
+                        packingBox?.data?.map((product, index) => (
+                          <tr key={index}>
+                            <td>{product?.title}</td>
+                            <td>{product?.capacity}</td>
+                            <td>{product?.breed_title}</td>
+                            <td>{product?.price}</td>
+                            <td>{product?.stock}</td>
+                            <td>
+                              <div className="circelBtnBx">
+                                <Button
+                                  className="btn"
+                                  color="link"
+                                  onClick={() => {
+                                    setIsEditing(true);
+                                    setPackingDetail(product);
+                                    setIsOpen(true);
+                                  }}
+                                >
+                                  <FaEdit />
+                                </Button>
+                                <Button className="btn" color="link">
+                                  <FaTrashAlt />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </Table>
+                  {!packingBox.loading && packingBox?.data?.length === 0 && (
+                    <p
+                      className="text-muted text-center my-4"
+                      style={{ fontSize: 14 }}
+                    >
+                      No Data found
+                    </p>
+                  )}
+                  {packingBox.loading && <LoadingComponent />}
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+      <Modal isOpen={isOpen} toggle={setIsOpen}>
+        <ModalHeader toggle={() => setIsOpen(false)}>
+          <h5 className="modal-title f-w-600" id="exampleModalLabel2">
+            {isEditing ? `Edit Bedding Material` : "Add New Bedding Material"}
+          </h5>
+        </ModalHeader>
+        <ModalBody>
+          <Form onSubmit={onSubmit}>
+            {allproductList?.data && allproductList.data?.length > 0 && (
+              <Autocomplete
+                disablePortal
+                options={allproductList?.data}
+                style={{ paddingTop: "16px" }}
+                disabled={isProcessing}
+                getOptionLabel={(option) => option?.title || ""}
+                value={
+                  allproductList?.data?.find(
+                    (sp) => sp.id === initialData?.breed_id
+                  ) || ""
+                }
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    setInitialData({ ...initialData, breed_id: newValue.id });
+                  } else {
+                    setInitialData({ ...initialData, breed_id: "" });
+                  }
+                }}
+                sx={{ width: "100%" }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Select animal" />
+                )}
+              />
+            )}
+            <FormGroup>
+              <Label htmlFor="recipient-name" className="col-form-label">
+                Packing box name :
+              </Label>
+              <Input
+                type="text"
+                required
+                min={3}
+                placeholder="Enter packing box name"
+                onChange={onChange}
+                value={initialData.title}
+                name="title"
+                disabled={isProcessing}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="recipient-name" className="col-form-label">
+                Stock :
+              </Label>
+              <Input
+                type="number"
+                required
+                min={0}
+                placeholder="Enter stock"
+                onChange={onChange}
+                name="stock"
+                value={initialData.stock}
+                disabled={isProcessing}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="recipient-name" className="col-form-label">
+                Packing box capacity :
+              </Label>
+              <Input
+                type="number"
+                required
+                min={1}
+                placeholder="Enter packing box capacity"
+                onChange={onChange}
+                value={initialData.capacity}
+                name="capacity"
+                disabled={isProcessing}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="recipient-name" className="col-form-label">
+                Packing box price :
+              </Label>
+              <Input
+                type="number"
+                required
+                min={0}
+                placeholder="Enter packing box price"
+                onChange={onChange}
+                name="price"
+                value={initialData.price}
+                disabled={isProcessing}
+              />
+            </FormGroup>
+            {/* <FormGroup className="col-md-6">
+                <Label htmlFor="org_type" className="col-form-label">
+                  Animal List
+                </Label>
+                <Input
+                  type="select"
+                  name="org_type"
+                  value={formData.org_type}
+                  onChange={handleInputChange}
+                  id="org_type"
+                >
+                  <option value="">Select Org Type</option>
+                  {allproductList?.data?.map((variety) => (
+                    <option key={variety.id} value={variety.id}>
+                      {variety.title}
+                    </option>
+                  ))}
+                </Input>
+              </FormGroup> */}
+            <ModalFooter className="px-0">
+              <Button
+                size="sm"
+                type="submit"
+                color="primary"
+                disabled={isProcessing}
+              >
+                Save
+              </Button>
+              <Button
+                size="sm"
+                type="button"
+                color="secondary"
+                onClick={() => setIsOpen(false)}
+                disabled={isProcessing}
+              >
+                Close
+              </Button>
+            </ModalFooter>
+          </Form>
+        </ModalBody>
+      </Modal>
+    </>
+  );
+};

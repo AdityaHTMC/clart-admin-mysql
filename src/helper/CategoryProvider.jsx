@@ -13,6 +13,7 @@ export const CategoryProvider = ({ children }) => {
   const [category, setCategory] = useState({ loading: true, data: [] })
   const [subcategory, setSubCategory] = useState([{ loading: true, data: [] }])
   const [productList, setProductList] = useState({loading: true,data: [],total: ""})
+  const [allproductList, setallProductList] = useState({loading: true,data: []})
   const [prouctDetails, setProuctDetails] = useState({})
   const [BannerList, setBannerList] = useState({ data: [], loading: true })
   const [FaqList, setFaqList] = useState({ loading: true, data: [] })
@@ -183,37 +184,67 @@ export const CategoryProvider = ({ children }) => {
 
   const editProduct = async (id, formData) => {
     try {
-      const response = await axios.put(
-        `${base_url}/admin/species/update/${id}`,
+      const response = await axios.post(
+        `${base_url}/admin/breed/edit/${id}`,
         formData,
         {
           headers: {
             Authorization: AuthToken,
-            "Content-Type": "multipart/form-data",
           },
         }
       );
-
-      const data = response.data;
-      return data
+      if (response.status === 200) {
+        toast.success(response.data.message);
+        navigate('/animal-list')
+      } else {
+        toast.error(response.data.message);
+      }
     } catch (error) {
-      console.error("Error updating Species:", error);
       return error?.response?.data || null
     }
   };
 
-  const ProductDelete = async (id) => {
+  const ProductDelete = async (id) => { 
     try {
-      const { data } = await axios.delete(
-        `${base_url}/species/delete/${id}`,
-        { headers: { Authorization: AuthToken } }
+      const response = await axios.delete(
+        `${base_url}/admin/breed/delete/${id}`,
+        { headers: { 'Authorization': AuthToken }}
       );
-
-      return data
+      
+      if (response.status === 200) {
+        toast.success(response?.data?.message)
+        getproductList(); 
+      } else {
+        toast.error(response?.data?.message)
+      }
     } catch (error) {
-      return error?.response?.data || null
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
   }
+
+
+  const getallproductList = async () => {
+    try {
+      setallProductList({ data: [], loading: true });
+      const response = await axios.get(
+        `${base_url}/admin/all/breeds/list`,
+        { headers: { Authorization: AuthToken } }
+      );
+      const data = response.data;
+      if (response.status === 200) {
+        setallProductList({
+          data: response?.data?.data || [],
+          loading: false,
+        });
+      } else {
+        setallProductList({ data: [], loading: false });
+
+      }
+    } catch (error) {
+      setallProductList({ data: [], loading: false });
+    }
+  };
+
 
   const getBannerList = async (data) => {
     try {
@@ -330,7 +361,7 @@ export const CategoryProvider = ({ children }) => {
         setFaqList({ data: response?.data?.data || [], loading: false });
       } else {
         setFaqList({ ...FaqList, loading: false });
-        toast.error("Failed to fetch varity list");
+        toast.error(response?.data?.message);
       }
     } catch (error) {
       setFaqList({ ...FaqList, loading: false });
@@ -346,7 +377,6 @@ export const CategoryProvider = ({ children }) => {
         {
           headers: {
             Authorization: AuthToken,
-            'Content-Type': 'application/json'
           }
         }
       );
@@ -383,7 +413,6 @@ const editFaq = async (id, formDataToSend) => {
         {
           headers: {
             Authorization: AuthToken,
-            "Content-Type": "application/json",
           },
         }
       );
@@ -419,7 +448,7 @@ const editFaq = async (id, formDataToSend) => {
 
 
   const values = {
-    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,editFaq,faqDelete , editCategory
+    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,editFaq,faqDelete , editCategory,getallproductList,allproductList
   }
   return (
     <AppContext.Provider value={values}>

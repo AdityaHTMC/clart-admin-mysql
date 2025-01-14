@@ -122,7 +122,8 @@ export const EditProduct = () => {
             toast.success('Animal updated successfully')
             Navigate('/animal-list')
         } else {
-            toast.error(res?.message || 'An error occured while adding product')
+          console.log('Animal not found')
+
         }
     }
 

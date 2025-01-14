@@ -88,16 +88,9 @@ export const AddAnimal = () => {
         }
         
 
-        setIsProcessing(true)
-        const res = await addProduct(bodyData)
-        setIsProcessing(false)
-        if (res?.success) {
-            getproductList()
-            toast.success('Animal added successfully')
-            Navigate('/animal-list')
-        } else {
-            toast.error(res?.message || 'An error occured while adding product')
-        }
+   
+     addProduct(bodyData)
+      
     }
 
     return (

@@ -83,6 +83,11 @@ const EditAnimal = () => {
     setNewImagePreviews(updatedPreviews);
   };
 
+  const handleRemoveImage = (index) => {
+    const updatedImages = gallery_images.filter((_, imgIndex) => imgIndex !== index);
+    setgallery_images(updatedImages);
+  };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -105,20 +110,25 @@ const EditAnimal = () => {
 
     const formDataToSend = new FormData();
 
-    formDataToSend.append("name", inputData.name);
-    formDataToSend.append("email", inputData.email);
-    formDataToSend.append("mobile", inputData.mobile);
-    formDataToSend.append("address", inputData.address);
-    formDataToSend.append("pincode", inputData.pincode);
-    formDataToSend.append("city", inputData.city);
-    formDataToSend.append("district", inputData.district);
-    formDataToSend.append("state", inputData.state);
 
-    if (inputData.image) {
-      formDataToSend.append("image", inputData.image);
-    }
+    Object.entries(inputData).forEach(([key, value]) => {
+      if (value) {
+        formDataToSend.append(key, value);
+      }
+    });
 
-    // editCustomer(id,formDataToSend);
+    const combinedImages = [...gallery_images, ...newImages];
+
+    combinedImages.forEach((image, index) => {
+      // Existing images are URLs; new images are files
+      if (image instanceof File) {
+        formDataToSend.append(`images[${index}]`, image);
+      } else {
+        formDataToSend.append(`images[${index}]`, image); // Handle as a URL
+      }
+    });
+
+    editProduct(id,formDataToSend);
   };
 
   return (
@@ -314,6 +324,39 @@ const EditAnimal = () => {
           </div>
 
           <div className="row">
+          <FormGroup className="mt-4">
+             <Label>Existing Gallery Images</Label> 
+            <Row>
+              {gallery_images?.map((image, index) => (
+                <Col key={index} sm="2">
+                  <div
+                    className="image-wrapper"
+                    style={{ position: "relative" }}
+                  >
+                    <img
+                      src={image}
+                      alt={`Gallery Image ${index}`}
+                      style={{
+                        width: "100px",
+                        height: "auto",
+                        marginBottom: "10px",
+                      }}
+                    />
+                    <FaTrashAlt
+                      onClick={() => handleRemoveImage(index)}
+                      style={{
+                        position: "absolute",
+                        top: "90%",
+                        right: "65%",
+                        cursor: "pointer",
+                        color: "red",
+                      }}
+                    />
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          </FormGroup>
           <FormGroup>
             <Label for="newImages">Add New Gallery Images</Label>
             <Input
@@ -367,7 +410,7 @@ const EditAnimal = () => {
        
 
           <Button type="submit" color="primary">
-            Edit Customer
+            Edit 
           </Button>
         </form>
       </div>
