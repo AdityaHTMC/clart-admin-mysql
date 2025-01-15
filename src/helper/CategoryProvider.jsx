@@ -13,6 +13,7 @@ export const CategoryProvider = ({ children }) => {
   const [category, setCategory] = useState({ loading: true, data: [] })
   const [subcategory, setSubCategory] = useState([{ loading: true, data: [] }])
   const [productList, setProductList] = useState({loading: true,data: [],total: ""})
+  const [riviewList, setReviewList] = useState({loading: true,data: [],total: ""})
   const [allproductList, setallProductList] = useState({loading: true,data: []})
   const [prouctDetails, setProuctDetails] = useState({})
   const [BannerList, setBannerList] = useState({ data: [], loading: true })
@@ -246,6 +247,29 @@ export const CategoryProvider = ({ children }) => {
   };
 
 
+  const getproductReviewList = async (id) => {
+    try {
+      setReviewList({ data: [], loading: true });
+      const response = await axios.post(
+        `${base_url}/admin/reviews/list`,{breed_id:id},
+        { headers: { Authorization: AuthToken } }
+      );
+      const data = response.data;
+      if (response.status === 200) {
+        setReviewList({
+          data: response?.data?.data || [],
+          loading: false,
+        });
+      } else {
+        setReviewList({ data: [], loading: false });
+
+      }
+    } catch (error) {
+      setReviewList({ data: [], loading: false });
+    }
+  };
+
+
   const getBannerList = async (data) => {
     try {
       setBannerList({ ...BannerList, loading: true })
@@ -448,7 +472,7 @@ const editFaq = async (id, formDataToSend) => {
 
 
   const values = {
-    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,editFaq,faqDelete , editCategory,getallproductList,allproductList
+    create_category, getCategoryList, category, getSubCategoryList, subcategory, categoryDelete, addCategory, addProduct, getproductList, productList, getproductDetails, prouctDetails, editProduct, ProductDelete, getBannerList, BannerList, addBanner, bannerDelete, editBranner, switchBranner, getFaqList, FaqList, addFaq,editFaq,faqDelete , editCategory,getallproductList,allproductList,getproductReviewList,riviewList
   }
   return (
     <AppContext.Provider value={values}>

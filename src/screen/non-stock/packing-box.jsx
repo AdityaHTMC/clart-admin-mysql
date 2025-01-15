@@ -54,8 +54,6 @@ export const PackingBox = () => {
     getallproductList();
   }, []);
 
-  console.log(allproductList.data, "product list");
-
   useEffect(() => {
     setInitialData({
       title: packingDetail?.title || "",
@@ -82,27 +80,13 @@ export const PackingBox = () => {
       return toast.info("Packing box name can not be empty");
     if (!initialData.breed_id) return toast.info("species required");
     setIsProcessing(true);
-    let res;
     if (isEditing) {
-      res = await edit_packing_box(packingDetail.id, initialData);
+      edit_packing_box(packingDetail.id, initialData);
     } else {
-      res = await create_packing_box(initialData);
+      create_packing_box(initialData);
     }
     setIsProcessing(false);
-    if (res?.success === true) {
-      toast.success(res.message);
-      setInitialData({
-        title: "",
-        stock: "",
-        capacity: "",
-        price: "",
-        breed_id: "",
-      });
-      setIsOpen(false);
-      getPackingBoxList({ page: 1, limit: 20 });
-    } else {
-      toast.error(res?.message || "Packing box can not be created");
-    }
+    setIsOpen(false);
   };
 
   return (
@@ -132,11 +116,11 @@ export const PackingBox = () => {
                     <thead>
                       <tr>
                         <th>TITLE</th>
-                        <th >CAPACITY</th>
-                        <th >Animal Name</th>
-                        <th >PRICE</th>
-                        <th >STOCK</th>
-                        <th >ACTION</th>
+                        <th>CAPACITY</th>
+                        <th>Animal Name</th>
+                        <th>PRICE</th>
+                        <th>STOCK</th>
+                        <th>ACTION</th>
                       </tr>
                     </thead>
                     <tbody>

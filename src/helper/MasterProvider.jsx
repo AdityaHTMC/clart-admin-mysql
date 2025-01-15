@@ -331,14 +331,28 @@ export const MasterProvider = ({ children }) => {
         }
     }
 
-    const edit_packing_box = async (id, body) => {
-        try {
-            const {data} = await axios.put(`${base_url}/packing-box/update/${id}`, body, { headers: { 'Authorization': Authtoken }});
-            return data
-        } catch (error) {
-            return error?.response?.data || null
+
+    const edit_packing_box = async (id, formData) => {
+      try {
+        const response = await axios.put(
+          `${base_url}/packing-box/update/${id}`,
+          formData,
+          {
+            headers: {
+              Authorization: Authtoken,
+            },
+          }
+        );
+        if (response.status === 200) {
+          toast.success(response.data.message);
+          getPackingBoxList()
+        } else {
+          toast.error(response.data.message);
         }
-    }
+      } catch (error) {
+        return error?.response?.data || null
+      }
+    };
 
     const getPackingBoxList = async () => {
         try {

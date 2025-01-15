@@ -64,6 +64,7 @@ import OrderStatusList from './screen/Master/OrderStatus';
 import RoomList from './screen/production/RoomList';
 import AnimalList from './screen/animals/AnimalList';
 import EditAnimal from './screen/animals/EditAnimal';
+import ReviewsList from './screen/animals/ReviewsList';
 
 function App() {
   const { initialLoading } = useAuthContext()
@@ -137,7 +138,7 @@ function App() {
           <Route path="/org-type" element={<OrgType />} />
           <Route path="/organization" element={<Organization />} />
           <Route path="/order-status" element={<OrderStatusList />} />
-          
+          <Route path="/animal-reviews" element={<ReviewsList />} />
 
           <Route path="*" element={<NotFound />} />
 
