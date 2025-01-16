@@ -79,6 +79,9 @@ export const SettingProvider = ({ children }) => {
         }
     }
 
+
+    
+
     const values = {
         getSettingDetails, storeSetting, edit_store_setting, getStoreMenu, storeMenu, reorderStoreMenu, reorderStoreSubMenu
     }

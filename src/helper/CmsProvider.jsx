@@ -13,6 +13,11 @@ export const CMsProvider = ({ children }) => {
     const [menuList, setMenuList] = useState({ loading: true, data: [] })
     const [cmsList, setCmsList] = useState({ loading: true, data: [] })
     const [currencyList, setCurrencyList] = useState({ loading: true, data: [] })
+    const [allOrderlist, setAllOrderlist] = useState({ loading: true, data: [] ,total: ""})
+    const [allOrderStatus, setallOrderStatus] = useState({ loading: true, data: [] })
+    const [allCustomer, setAllCustomer] = useState({ loading: true, data: [] });
+    const [packingbox, setpackingbox] = useState({ loading: true, data: [] });
+    const [allanimal, setallanimal] = useState({ loading: true, data: [] });
     const { Authtoken } = useAuthContext()
     const AuthToken = localStorage.getItem('Authtoken')
 
@@ -144,9 +149,121 @@ export const CMsProvider = ({ children }) => {
       };
 
 
+      const getAllOrderList = async (dataToSend) => {
+        try {
+          setAllOrderlist({ loading: true, data: [] ,total: ""})
+            const response = await axios.post(
+                `${base_url}/admin/orders/list`,
+                {...dataToSend} ,
+                { headers: { Authorization: Authtoken } }
+            );
+            if (response.status === 200) {
+                setAllOrderlist({
+                    data: response?.data?.data || [],
+                    loading: false,
+                    total: response.data.total,
+                });
+            } else {
+                setAllOrderlist({ loading: false, data: [] });
+            }
+        } catch (error) {
+            setAllOrderlist({ loading: false, data: [] });
+            toast.error(error.response?.data?.message || "Something went wrong");
+        }
+    };
+
+    const getAllOrderStatus = async (data) => {
+      try {
+        const response = await axios.get(
+          `${base_url}/admin/dashboard/order/count`,
+          { headers: { 'Authorization': Authtoken } }
+        );
+        const data = response.data;
+        if (response.status === 200) {
+          setallOrderStatus({ data: response?.data?.data || [], loading: false });
+        } else {
+          setallOrderStatus({data:[], loading: false});
+          toast.error("server errors");
+        }
+      } catch (error) {
+        setallOrderStatus({data:[], loading: false});
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
+    };
+
+
+    const getCustomerDetail = async (data) => {
+      try {
+          setAllCustomer({ ...allCustomer, loading: true });
+          const response = await axios.post(
+              `${base_url}/admin/all/customers/list`,
+              data ,
+              { headers: { Authorization: Authtoken } }
+          );
+          if (response.status === 200) {
+              setAllCustomer({
+                  data: response?.data?.data || [],
+                  loading: false,
+              });
+          } else {
+              setAllCustomer({ data: [], loading: false });
+          }
+      } catch (error) {
+          setAllCustomer({ data: [], loading: false });
+          // toast.error("Failed to test list");
+      }
+  };
+
+
+  const getpackingBox = async (data) => {
+    try {
+      setpackingbox({ ...allCustomer, loading: true });
+      const response = await axios.post(
+        `${base_url}/admin/all/customers/list`,
+        data,
+        { headers: { Authorization: Authtoken } }
+      );
+      if (response.status === 200) {
+        setpackingbox({
+          data: response?.data?.data || [],
+          loading: false,
+        });
+      } else {
+        setpackingbox({ data: [], loading: false });
+      }
+    } catch (error) {
+      setpackingbox({ data: [], loading: false });
+      // toast.error("Failed to test list");
+    }
+  };
+
+
+  const getAllAnimal = async () => {
+    try {
+      setallanimal({ data: [], loading: true });
+      const response = await axios.get(
+        `${base_url}/admin/all/breeds/list`,
+        { headers: { Authorization: AuthToken } }
+      );
+      const data = response.data;
+      if (response.status === 200) {
+        setallanimal({
+          data: response?.data?.data || [],
+          loading: false,
+        });
+      } else {
+        setallanimal({ data: [], loading: false });
+
+      }
+    } catch (error) {
+      setallanimal({ data: [], loading: false });
+    }
+  };
+
+
 
     const values = {
-        getMenuList, menuList , getCmsList ,cmsList ,addCms,deleteCms,editcms,getCurrencyList,currencyList
+        getMenuList, menuList , getCmsList ,cmsList ,addCms,deleteCms,editcms,getCurrencyList,currencyList,getAllOrderList,allOrderlist,getAllOrderStatus,allOrderStatus,getCustomerDetail,allCustomer,getpackingBox,packingbox,getAllAnimal,allanimal
     }
     return (
         <AppContext.Provider value={values} >

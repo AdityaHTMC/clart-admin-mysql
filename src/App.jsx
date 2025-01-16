@@ -65,6 +65,10 @@ import RoomList from './screen/production/RoomList';
 import AnimalList from './screen/animals/AnimalList';
 import EditAnimal from './screen/animals/EditAnimal';
 import ReviewsList from './screen/animals/ReviewsList';
+import VendorManagement from './screen/StockManagement/VendorManagement';
+import AllOrderList from './screen/OrderMenu/AllOrderList';
+import AddOrder from './screen/OrderMenu/AddOrder';
+
 
 function App() {
   const { initialLoading } = useAuthContext()
@@ -139,6 +143,9 @@ function App() {
           <Route path="/organization" element={<Organization />} />
           <Route path="/order-status" element={<OrderStatusList />} />
           <Route path="/animal-reviews" element={<ReviewsList />} />
+          <Route path="/vendor-management" element={<VendorManagement />} />
+          <Route path="/all-orders" element={<AllOrderList/>} />
+          <Route path="/add-orders" element={<AddOrder/>} />
 
           <Route path="*" element={<NotFound />} />
 

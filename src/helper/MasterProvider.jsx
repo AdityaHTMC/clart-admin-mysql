@@ -35,6 +35,7 @@ export const MasterProvider = ({ children }) => {
     const [speciesMasterList, setSpeciesMasterList] = useState({loading: true,data: [],total: ""});
     const [orderMasterList, setorderMasterList] = useState({loading: true,data: [],total: ""});
     const [allspecies, setallspecies] = useState({loading: true,data: []});
+    const [vendorList, setVendorList] = useState({loading: true,data: [],total: "",});
     const { Authtoken } = useAuthContext()
 
     //  Unit fucntions
@@ -1533,11 +1534,98 @@ export const MasterProvider = ({ children }) => {
           toast.error(error.response?.data?.message || "Something went wrong");
         }
       };
+
+
+      const getvendorList = async (dataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/vendors/list`,
+            {...dataToSend},
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setVendorList({
+              data: response?.data?.data || [],
+              total: response.data.total,
+              loading: false,
+            });
+          } else {
+            setVendorList({ data: [], loading: false });
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          setVendorList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+    
+      const addVendor = async (formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/vendor/add`,
+            { ...formDataToSend },
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response.data.message);
+            getvendorList();
+          } else {
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+    
+      const editVendor = async (id, formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/vendor/update/${id}`,
+            { ...formDataToSend },
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response.data.message);
+            getvendorList();
+          } else {
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+    
+      const deletevendor = async (id) => {
+        try {
+          const response = await axios.delete(
+            `${base_url}/admin/vendor/delete/${id}`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            toast.success(response.data.message);
+            getvendorList();
+          } else {
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
     
     
 
     const values = {
-        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList,getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,getNotificationSettingsList,editNotificationSettingsList,notificationSettingsList,getPaymentMethodsList,paymentMethodsList, editPaymentMethodsList,deletePaymentMethodsList,deleteNotificationList,deleteWhatsAppList,deleteSmsNotificationList,deleteEmailList,getSettingDetails,storeSetting, edit_store_setting,getShippingAgencyList,ShippingAgencyList,AddShipping_agency,editShippingAgencyList,deleteShippingAgency,getStateList,stateList,addState,editState,StateDelete,addDistrict,editDistrict,getdistrictList,districtList,DistrictDelete,getOrgTypeList,orgTypeList,addOrgType,editOrgType,deleteOrgType,getAllOrgTypeList,allorgtypeList,addOrg,getOrgList,orgList,editOrg,deleteOrg,getCityList,cityList,addCity,editCity,cityDelete,getSpeciesMasterList,speciesMasterList,addSpeciesMasterList,editSpeciesMasterList,DeleteSpecies,getOrderMasterList,orderMasterList,addOrderMasterList,editOrderStatus , getAllSpeciesList , allspecies
+        create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox,getSmsSettingsList,smsSettingsList,editSMSSettingsList,getEmailSettingsList,editEmailSettingsList,emailSettingsList,getWhatsAppSettingsList,whatsAppSettingsList,editWhatsAppSettingsList,getNotificationSettingsList,editNotificationSettingsList,notificationSettingsList,getPaymentMethodsList,paymentMethodsList, editPaymentMethodsList,deletePaymentMethodsList,deleteNotificationList,deleteWhatsAppList,deleteSmsNotificationList,deleteEmailList,getSettingDetails,storeSetting, edit_store_setting,getShippingAgencyList,ShippingAgencyList,AddShipping_agency,editShippingAgencyList,deleteShippingAgency,getStateList,stateList,addState,editState,StateDelete,addDistrict,editDistrict,getdistrictList,districtList,DistrictDelete,getOrgTypeList,orgTypeList,addOrgType,editOrgType,deleteOrgType,getAllOrgTypeList,allorgtypeList,addOrg,getOrgList,orgList,editOrg,deleteOrg,getCityList,cityList,addCity,editCity,cityDelete,getSpeciesMasterList,speciesMasterList,addSpeciesMasterList,editSpeciesMasterList,DeleteSpecies,getOrderMasterList,orderMasterList,addOrderMasterList,editOrderStatus , getAllSpeciesList , allspecies,getvendorList , addVendor ,editVendor, deletevendor,vendorList
     }
 
     return (
