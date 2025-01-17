@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import CommonBreadcrumb from "../../component/common/bread-crumb";
 import { useCmsContext } from "../../helper/CmsProvider";
 import { Link } from "react-router-dom";
-import { Badge, FormGroup, Input, Label, Spinner } from "reactstrap";
+import { Badge, Button, FormGroup, Input, Label, Spinner } from "reactstrap";
 import { FaCircleXmark } from "react-icons/fa6";
-
+import { GoTrash } from "react-icons/go";
 const AddOrder = () => {
   const {
     getCustomerDetail,
@@ -13,7 +13,7 @@ const AddOrder = () => {
     getpackingBox,
     packingbox,
     getAllAnimal,
-    allanimal,
+    allanimal,createNewOrder,getAddressList,allAddress
   } = useCmsContext();
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -21,29 +21,117 @@ const AddOrder = () => {
   const [quantity, setQuantity] = useState(1);
   const [showPackingBox, setShowPackingBox] = useState(false);
   const [packingBoxNumber, setPackingBoxNumber] = useState("");
+  const [orderItems, setOrderItems] = useState([
+    { animalId: "", quantity: 1, packingBoxNumber: "", totalPrice: 0, packing_box_id : 1, packing_box_total_price: 0},
+  ]);
+
+  const [inputData , setInputData] = useState({
+    iiac_number:'',
+    iiac_valid_from: '',
+    iiac_valid_to: '',
+    total_amount: 0,
+    status: 'Pending',
+    order_date: new Date(),
+    payment_mode:'CASH'
+  });
 
   useEffect(() => {
     getAllAnimal();
-  }, []);
+    if(selectedCustomer?.id){
+      getAddressList(selectedCustomer?.id);
+    }
+  }, [selectedCustomer]);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setInputData((prevData) => ({
+      ...prevData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
 
   useEffect(() => {
     if (showPackingBox && selectedAnimal && quantity > 0) {
-      getpackingBox(selectedAnimal, quantity)
+      getpackingBox(selectedAnimal, quantity);
     }
   }, [selectedAnimal, quantity, showPackingBox]);
 
-  const handleAnimalChange = (e) => {
-    setSelectedAnimal(e.target.value);
+  const handleItemChange = async (index, field, value) => {
+    const updatedItems = [...orderItems];
+    updatedItems[index][field] = value;
+
+    if (field === "animalId" || field === "quantity") {
+      const animal = allanimal?.data?.find(
+        (a) => a.id === parseInt(updatedItems[index].animalId)
+      );
+      const quantity = parseInt(updatedItems[index].quantity) || 1;
+
+      const price =
+        selectedCustomer?.organization_type === "Government"
+          ? animal?.gov_price || 0
+          : animal?.price || 0;
+      updatedItems[index].totalPrice = price * quantity;
+
+      if (animal && quantity > 0) {
+        getpackingBox(animal.id, quantity).then((res) => {
+          updatedItems[index].packingBoxNumber = res?.expected_quantity;
+          updatedItems[index].packing_box_id = res?.id;
+          updatedItems[index].packing_box_total_price = res?.price * res?.expected_quantity
+          setOrderItems(updatedItems);
+        });
+      }
+    }
+
+    setOrderItems(updatedItems);
   };
 
-  const handleQuantityChange = (e) => {
-    const value = e.target.value;
-    setQuantity(value);
+  const addItemRow = () => {
+    setOrderItems([
+      ...orderItems,
+      { animalId: "", quantity: 1, packingBoxNumber: "", totalPrice: 0 },
+    ]);
   };
 
-  const handleCheckboxChange = (e) => {
-    setShowPackingBox(e.target.checked);
+  const removeItemRow = (index) => {
+    const updatedItems = orderItems.filter((_, i) => i !== index);
+    setOrderItems(updatedItems);
   };
+
+  const handleSubmit = () => {
+    const items = orderItems.map((item) => ({
+      breed_id: parseInt(item.animalId, 10),
+      quantity: parseInt(item.quantity, 10),
+      total_price: parseFloat(item.totalPrice),
+      packing_box_quantity: parseInt(item.packingBoxNumber, 10),
+      packing_box_id: parseInt(item.packing_box_id, 10),
+      packing_box_total_price: parseFloat(item.packing_box_total_price),
+    }));
+  
+    const final_amount = items.reduce((sum, item) => sum + item.total_price, 0);
+  
+    const formData = new FormData();
+    orderItems.forEach((el, i) => {
+      formData.append(`items[${i}][breed_id]`, parseInt(el.animalId, 10));
+      formData.append(`items[${i}][quantity]`, parseInt(el.quantity, 10));
+      formData.append(`items[${i}][total_price]`, parseFloat(el.totalPrice));
+      formData.append(`items[${i}][packing_box_quantity]`, parseInt(el.packingBoxNumber, 10));
+      formData.append(`items[${i}][packing_box_id]`, parseInt(el.packing_box_id, 10));
+      formData.append(`items[${i}][packing_box_total_price]`, parseFloat(el.packing_box_total_price));
+    });
+  
+    formData.append("customer_id", selectedCustomer?.id || "");
+    formData.append("total_amount", final_amount);
+    formData.append("iiac_number", inputData.iiac_number );
+    // Debugging: Log FormData contents properly
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+  
+    // Send the formData via API
+    createNewOrder(formData);
+  };
+  
 
   useEffect(() => {
     if (search && search.length > 2) {
@@ -168,60 +256,91 @@ const AddOrder = () => {
             </div>
           )}
 
-          {selectedCustomer && selectedCustomer?.id && (
-            <div>
-              <FormGroup>
-                <Label for="animalSelect">Choose Animal</Label>
-                <Input
-                  type="select"
-                  id="animalSelect"
-                  value={selectedAnimal}
-                  onChange={handleAnimalChange}
-                  style={{ padding: "10px", borderRadius: "5px" }}
-                >
-                  <option value="">Select Animal</option>
-                  {allanimal?.data?.map((animal) => (
-                    <option key={animal.id} value={animal.id}>
-                      {animal.title}
-                    </option>
-                  ))}
-                </Input>
-              </FormGroup>
-              <FormGroup>
-                <Label for="quantityInput">Quantity</Label>
-                <Input
-                  type="number"
-                  id="quantityInput"
-                  value={quantity}
-                  min="1"
-                  onChange={handleQuantityChange}
-                  style={{ padding: "10px", borderRadius: "5px" }}
-                />
-              </FormGroup>
-              <FormGroup check style={{ marginBottom: '15px' }}>
-              <Label check>
-                <Input
-                  type="checkbox"
-                  checked={showPackingBox}
-                  onChange={handleCheckboxChange}
-                />{' '}
-                Add Packing Box
-              </Label>
-            </FormGroup>
-            {showPackingBox && (
-              <FormGroup>
-                <Label for="packingBoxInput">Packing Box Number</Label>
-                <Input
-                  type="text"
-                  id="packingBoxInput"
-                  value={packingBoxNumber}
-                  readOnly
-                  style={{ backgroundColor: '#f8f9fa', padding: '10px', borderRadius: '5px' }}
-                />
-              </FormGroup>
+          <div>
+            {selectedCustomer && (
+              <div>
+                {orderItems.map((item, index) => (
+                  <div className="row" key={index}>
+                    <FormGroup className="col-md-3">
+                      <Label>Choose Animal</Label>
+                      <Input
+                        type="select"
+                        value={item.animalId}
+                        onChange={(e) =>
+                          handleItemChange(index, "animalId", e.target.value)
+                        }
+                      >
+                        <option value="">Select Animal</option>
+                        {allanimal?.data?.map((animal) => (
+                          <option key={animal.id} value={animal.id}>
+                            {animal.title}
+                          </option>
+                        ))}
+                      </Input>
+                    </FormGroup>
+                    <FormGroup className="col-md-2">
+                      <Label>Quantity</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          handleItemChange(index, "quantity", e.target.value)
+                        }
+                      />
+                    </FormGroup>
+                    <FormGroup className="col-md-2">
+                      <Label>Packing Box Number</Label>
+                      <Input
+                        type="text"
+                        value={item.packingBoxNumber}
+                        style={{ backgroundColor: "#f8f9fa" }}
+                      />
+                    </FormGroup>
+                    <FormGroup className="col-md-2">
+                      <Label>Total Price</Label>
+                      <Input type="text" value={item.totalPrice} readOnly />
+                    </FormGroup>
+                    <FormGroup className="col-md-2 d-flex align-items-end">
+                      <Button
+                        color="danger"
+                        onClick={() => removeItemRow(index)}
+                      >
+                        <GoTrash style={{ fontSize: 15, color: "#000" }} />
+                      </Button>
+                    </FormGroup>
+                  </div>
+                ))}
+                <Button color="primary" onClick={addItemRow}>
+                  + Add Animal
+                </Button>{" "}
+                <br /> <br />
+              </div>
             )}
-            </div>
-          )}
+
+            {selectedCustomer && (
+              <div>
+                <FormGroup>
+                  <Label for="title" className="col-form-label">
+                   iiac Number <span className="text-danger">*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="iiac_number"
+                    value={inputData.iiac_number}
+                    onChange={handleInputChange}
+                    id="iiac_number"
+                  />
+                </FormGroup>
+                <Button color="secondary" onClick={handleSubmit}>
+              Submit Order
+            </Button>
+              </div>
+              
+            )}
+
+            
+          </div>
         </form>
       </div>
     </>

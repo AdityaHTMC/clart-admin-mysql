@@ -3,12 +3,13 @@ import axios from 'axios';
 import { createContext, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAuthContext } from './AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 const AppContext = createContext();
 
 // eslint-disable-next-line react/prop-types
 export const CMsProvider = ({ children }) => {
-
+  const navigate = useNavigate()
     const base_url = import.meta.env.VITE_API_URL
     const [menuList, setMenuList] = useState({ loading: true, data: [] })
     const [cmsList, setCmsList] = useState({ loading: true, data: [] })
@@ -18,6 +19,7 @@ export const CMsProvider = ({ children }) => {
     const [allCustomer, setAllCustomer] = useState({ loading: true, data: [] });
     const [packingbox, setpackingbox] = useState({ loading: true, data: [] });
     const [allanimal, setallanimal] = useState({ loading: true, data: [] });
+    const [allAddress, setAllAddress] = useState({ loading: true, data: [] });
     const { Authtoken } = useAuthContext()
     const AuthToken = localStorage.getItem('Authtoken')
 
@@ -215,12 +217,13 @@ export const CMsProvider = ({ children }) => {
   };
 
 
-  const getpackingBox = async (data) => {
+  const getpackingBox = async (id, quantity) => {
     try {
-      setpackingbox({ ...allCustomer, loading: true });
       const response = await axios.post(
-        `${base_url}/admin/all/customers/list`,
-        data,
+        `${base_url}/admin/packing-box/capacity/detail`,
+        {
+          breed_id: id, quantity : quantity
+        },
         { headers: { Authorization: Authtoken } }
       );
       if (response.status === 200) {
@@ -228,12 +231,15 @@ export const CMsProvider = ({ children }) => {
           data: response?.data?.data || [],
           loading: false,
         });
+        return response?.data?.data
       } else {
         setpackingbox({ data: [], loading: false });
+        return null
       }
     } catch (error) {
       setpackingbox({ data: [], loading: false });
       // toast.error("Failed to test list");
+      return null
     }
   };
 
@@ -260,10 +266,55 @@ export const CMsProvider = ({ children }) => {
     }
   };
 
+  const getAddressList = async (customer_id) => {
+    try {
+      setAllAddress({ data: [], loading: true });
+      const response = await axios.post(
+        `${base_url}/customer/address/getAll`,{customer_id:customer_id},
+        { headers: { Authorization: AuthToken } }
+      );
+      const data = response.data;
+      if (response.status === 200) {
+        setAllAddress({
+          data: response?.data?.data || [],  
+          loading: false,
+        });
+      } else {
+        setAllAddress({ data: [], loading: false });
+
+      }
+    } catch (error) {
+      setAllAddress({ data: [], loading: false });
+    }
+  };
+
+  const createNewOrder = async (bodyData) => {
+    try {
+      const response = await axios.post(
+        `${base_url}/admin/order/place`,
+        bodyData,
+        {
+          headers: {
+            Authorization: Authtoken,
+            'Content-Type': 'multipart/form',
+          },
+        }
+      );
+      if (response.status === 200) {
+        toast.success(response?.data?.message);
+        navigate('/all-orders')
+      } else {
+        toast.error(response?.data?.message)
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
 
 
     const values = {
-        getMenuList, menuList , getCmsList ,cmsList ,addCms,deleteCms,editcms,getCurrencyList,currencyList,getAllOrderList,allOrderlist,getAllOrderStatus,allOrderStatus,getCustomerDetail,allCustomer,getpackingBox,packingbox,getAllAnimal,allanimal
+        getMenuList, menuList , getCmsList ,cmsList ,addCms,deleteCms,editcms,getCurrencyList,currencyList,getAllOrderList,allOrderlist,getAllOrderStatus,allOrderStatus,getCustomerDetail,allCustomer,getpackingBox,packingbox,getAllAnimal,allanimal,createNewOrder,getAddressList,allAddress
     }
     return (
         <AppContext.Provider value={values} >

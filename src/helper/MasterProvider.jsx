@@ -579,11 +579,11 @@ export const MasterProvider = ({ children }) => {
             });
           } else {
             setPaymentMethodsList({ data: [], loading: false });
-            toast.error(response?.data?.message)
+          
           }
         } catch (error) {
             setPaymentMethodsList({ data: [], loading: false });
-          toast.error(error.response?.data?.message || 'Server error');
+       
         }
       };
 
