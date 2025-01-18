@@ -80,13 +80,17 @@ export const PackingBox = () => {
       return toast.info("Packing box name can not be empty");
     if (!initialData.breed_id) return toast.info("species required");
     setIsProcessing(true);
+    let res;
     if (isEditing) {
-      edit_packing_box(packingDetail.id, initialData);
+      res = await edit_packing_box(packingDetail.id, initialData);
     } else {
-      create_packing_box(initialData);
+      res = await create_packing_box(initialData);
     }
-    setIsProcessing(false);
-    setIsOpen(false);
+    if(res?.status === 200){
+      setIsProcessing(false);
+      setIsOpen(false);
+      getPackingBoxList()
+    }
   };
 
   return (
