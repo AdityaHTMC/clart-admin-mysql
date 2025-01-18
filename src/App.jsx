@@ -6,51 +6,30 @@ import { Route, Routes } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import Login from './screen/auth/Login'
 import DashboardContainer from './screen/Home'
-import SubCategoryPage from './screen/sub-category'
-import SalesOrders from './screen/Orders'
-import SalesTransaction from './screen/transaction'
-import CreateCoupons from './screen/create-coupon'
-import CreatePage from './screen/create-pages'
-import Profile from './screen/Profile'
-import ListCoupons from './screen/coupon-list'
-import ListPages from './screen/pages-list'
-import MenuList from './screen/menu-list'
 
 import CommonLayout from './component/common/common-layout'
 import { useAuthContext } from './helper/AuthProvider'
 import BannerList from './screen/setting/BannerList'
 import FaqList from './screen/FaqList'
 import CmsList from './screen/CmsList'
-import CurrencyList from './screen/CurrencyList'
-import Location from './screen/Location'
 import SmsSettings from './screen/SmsSettings'
 import SubscribeEmail from './screen/SubscribeEmail'
 import SubCategoryList from './screen/SubCategoryList'
-import OrderList from './screen/OrderList';
 import OrderDetails from './screen/OrderDetails';
-import AddCoupon from './screen/AddCoupon';
-import PromoCodeList from './screen/PromoCodeList';
 import { Unit } from './screen/production/unit';
-import { RoomPage } from './screen/production/room';
 import { RackPage } from './screen/production/rack';
 import { BeddingMaterial } from './screen/non-stock/bedding-material';
 import { PackingBox } from './screen/non-stock/packing-box';
 import { AddAnimal } from './screen/animals/AddAnimal';
-import { SubAdminManagement } from './screen/sub_admin/management';
-import { PermissionManagement } from './screen/sub_admin/permission_management';
-import { RoleManagement } from './screen/sub_admin/role_management';
 import { StoreMenu } from './screen/setting/store-menu';
 import { ColonyList } from './screen/colony/colony-list';
 import { NotFound } from './screen/404';
-import EventList from "./screen/EventList";
-import AddEvent from "./screen/AddEvent";
 import { FloorPage } from './screen/production/floor';
 import EmailSettings from './screen/EmailSettings';
 import WhatsAppSettings from './screen/WhatsAppSettings';
 import NotificationSettings from './screen/NotificationSettings';
 import PaymentMethods from './screen/PaymentMethods';
 import StoreSettings from './screen/StoreSettings';
-import ShippingAgency from './screen/Master/ShippingAgency';
 import StateList from './screen/LocationManagement/StateList';
 import DistrictList from './screen/LocationManagement/DistrictList';
 import OrgType from './screen/Master/OrgType/OrgType';
@@ -68,6 +47,9 @@ import ReviewsList from './screen/animals/ReviewsList';
 import VendorManagement from './screen/StockManagement/VendorManagement';
 import AllOrderList from './screen/OrderMenu/AllOrderList';
 import AddOrder from './screen/OrderMenu/AddOrder';
+import PermissionList from './screen/SubAdmin/PermissionList';
+import RoleList from './screen/SubAdmin/RoleList';
+import UserManagementList from './screen/SubAdmin/UserManagementList';
 
 
 function App() {
@@ -83,12 +65,10 @@ function App() {
         <Route element={<CommonLayout />}>
           <Route path="/" element={<DashboardContainer />} />
           <Route path="/species-management" element={<SpeciesList />} />
-          <Route path="/product/sub-category" element={<SubCategoryPage />} />
           <Route path="/animal-list" element={<AnimalList/>} />
           <Route path="/product-edit/:id" element={<EditAnimal/>} />
           <Route path="/banner-list" element={<BannerList />} />
           <Route path="/cms" element={<CmsList />} />
-          <Route path="/currency" element={<CurrencyList />} />
           <Route path="/faqs" element={<FaqList />} />
           <Route path="/sms-setting" element={<SmsSettings />} />
           <Route path="/subscribed-email" element={<SubscribeEmail />} />
@@ -97,23 +77,9 @@ function App() {
           <Route path="/customer" element={<UserList />} />
           <Route path="/add-customer" element={<AddUser />} />
           <Route path="/edit-customer/:id" element={<EditUser />} />
-          <Route path="/orders" element={<OrderList />} />
 
-          <Route path="/orders-details/:id" element={<OrderDetails />} />
+          <Route path="/order-details/:id" element={<OrderDetails />} />
 
-          <Route path="/addcoupons" element={<AddCoupon />} />
-
-          <Route path="/promo-code" element={<PromoCodeList />} />
-
-          <Route path="/sales/orders" element={<SalesOrders />} />
-          <Route path="/sales/transactions" element={<SalesTransaction />} />
-          <Route path="/create-coupons" element={<CreateCoupons />} />
-          <Route path="/coupons-list" element={<ListCoupons />} />
-          <Route path="/create-pages" element={<CreatePage />} />
-          <Route path="/pages-list" element={<ListPages />} />
-          <Route path="/menu-list" element={<MenuList />} />
-
-          <Route path="/profile" element={<Profile />} />
           <Route path="/add-animal" element={<AddAnimal />} />
 
           <Route path="/production-unit" element={<Unit />} />
@@ -128,13 +94,7 @@ function App() {
           <Route path="/notification-settings" element={<NotificationSettings />} />
           <Route path="/payment-methods" element={<PaymentMethods />} />
           <Route path="/store-settings" element={<StoreSettings />} />
-          <Route path="/Shipping-Agency" element={<ShippingAgency />} />
-          <Route path="/user-management" element={<SubAdminManagement />} />
-          <Route path="/permission-management" element={<PermissionManagement />} />
-          <Route path="/role-management" element={<RoleManagement />} />
           <Route path="/store-menu" element={<StoreMenu />} />
-          <Route path="/event-list" element={<EventList />} />
-          <Route path="/add-event" element={<AddEvent />} />
           <Route path="/cms-list" element={<CmsList />} />
           <Route path="/location-management" element={<StateList />} />
           <Route path="/district-management/:id" element={<DistrictList />} />
@@ -146,6 +106,10 @@ function App() {
           <Route path="/vendor-management" element={<VendorManagement />} />
           <Route path="/all-orders" element={<AllOrderList/>} />
           <Route path="/add-orders" element={<AddOrder/>} />
+          
+          <Route path="/permission-management" element={<PermissionList />} />
+          <Route path="/role-management" element={<RoleList />} />
+          <Route path="/user-management" element={<UserManagementList />} />
 
           <Route path="*" element={<NotFound />} />
 
