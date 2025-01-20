@@ -9,8 +9,8 @@ export const BirthEntryForm = ({ itemDetail, onClose }) => {
     const [isProcessing, setIsProcessing] = useState(false)
     const [entryData, setEntryData] = useState({
         date_of_birth: '',
-        male: '',
-        female: '',
+        total_male: '',
+        total_female: '',
     })
 
     const { newBirthEntry, getColonyList } = useColonyContext()
@@ -21,17 +21,17 @@ export const BirthEntryForm = ({ itemDetail, onClose }) => {
 
     const onBirthEntry = async () => {
         if (!entryData.date_of_birth) return toast.info("Date of Birth required")
-        if (!entryData.male && !entryData.female) return toast.info("At least 1 male or female required")
+        if (!entryData.total_male && !entryData.total_female) return toast.info("At least 1 total_male or total_female required")
 
         setIsProcessing(true)
-        const res = await newBirthEntry(itemDetail?._id, entryData)
+        const res = await newBirthEntry(itemDetail?.id, entryData)
         setIsProcessing(false)
         if (res && res.success) {
             toast.success("Birth entry submitted!")
             setEntryData({
                 date_of_birth: '',
-                male: '',
-                female: '',
+                total_male: '',
+                total_female: '',
             })
             onClose(false)
             getColonyList();
@@ -46,14 +46,14 @@ export const BirthEntryForm = ({ itemDetail, onClose }) => {
                     <Label htmlFor="recipient-name" className="col-form-label">
                         No OF Male :
                     </Label>
-                    <Input type="number" name="male" onChange={onChange} value={entryData.male} required min={0} placeholder="Enter no of male" disabled={isProcessing} />
+                    <Input type="number" name="total_male" onChange={onChange} value={entryData.total_male} required min={0} placeholder="Enter no of total_male" disabled={isProcessing} />
                 </div>
 
                 <div>
                     <Label htmlFor="recipient-name" className="col-form-label">
                         No Of Female :
                     </Label>
-                    <Input type="number" name="female" onChange={onChange} value={entryData.female} required min={0} placeholder="Enter no of female" disabled={isProcessing} />
+                    <Input type="number" name="total_female" onChange={onChange} value={entryData.total_female} required min={0} placeholder="Enter no of total_female" disabled={isProcessing} />
                 </div>
 
                 <div className="mb-2">

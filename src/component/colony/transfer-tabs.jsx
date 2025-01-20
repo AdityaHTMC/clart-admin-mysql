@@ -3,7 +3,6 @@
 
 import { Fragment } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { RemoveEntry } from "./remove-entry-form";
 import { TransferEntry } from "./transfer-entry-form";
 
 const TransferTabs = ({ onClose, itemDetail }) => {
@@ -14,7 +13,7 @@ const TransferTabs = ({ onClose, itemDetail }) => {
                     {itemDetail?.total_items > 0 && (
                         <Tab className="nav-link">Transfer Current Stock</Tab>
                     )}
-                    {itemDetail?.children?.total > 0 && (
+                    {itemDetail?.children_total > 0 && (
                         <Tab className="nav-link">Transfer Child Stock</Tab>
                     )}
                 </TabList>
@@ -27,7 +26,7 @@ const TransferTabs = ({ onClose, itemDetail }) => {
                         </div>
                     </TabPanel>
                 )}
-                {itemDetail?.children?.total > 0 && (
+                {itemDetail?.children_total > 0 && (
                     <TabPanel>
                         <div>
                             <TransferEntry itemDetail={itemDetail} onClose={onClose} type={'birth'} />

@@ -10,7 +10,6 @@ import { RiQrScan2Line } from "react-icons/ri";
 import EntryTabs from "../../component/colony/entry-tabs";
 import RemoveTabs from "../../component/colony/remove-tab";
 import { BiTransfer } from "react-icons/bi"
-import { Tooltip } from "@mui/material";
 import TransferTabs from "../../component/colony/transfer-tabs";
 
 export const ColonyList = () => {
@@ -66,7 +65,7 @@ export const ColonyList = () => {
                                                     <td className="text-center">
                                                         <Badge color={item?.use_for === 'Lab' ? 'danger' : 'success'} style={{ textTransform: 'capitalize' }}>{item?.use_for}</Badge>
                                                     </td>
-                                                    <td className="text-center"> {item?.children?.total > 0 ? `Available (${item?.children?.total})` : 'Not Available'} </td>
+                                                    <td className="text-center"> {item?.children_total > 0 ? `Available (${item?.children_total})` : 'Not Available'} </td>
                                                     <td>
                                                         <div className="d-flex justify-content-end align-items-center gap-2">
 
@@ -83,7 +82,7 @@ export const ColonyList = () => {
                                                                         <span style={{ fontSize: 14, fontWeight: 500 }}>QR Code</span>
                                                                     </DropdownItem>
 
-                                                                    {(item?.total_items === 0 || item?.children?.total === 0) && (
+                                                                    {(item?.total_items === 0 || item?.children_total === 0) && (
                                                                         <DropdownItem className="d-flex gap-2 align-items-center" onClick={() => { setIsOpen(true); setItemDetail(item); }}>
                                                                             <Badge style={{ cursor: 'pointer' }}>
                                                                                 <FaPlus size={14} />

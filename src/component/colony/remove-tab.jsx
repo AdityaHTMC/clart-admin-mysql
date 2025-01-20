@@ -11,7 +11,7 @@ const RemoveTabs = ({ onClose, itemDetail }) => {
                     {itemDetail?.total_items > 0 && (
                         <Tab className="nav-link">Remove Current Stock</Tab>
                     )}
-                    {itemDetail?.children?.total > 0 && (
+                    {itemDetail?.children_total > 0 && (
                         <Tab className="nav-link">Remove Child Stock</Tab>
                     )}
                 </TabList>
@@ -24,7 +24,7 @@ const RemoveTabs = ({ onClose, itemDetail }) => {
                         </div>
                     </TabPanel>
                 )}
-                {itemDetail?.children?.total > 0 && (
+                {itemDetail?.children_total > 0 && (
                     <TabPanel>
                         <div>
                             <RemoveEntry itemDetail={itemDetail} onClose={onClose} type="birth" />

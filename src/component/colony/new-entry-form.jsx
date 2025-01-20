@@ -5,48 +5,49 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Autocomplete, TextField } from "@mui/material";
 import { useColonyContext } from "../../helper/ColonyProvider";
+import { useCategoryContext } from "../../helper/CategoryProvider";
 
 export const NewEntryForm = ({ itemDetail, onClose }) => {
     const [isProcessing, setIsProcessing] = useState(false)
+    const { getallproductList, allproductList } = useCategoryContext();
+
     const [entryData, setEntryData] = useState({
         date_of_birth: '',
         life_cycle: '',
         total_male: '',
         total_female: '',
-        species_id: '',
+        animal_id: '',
     })
 
     useEffect(() => {
-        if(itemDetail && itemDetail._id){
+        if (itemDetail && itemDetail._id) {
             setEntryData({
                 date_of_birth: itemDetail?.date_of_birth ? new Date(itemDetail?.date_of_birth).toISOString().split('T')[0] : '',
                 life_cycle: itemDetail?.life_cycle || '',
                 total_male: '',
                 total_female: '',
-                species_id: itemDetail?.species_id || '',
+                animal_id: itemDetail?.animal_id || '',
             })
         }
     }, [itemDetail])
 
-    const { getColonyList, newStockEntry, getAllSpecies, allSpecies } = useColonyContext()
+    const { getColonyList, newStockEntry } = useColonyContext()
 
     useEffect(() => {
-        if (allSpecies.length === 0) {
-            getAllSpecies()
-        }
-    }, [allSpecies])
+        getallproductList()
+    }, [])
 
     const onChange = (e) => {
         setEntryData({ ...entryData, [e.target.name]: e.target.value })
     }
 
     const onNewEntry = async () => {
-        if (!entryData.species_id) return toast.info("Animal required")
+        if (!entryData.animal_id) return toast.info("Animal required")
         if (!entryData.life_cycle) return toast.info("Life cycle required")
         if (!entryData.date_of_birth) return toast.info("Date of Birth required")
         if (!entryData.total_male && !entryData.total_female) return toast.info("STock can not be empty")
         setIsProcessing(true)
-        const res = await newStockEntry(itemDetail?._id, entryData)
+        const res = await newStockEntry(itemDetail?.id, entryData)
         setIsProcessing(false)
         if (res && res.success) {
             toast.success("New entry created successfully!")
@@ -55,7 +56,7 @@ export const NewEntryForm = ({ itemDetail, onClose }) => {
                 life_cycle: '',
                 total_male: '',
                 total_female: '',
-                species_id: '',
+                animal_id: '',
             })
             onClose(false)
             getColonyList();
@@ -65,24 +66,32 @@ export const NewEntryForm = ({ itemDetail, onClose }) => {
     }
     return (
         <>
-            <div style={{maxHeight: '50vh', overflow: 'auto'}}>
-                <Autocomplete
-                    disablePortal
-                    options={allSpecies}
-                    style={{paddingTop: '16px'}}
-                    disabled={isProcessing}
-                    value={allSpecies?.find((sp) => sp._id === entryData.species_id) || ''}
-                    onChange={(event, newValue) => {
-                        if (newValue) {
-                            setEntryData({ ...entryData, species_id: newValue._id });
-                        } else {
-                            setEntryData({ ...entryData, species_id: '' });
+            <div style={{ maxHeight: '50vh', overflow: 'auto' }}>
+                {allproductList?.data && allproductList.data?.length > 0 && (
+                    <Autocomplete
+                        disablePortal
+                        options={allproductList?.data}
+                        style={{ paddingTop: "16px" }}
+                        disabled={isProcessing}
+                        getOptionLabel={(option) => option?.title || ""}
+                        value={
+                            allproductList?.data?.find(
+                                (sp) => sp.id === entryData?.animal_id
+                            ) || ""
                         }
-                    }}
-                    sx={{ width: '100%' }}
-                    renderInput={(params) => <TextField {...params} label="Select animal" />}
-                />
-
+                        onChange={(event, newValue) => {
+                            if (newValue) {
+                                setEntryData({ ...entryData, animal_id: newValue.id });
+                            } else {
+                                setEntryData({ ...entryData, animal_id: "" });
+                            }
+                        }}
+                        sx={{ width: "100%" }}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Select animal" />
+                        )}
+                    />
+                )}
                 <div>
                     <Label htmlFor="recipient-name" className="col-form-label">
                         Life Stage :

@@ -15,7 +15,6 @@ const EntryTabs = ({ onClose, itemDetail }) => {
                     )}
                     {itemDetail?.total_items > 0 && (
                         <Tab className="nav-link">Birth Entry</Tab>
-
                     )}
                 </TabList>
 

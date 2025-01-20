@@ -51,11 +51,11 @@ export const TransferEntry = ({ itemDetail, onClose, type }) => {
                 return
             }
         } else {
-            if (itemDetail?.children?.male < Number(entryData.male)) {
+            if (itemDetail?.children_male < Number(entryData.male)) {
                 toast.error("Male item can't be more than total male stock")
                 return
             }
-            if (itemDetail?.children?.female < Number(entryData.female)) {
+            if (itemDetail?.children_female < Number(entryData.female)) {
                 toast.error("Female item can't be more than total female stock")
                 return
             }
@@ -64,7 +64,7 @@ export const TransferEntry = ({ itemDetail, onClose, type }) => {
 
         setIsProcessing(true)
         let res = {}
-        const body = { total_male: Number(entryData?.male) || 0, total_female: Number(entryData?.female) || 0, colony_id: itemDetail?._id, ref: colonyRef }
+        const body = { total_male: Number(entryData?.male) || 0, total_female: Number(entryData?.female) || 0, colony_from: itemDetail?.id, colony_to: colonyRef }
         if (type === 'colony') {
             res = await transferItem(body)
         } else {
@@ -137,14 +137,14 @@ export const TransferEntry = ({ itemDetail, onClose, type }) => {
 
                 <div>
                     <Label htmlFor="recipient-name" className="col-form-label">
-                        No OF Male :
+                        No of male :
                     </Label>
                     <Input type="number" name="male" onChange={onChange} value={entryData.male} required min={0} placeholder="Enter no of male to be remove" disabled={isProcessing} />
                 </div>
 
                 <div className="mb-2">
                     <Label htmlFor="recipient-name" className="col-form-label">
-                        No Of Female :
+                        No of female :
                     </Label>
                     <Input type="number" name="female" onChange={onChange} value={entryData.female} required min={0} placeholder="Enter no of female to be transfer" disabled={isProcessing} />
                 </div>

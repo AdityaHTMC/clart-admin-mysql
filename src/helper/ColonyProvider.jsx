@@ -9,11 +9,11 @@ const AppContext = createContext();
 export const ColonyProvider = ({ children }) => {
 
     const base_url = import.meta.env.VITE_API_URL
-    const [colonyList, setColonyList] = useState({total_page: 1, current_page: 1, loading: true, data: []})
+    const [colonyList, setColonyList] = useState({ total_page: 1, current_page: 1, loading: true, data: [] })
     const [allSpecies, setAllSpecies] = useState([])
     const [allBreeds, setAllBreeds] = useState([])
     const { Authtoken } = useAuthContext()
-    const [colonyData, setColonyData] = useState({loading: false, data: []})
+    const [colonyData, setColonyData] = useState({ loading: false, data: [] })
 
     const getColonyList = async (body) => {
         try {
@@ -36,7 +36,7 @@ export const ColonyProvider = ({ children }) => {
 
     const newStockEntry = async (id, body) => {
         try {
-            const { data }  = await axios.put(`${base_url}/colony/new-entry/${id}`, body, {
+            const { data } = await axios.post(`${base_url}/colony/new-entry/${id}`, body, {
                 headers: {
                     'Authorization': Authtoken
                 }
@@ -49,12 +49,12 @@ export const ColonyProvider = ({ children }) => {
 
     const getAllSpecies = async (body) => {
         try {
-            const { data }  = await axios.get(`${base_url}/species/getAll`, {
+            const { data } = await axios.get(`${base_url}/admin/all/breeds/list`, {
                 headers: {
                     'Authorization': Authtoken
                 }
             })
-            if(data.success){
+            if (data.status === 200) {
                 setAllSpecies(data.data)
             }
         } catch (error) {
@@ -63,12 +63,12 @@ export const ColonyProvider = ({ children }) => {
     }
     const getAllBreeds = async (body) => {
         try {
-            const { data }  = await axios.get(`${base_url}/admin/all/breeds/list`, {
+            const { data } = await axios.get(`${base_url}/admin/all/breeds/list`, {
                 headers: {
                     'Authorization': Authtoken
                 }
             })
-            if(data.success){
+            if (data.success) {
                 setAllBreeds(data.data)
             }
         } catch (error) {
@@ -78,7 +78,7 @@ export const ColonyProvider = ({ children }) => {
 
     const newBirthEntry = async (id, body) => {
         try {
-            const { data }  = await axios.put(`${base_url}/colony/birth-entry/${id}`, body, {
+            const { data } = await axios.post(`${base_url}/colony/birth-entry/${id}`, body, {
                 headers: {
                     'Authorization': Authtoken
                 }
@@ -88,10 +88,10 @@ export const ColonyProvider = ({ children }) => {
             return error?.response?.data || null
         }
     }
-    
+
     const removeColonyItem = async (id, body) => {
         try {
-            const { data }  = await axios.put(`${base_url}/colony/remove/${id}`, body, {
+            const { data } = await axios.post(`${base_url}/colony/item/remove/${id}`, body, {
                 headers: {
                     'Authorization': Authtoken
                 }
@@ -104,7 +104,7 @@ export const ColonyProvider = ({ children }) => {
 
     const removeBirthItem = async (id, body) => {
         try {
-            const { data }  = await axios.put(`${base_url}/colony/birth-remove/${id}`, body, {
+            const { data } = await axios.post(`${base_url}/colony/birth/item/remove/${id}`, body, {
                 headers: {
                     'Authorization': Authtoken
                 }
@@ -117,26 +117,26 @@ export const ColonyProvider = ({ children }) => {
 
     const searchColony = async (search) => {
         try {
-            setColonyData({...colonyData, loading: true })
-            const { data }  = await axios.get(`${base_url}/colony/search?keyword_search=${search}`, {
+            setColonyData({ ...colonyData, loading: true })
+            const { data } = await axios.post(`${base_url}/colony/getAll`, { keyword_search: search }, {
                 headers: {
                     'Authorization': Authtoken
                 }
             })
-            if(data.success){
+            if (data.status === 200) {
                 setColonyData({ loading: false, data: data.data })
-            }else{
-                setColonyData({data: [], loading: false })
+            } else {
+                setColonyData({ data: [], loading: false })
             }
         } catch (error) {
-            setColonyData({data: [], loading: false })
+            setColonyData({ data: [], loading: false })
             return error?.response?.data || null
         }
     }
 
     const transferItem = async (body) => {
         try {
-            const { data }  = await axios.post(`${base_url}/colony/transfer-entry`, body, {
+            const { data } = await axios.post(`${base_url}/colony/transfer-entry`, body, {
                 headers: {
                     'Authorization': Authtoken
                 }
@@ -146,10 +146,10 @@ export const ColonyProvider = ({ children }) => {
             return error?.response?.data || null
         }
     }
-    
+
     const birthTransferItem = async (body) => {
         try {
-            const { data }  = await axios.post(`${base_url}/colony/birth/transfer-entry`, body, {
+            const { data } = await axios.post(`${base_url}/colony/birth/transfer-entry`, body, {
                 headers: {
                     'Authorization': Authtoken
                 }
@@ -159,7 +159,7 @@ export const ColonyProvider = ({ children }) => {
             return error?.response?.data || null
         }
     }
-    
+
 
     const values = {
         getColonyList, colonyList, newStockEntry, getAllSpecies, allSpecies, newBirthEntry, removeColonyItem, removeBirthItem, transferItem, colonyData, searchColony, birthTransferItem, getAllBreeds, allBreeds
