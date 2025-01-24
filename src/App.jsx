@@ -50,6 +50,8 @@ import AddOrder from './screen/OrderMenu/AddOrder';
 import PermissionList from './screen/SubAdmin/PermissionList';
 import RoleList from './screen/SubAdmin/RoleList';
 import UserManagementList from './screen/SubAdmin/UserManagementList';
+import PurchaseStock from './screen/non-stock/PurchaseStock';
+import StockReport from './screen/non-stock/StockReport';
 
 
 function App() {
@@ -110,6 +112,8 @@ function App() {
           <Route path="/permission-management" element={<PermissionList />} />
           <Route path="/role-management" element={<RoleList />} />
           <Route path="/user-management" element={<UserManagementList />} />
+          <Route path="/purchase-to-stock" element={<PurchaseStock />} />
+          <Route path="/stock-reports" element={<StockReport />} />
 
           <Route path="*" element={<NotFound />} />
 
