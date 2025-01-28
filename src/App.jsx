@@ -52,6 +52,7 @@ import RoleList from './screen/SubAdmin/RoleList';
 import UserManagementList from './screen/SubAdmin/UserManagementList';
 import PurchaseStock from './screen/non-stock/PurchaseStock';
 import StockReport from './screen/non-stock/StockReport';
+import UnPaidOrder from './screen/OrderMenu/UnpaidOrder';
 
 
 function App() {
@@ -114,6 +115,7 @@ function App() {
           <Route path="/user-management" element={<UserManagementList />} />
           <Route path="/purchase-to-stock" element={<PurchaseStock />} />
           <Route path="/stock-reports" element={<StockReport />} />
+          <Route path="/finance" element={<UnPaidOrder />} />
 
           <Route path="*" element={<NotFound />} />
 

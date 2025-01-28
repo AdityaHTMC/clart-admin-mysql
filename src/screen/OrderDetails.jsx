@@ -90,9 +90,9 @@ const OrderDetails = () => {
                     <>
                       <tr>
                         <td>1</td>
-                        <td>{item.itemName}</td>
-                        <td>{item.quantity} </td>
-                        <td>₹{item.total_price}</td>
+                        <td>{item?.itemName}</td>
+                        <td>{item?.quantity} </td>
+                        <td>₹{item?.total_price}</td>
                       </tr>
                     </>
                   ))}
