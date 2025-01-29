@@ -64,7 +64,7 @@ const RoomList = () => {
   });
  
   useEffect(() => {
-    getSubAdminList();
+    // getSubAdminList();
     getAllUnit();
   }, []);
 
@@ -270,7 +270,7 @@ const RoomList = () => {
                 <Autocomplete
                   sx={{ m: 1 }}
                   multiple
-                  options={subAdminList.data || []}
+                  options={subAdminList?.data || []}
                   getOptionLabel={(option) => option?.email || ""}
                   value={selectedProducts}
                   onChange={(event, newValue) => setSelectedProducts(newValue)}
@@ -341,7 +341,7 @@ const RoomList = () => {
                 <Autocomplete
                   sx={{ m: 1 }}
                   multiple
-                  options={subAdminList.data || []}
+                  options={subAdminList?.data || []}
                   getOptionLabel={(option) => option?.email || ""}
                   value={selectedProducts}
                   onChange={(event, newValue) => setSelectedProducts(newValue)}

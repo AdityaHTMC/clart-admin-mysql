@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Badge, Button, Card, CardBody, Col, Container, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from "reactstrap"
 import CommonBreadcrumb from "../../component/common/bread-crumb"
 import { useMasterContext } from "../../helper/MasterProvider"
@@ -5,6 +6,7 @@ import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import { FaEdit } from "react-icons/fa"
 import { LoadingComponent } from "../../component/common/loading"
+import { Pagination, Stack } from "@mui/material"
 
 export const Unit = () => {
     const { getUnitList, unitList, create_unit, edit_unit } = useMasterContext()
@@ -14,15 +16,24 @@ export const Unit = () => {
     const [unitDetail, setUnitDetail] = useState(null)
     const [title, setTitle] = useState('')
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemperPage = 8;
+  
+    const totalPages =
+    unitList?.total && Math.ceil(unitList?.total / itemperPage);
+
     useEffect(() => {
         setTitle(unitDetail?.title || '')
     }, [unitDetail])
 
+
     useEffect(() => {
-        if (unitList.data.length === 0 && unitList.loading === true) {
-            getUnitList()
-        }
-    }, [unitList.data])
+        const dataToSend = {
+          page: currentPage,
+          limit: itemperPage,
+        };
+        getUnitList(dataToSend);
+      }, [currentPage]);
 
     const onSubmit = async (e) => {
         e.preventDefault()
@@ -44,6 +55,10 @@ export const Unit = () => {
             toast.error(res?.message || "Unit can not be created")
         }
     }
+
+    const handlepagechange = (newpage) => {
+        setCurrentPage(newpage);
+      };
 
     return (
         <>
@@ -89,6 +104,15 @@ export const Unit = () => {
                                             ))}
                                         </tbody>
                                     </Table>
+                                    <Stack className="rightPagination mt10" spacing={2}>
+                    <Pagination
+                      color="primary"
+                      count={totalPages}
+                      page={currentPage}
+                      shape="rounded"
+                      onChange={(event, value) => handlepagechange(value)}
+                    />
+                  </Stack>
                                     {!unitList.loading && unitList?.data?.length === 0 && (
                                         <p className="text-muted text-center my-4" style={{ fontSize: 14 }}>No Data found</p>
                                     )}

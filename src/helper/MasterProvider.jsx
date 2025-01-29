@@ -14,9 +14,9 @@ export const MasterProvider = ({ children }) => {
   const [allUnit, setAllUnit] = useState([])
   const [roomList, setRoomList] = useState({ total_page: 1, current_page: 1, loading: true, data: [] })
   const [allRoom, setAllRoom] = useState([])
-  const [floorList, setFloorList] = useState({ total_page: 1, current_page: 1, loading: true, data: [] })
+  const [floorList, setFloorList] =  useState({ loading: true, data: [], total: "", })
   const [allFloor, setAllFloor] = useState([])
-  const [rackList, setRackList] = useState({ total_page: 1, current_page: 1, loading: true, data: [] })
+  
   const [material, setMaterial] = useState({ loading: true, data: [] })
   const [packingBox, setPackingBox] = useState({ loading: true, data: [] })
   const [smsSettingsList, setSmsSettingsList] = useState({ loading: true, data: [], total: "" });
@@ -36,6 +36,7 @@ export const MasterProvider = ({ children }) => {
   const [orderMasterList, setorderMasterList] = useState({ loading: true, data: [], total: "" });
   const [allspecies, setallspecies] = useState({ loading: true, data: [] });
   const [vendorList, setVendorList] = useState({ loading: true, data: [], total: "", });
+  const [rackList, setRackList] = useState({ loading: true, data: [], total: "", });
   const [roleList, setRoleList] = useState({ loading: true, data: [], total: "" });
   const [permissionList, setPermissionList] = useState({ loading: true, data: [], total: "" });
   const [userMagList, setUserMagList] = useState({ loading: true, data: [], total: "" });
@@ -67,24 +68,29 @@ export const MasterProvider = ({ children }) => {
     }
   }
 
-  const getUnitList = async (body) => {
+  const getUnitList = async (dataToSend) => {
     try {
-      setUnitList({ ...unitList, loading: true })
-      const { data } = await axios.post(`${base_url}/unit-list`, body || {}, {
-        headers: {
-          'Authorization': Authtoken
-        }
-      })
-      if (data.success) {
-        setUnitList({ loading: false, data: data.data, total_page: data.pages, current_page: data.page })
+      const response = await axios.post(
+        `${base_url}/unit-list`,
+        { ...dataToSend },
+        { headers: { Authorization: Authtoken } }
+      );
+      const data = response.data;
+      if (response.status === 200) {
+        setUnitList({
+          data: response?.data?.data || [],
+          total: response.data.total,
+          loading: false,
+        });
       } else {
-        setUnitList({ ...unitList, loading: false })
-        console.error(data.message)
+        setUnitList({ data: [], loading: false });
+        toast.error(response.data.message);
       }
     } catch (error) {
-      setUnitList({ ...unitList, loading: false })
+      setUnitList({ data: [], loading: false });
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
-  }
+  };
 
   const getAllUnit = async () => {
     try {
@@ -221,24 +227,29 @@ export const MasterProvider = ({ children }) => {
     }
   }
 
-  const getFloorList = async (body) => {
+  const getFloorList = async (dataToSend) => {
     try {
-      setFloorList({ ...floorList, loading: true })
-      const { data } = await axios.post(`${base_url}/floor-list`, body || {}, {
-        headers: {
-          'Authorization': Authtoken
-        }
-      })
-      if (data.success) {
-        setFloorList({ loading: false, data: data.data, total_page: data.pages, current_page: data.page })
+      const response = await axios.post(
+        `${base_url}/floor-list`,
+        { ...dataToSend },
+        { headers: { Authorization: Authtoken } }
+      );
+      const data = response.data;
+      if (response.status === 200) {
+        setFloorList({
+          data: response?.data?.data || [],
+          total: response.data.total,
+          loading: false,
+        });
       } else {
-        setFloorList({ ...floorList, loading: false })
-        console.error(data.message)
+        setFloorList({ data: [], loading: false });
+        toast.error(response.data.message);
       }
     } catch (error) {
-      setFloorList({ ...floorList, loading: false })
+      setFloorList({ data: [], loading: false });
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
-  }
+  };
 
   const getAllFloor = async () => {
     try {
@@ -274,24 +285,29 @@ export const MasterProvider = ({ children }) => {
     }
   }
 
-  const getRacksList = async (body) => {
+  const getRacksList = async (dataToSend) => {
     try {
-      setRackList({ ...rackList, loading: true })
-      const { data } = await axios.post(`${base_url}/rack-list`, body || {}, {
-        headers: {
-          'Authorization': Authtoken
-        }
-      })
-      if (data.success) {
-        setRackList({ loading: false, data: data.data, total_page: data.pages, current_page: data.page })
+      const response = await axios.post(
+        `${base_url}/rack-list`,
+        { ...dataToSend },
+        { headers: { Authorization: Authtoken } }
+      );
+      const data = response.data;
+      if (response.status === 200) {
+        setRackList({
+          data: response?.data?.data || [],
+          total: response.data.total,
+          loading: false,
+        });
       } else {
-        setRackList({ ...rackList, loading: false })
-        console.error(data.message)
+        setRackList({ data: [], loading: false });
+        toast.error(response.data.message);
       }
     } catch (error) {
-      setRackList({ ...rackList, loading: false })
+      setRackList({ data: [], loading: false });
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
-  }
+  };
 
   const create_material = async (body) => {
     try {
