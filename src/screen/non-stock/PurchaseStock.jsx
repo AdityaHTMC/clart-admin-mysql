@@ -165,7 +165,7 @@ const PurchaseStock = () => {
 
   return (
     <>
-      <CommonBreadcrumb title="Item Management" />
+      <CommonBreadcrumb title="Purchase Stocks" />
       <Container fluid>
         <Row>
           <Col sm="12">
