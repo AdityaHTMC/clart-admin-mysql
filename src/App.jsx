@@ -53,6 +53,7 @@ import UserManagementList from './screen/SubAdmin/UserManagementList';
 import PurchaseStock from './screen/non-stock/PurchaseStock';
 import StockReport from './screen/non-stock/StockReport';
 import UnPaidOrder from './screen/OrderMenu/UnpaidOrder';
+import EditOrder from './screen/OrderMenu/EditOrder';
 
 
 function App() {
@@ -82,7 +83,7 @@ function App() {
           <Route path="/edit-customer/:id" element={<EditUser />} />
 
           <Route path="/order-details/:id" element={<OrderDetails />} />
-
+          <Route path="/order-edit/:id" element={<EditOrder />} />
           <Route path="/add-animal" element={<AddAnimal />} />
 
           <Route path="/production-unit" element={<Unit />} />

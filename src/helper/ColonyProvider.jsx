@@ -2,37 +2,42 @@
 import axios from 'axios';
 import { createContext, useContext, useState } from 'react';
 import { useAuthContext } from './AuthProvider';
-
+import { toast } from "react-toastify";
 const AppContext = createContext();
 
 // eslint-disable-next-line react/prop-types
 export const ColonyProvider = ({ children }) => {
 
     const base_url = import.meta.env.VITE_API_URL
-    const [colonyList, setColonyList] = useState({ total_page: 1, current_page: 1, loading: true, data: [] })
     const [allSpecies, setAllSpecies] = useState([])
     const [allBreeds, setAllBreeds] = useState([])
     const { Authtoken } = useAuthContext()
     const [colonyData, setColonyData] = useState({ loading: false, data: [] })
+    const [colonyList, setColonyList] =  useState({ loading: true, data: [], total: "", })
 
-    const getColonyList = async (body) => {
+    const getColonyList = async (dataToSend) => {
         try {
-            setColonyList({ ...colonyList, loading: true })
-            const { data } = await axios.post(`${base_url}/colony-list`, body || {}, {
-                headers: {
-                    'Authorization': Authtoken
-                }
-            })
-            if (data.success) {
-                setColonyList({ loading: false, data: data.data, total_page: data.pages, current_page: data.page })
-            } else {
-                setColonyList({ ...colonyList, loading: false })
-                console.error(data.message)
-            }
+          const response = await axios.post(
+            `${base_url}/colony-list`,
+            { ...dataToSend },
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setColonyList({
+              data: response?.data?.data || [],
+              total: response.data.total,
+              loading: false,
+            });
+          } else {
+            setColonyList({ data: [], loading: false });
+            toast.error(response.data.message);
+          }
         } catch (error) {
-            setColonyList({ ...colonyList, loading: false })
+            setColonyList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || "Something went wrong");
         }
-    }
+      };
 
     const newStockEntry = async (id, body) => {
         try {

@@ -21,10 +21,6 @@ const AddOrder = () => {
   } = useCmsContext();
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [selectedAnimal, setSelectedAnimal] = useState("");
-  const [quantity, setQuantity] = useState(1);
-  const [showPackingBox, setShowPackingBox] = useState(false);
-  const [packingBoxNumber, setPackingBoxNumber] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [orderItems, setOrderItems] = useState([
@@ -103,13 +99,13 @@ const AddOrder = () => {
       }));
     }
   };
-  ;
 
-  useEffect(() => {
-    if (showPackingBox && selectedAnimal && quantity > 0) {
-      getpackingBox(selectedAnimal, quantity);
-    }
-  }, [selectedAnimal, quantity, showPackingBox]);
+
+  // useEffect(() => {
+  //   if (showPackingBox && selectedAnimal && quantity > 0) {
+  //     getpackingBox(selectedAnimal, quantity);
+  //   }
+  // }, [selectedAnimal, quantity, showPackingBox]);
 
   const handleItemChange = async (index, field, value) => {
     const updatedItems = [...orderItems];
@@ -124,7 +120,7 @@ const AddOrder = () => {
       const price =
         selectedCustomer?.organization_type === "Government"
           ? animal?.gov_price || 0
-          : animal?.price || 0;
+          : animal?.non_gov_price || 0;
       updatedItems[index].totalPrice = price * quantity;
 
       if (animal && quantity > 0) {

@@ -27,15 +27,15 @@ const DashboardContainer = () => {
                     <TopDashboardCards />
                     {/* <MarketValue /> */}
                     <LatestOrders />
-                    <TopProducts/>
-                    <TotalSales />
-                    <TotalPurchase />
-                    <TotalCash />
-                    <DailyDeposits />
-                    <BuySell />
-                    <ProductCart />
-                    <EmployeeStatus />
-                    <SalesStatus />
+                    {/* <TopProducts/> */}   
+                    {/* <TotalSales /> */}
+                    {/* <TotalPurchase /> */}
+                    {/* <TotalCash /> */}
+                    {/* <DailyDeposits /> */}
+                    {/* <BuySell /> */}
+                    {/* <ProductCart /> */}
+                    {/* <EmployeeStatus /> */}
+                    {/* <SalesStatus /> */}
                 </Row>
             </Container>
         </>

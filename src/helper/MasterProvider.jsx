@@ -506,11 +506,11 @@ export const MasterProvider = ({ children }) => {
         });
       } else {
         setWhatsAppSettingsList({ data: [], loading: false });
-        toast.error(response?.data?.message)
+        // toast.error(response?.data?.message)
       }
     } catch (error) {
       setWhatsAppSettingsList({ data: [], loading: false });
-      toast.error(error.response?.data?.message || 'Server error');
+      // toast.error(error.response?.data?.message || 'Server error');
     }
   };
 

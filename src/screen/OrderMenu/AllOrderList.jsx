@@ -14,6 +14,7 @@ import {
   import { useLocation, useNavigate } from "react-router-dom";
   import { useEffect, useState } from "react";
   import { FaDeleteLeft, FaEye } from "react-icons/fa6";
+  import { FaEdit } from "react-icons/fa";
   import DatePicker from "react-datepicker";
   import "react-datepicker/dist/react-datepicker.css";
   import { IconButton, Pagination, Stack, TextField } from "@mui/material";
@@ -80,6 +81,10 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
   
     const navigatOrderDetails = (id) => {
       Navigate(`/order-details/${id}`);
+    };
+
+    const navigatOrderEdit = (id) => {
+      Navigate(`/order-edit/${id}`);
     };
   
     return (
@@ -208,15 +213,17 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
                                       <FaEye />
                                     </Button>
                                   </div>
-                                  {/* <div className="circelBtnBx">
+                                  <div className="circelBtnBx">
                                       <Button
                                         className="btn"
                                         color="link"
-                                        // onClick={() => handleRemove(lab)}
+                                        onClick={() =>
+                                          navigatOrderEdit(order?.id)
+                                        }
                                       >
-                                        <FiEdit />
+                                        <FaEdit />
                                       </Button>
-                                    </div> */}
+                                    </div>
                                 </div>
                               </td>
                             </tr>
