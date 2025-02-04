@@ -40,6 +40,8 @@ export const MasterProvider = ({ children }) => {
   const [roleList, setRoleList] = useState({ loading: true, data: [], total: "" });
   const [permissionList, setPermissionList] = useState({ loading: true, data: [], total: "" });
   const [userMagList, setUserMagList] = useState({ loading: true, data: [], total: "" });
+  const [allShippingAgency, setAllShippingAgency] = useState({ loading: true, data: []});
+  const [shippingAgency, setShippingAgency] = useState({ loading: true, data: [], total: "" });
   const [dropdownRoleList, setdropdownRoleList] = useState({ loading: true, data: [] });
   const [dropdownMenuList, setdropdownMenuList] = useState({ loading: true, data: [] });
 
@@ -1916,10 +1918,30 @@ export const MasterProvider = ({ children }) => {
   };
 
 
+  const getAllShippingAgency = async () => {
+    try {
+      setAllShippingAgency({ data: [], loading: true });
+      const response = await axios.get(
+        `${base_url}/admin/shipping-agency/getAll`, 
+        { headers: { Authorization: Authtoken } }
+      );
+      if (response.status === 200) {
+        setAllShippingAgency({ data: response?.data?.data || [], loading: false });
+      } else {
+        setAllShippingAgency({ data: [], total: '', loading: false });
+      }
+    } catch (error) {
+      setAllShippingAgency({ data: [], loading: false });
+    }
+  };
+
+
+
+
 
   const values = {
     create_unit, edit_unit, unitList, getUnitList, allUnit, getAllUnit, create_room, edit_room, roomList, getRoomList, getAllRoom, allRoom, create_floor, edit_floor, getFloorList, floorList, getAllFloor, allFloor, getRacksList, rackList, edit_rack, create_rack, create_material, edit_material, getMaterialList, material, getPackingBoxList, create_packing_box, edit_packing_box, packingBox, getSmsSettingsList, smsSettingsList, editSMSSettingsList, getEmailSettingsList, editEmailSettingsList, emailSettingsList, getWhatsAppSettingsList, whatsAppSettingsList, editWhatsAppSettingsList, getNotificationSettingsList, editNotificationSettingsList, notificationSettingsList, getPaymentMethodsList, paymentMethodsList, editPaymentMethodsList, deletePaymentMethodsList, deleteNotificationList, deleteWhatsAppList, deleteSmsNotificationList, deleteEmailList, getSettingDetails, storeSetting, edit_store_setting, getShippingAgencyList, ShippingAgencyList, AddShipping_agency, editShippingAgencyList, deleteShippingAgency, getStateList, stateList, addState, editState, StateDelete, addDistrict, editDistrict, getdistrictList, districtList, DistrictDelete, getOrgTypeList, orgTypeList, addOrgType, editOrgType, deleteOrgType, getAllOrgTypeList, allorgtypeList, addOrg, getOrgList, orgList, editOrg, deleteOrg, getCityList, cityList, addCity, editCity, cityDelete, getSpeciesMasterList, speciesMasterList, addSpeciesMasterList, editSpeciesMasterList, DeleteSpecies, getOrderMasterList, orderMasterList, addOrderMasterList, editOrderStatus, getAllSpeciesList, allspecies, getvendorList, addVendor, editVendor, deletevendor, vendorList,
-    getDropDownRoleList, dropdownRoleList, getDropDownMenuList, dropdownMenuList, getpermissionList, permissionList, addPermission, editpermissionList, Deletepermission, getRoleList, roleList, addRole, editRoleList, getUserMagList,userMagList,addUserManagement,editUserMagList,DeleteUserMag
+    getDropDownRoleList, dropdownRoleList, getDropDownMenuList, dropdownMenuList, getpermissionList, permissionList, addPermission, editpermissionList, Deletepermission, getRoleList, roleList, addRole, editRoleList, getUserMagList,userMagList,addUserManagement,editUserMagList,DeleteUserMag,getAllShippingAgency,allShippingAgency,
   }
 
   return (

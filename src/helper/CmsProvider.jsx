@@ -296,7 +296,28 @@ export const CMsProvider = ({ children }) => {
         {
           headers: {
             Authorization: Authtoken,
-            'Content-Type': 'multipart/form',
+          },
+        }
+      );
+      if (response.status === 200) {
+        toast.success(response?.data?.message);
+        navigate('/all-orders')
+      } else {
+        toast.error(response?.data?.message)
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
+  const EditOrder = async (bodyData) => {
+    try {
+      const response = await axios.post(
+        `${base_url}/admin/order/edit`,
+        bodyData,
+        {
+          headers: {
+            Authorization: Authtoken,
           },
         }
       );
@@ -312,9 +333,34 @@ export const CMsProvider = ({ children }) => {
   };
 
 
+  const paymentreq = async (id) => {
+    try {
+      const response = await axios.post(
+        `${base_url}/order/payment/request`,
+        {order_id:id},
+        {
+          headers: {
+            Authorization: Authtoken,
+          },
+        }
+      );
+      if (response.status === 200) {
+        toast.success(response?.data?.message);
+        return response;
+      } else {
+        toast.error(response?.data?.message)
+        return null;  // Return null on failure
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+      return null;  // Return null on error
+    }
+  };
+
+
 
     const values = {
-        getMenuList, menuList , getCmsList ,cmsList ,addCms,deleteCms,editcms,getCurrencyList,currencyList,getAllOrderList,allOrderlist,getAllOrderStatus,allOrderStatus,getCustomerDetail,allCustomer,getpackingBox,packingbox,getAllAnimal,allanimal,createNewOrder,getAddressList,allAddress
+        getMenuList, menuList , getCmsList ,cmsList ,addCms,deleteCms,editcms,getCurrencyList,currencyList,getAllOrderList,allOrderlist,getAllOrderStatus,allOrderStatus,getCustomerDetail,allCustomer,getpackingBox,packingbox,getAllAnimal,allanimal,createNewOrder,getAddressList,allAddress,EditOrder,paymentreq
     }
     return (
         <AppContext.Provider value={values} >

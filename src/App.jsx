@@ -54,6 +54,8 @@ import PurchaseStock from './screen/non-stock/PurchaseStock';
 import StockReport from './screen/non-stock/StockReport';
 import UnPaidOrder from './screen/OrderMenu/UnpaidOrder';
 import EditOrder from './screen/OrderMenu/EditOrder';
+import ShippingAgency from './screen/Master/ShippingAgency';
+import PendingOrder from './screen/OrderMenu/PendingOrder';
 
 
 function App() {
@@ -117,6 +119,8 @@ function App() {
           <Route path="/purchase-to-stock" element={<PurchaseStock />} />
           <Route path="/stock-reports" element={<StockReport />} />
           <Route path="/finance" element={<UnPaidOrder />} />
+          <Route path="/shipping-management" element={<ShippingAgency />} />
+          <Route path="/pending-orders" element={<PendingOrder />} />
 
           <Route path="*" element={<NotFound />} />
 
