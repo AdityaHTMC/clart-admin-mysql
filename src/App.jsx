@@ -70,7 +70,7 @@ function App() {
       <Routes>
         <Route element={<CommonLayout />}>
           <Route path="/" element={<DashboardContainer />} />
-          <Route path="/species-management" element={<SpeciesList />} />
+          <Route path="/breed-management" element={<SpeciesList />} />
           <Route path="/animal-list" element={<AnimalList/>} />
           <Route path="/product-edit/:id" element={<EditAnimal/>} />
           <Route path="/banner-list" element={<BannerList />} />

@@ -7,6 +7,7 @@ import { Badge, Button, FormGroup, Input, Label, Spinner } from "reactstrap";
 import { FaCircleXmark } from "react-icons/fa6";
 import { GoTrash } from "react-icons/go";
 import DatePicker from "react-datepicker";
+import { useMasterContext } from "../../helper/MasterProvider";
 const AddOrder = () => {
   const {
     getCustomerDetail,
@@ -19,6 +20,7 @@ const AddOrder = () => {
     getAddressList,
     allAddress,
   } = useCmsContext();
+  const { getAllShippingAgency,allShippingAgency} = useMasterContext()
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [startDate, setStartDate] = useState("");
@@ -42,6 +44,9 @@ const AddOrder = () => {
     status: "Pending",
     order_date: new Date(),
     payment_mode: "CASH",
+    transport_mode:"",
+    shipping_method:"",
+    shipping_charges:"",
     shipping_address: {
       first_name: "",
       last_name: "",
@@ -77,6 +82,7 @@ const AddOrder = () => {
     getAllAnimal();
     if (selectedCustomer?.id) {
       getAddressList(selectedCustomer?.id);
+      getAllShippingAgency()
     }
   }, [selectedCustomer]);
 
@@ -183,6 +189,9 @@ const AddOrder = () => {
     formData.append("customer_id", selectedCustomer?.id || "");
     formData.append("total_amount", final_amount);
     formData.append("iiac_number", inputData.iiac_number);
+    formData.append("transport_mode", inputData.transport_mode);
+    formData.append("shipping_charges", inputData.shipping_charges);
+    formData.append("shipping_method", inputData.shipping_method);
     formData.append("iiac_valid_from", startDate ? formatDate(startDate) : null);
     formData.append("iiac_valid_to", endDate ? formatDate(endDate) : null);
   
@@ -453,6 +462,71 @@ const AddOrder = () => {
                       }}
                     />
                   </div>
+                    <FormGroup className="col-md-4">
+                                  <Label
+                                    for="title"
+                                    className="col-form-label font-weight-bold"
+                                    style={{ color: "#495057" }}
+                                  >
+                                    Transport Mode
+                                  </Label>
+                                  <Input
+                                    type="text"
+                                    name="transport_mode"
+                                    value={inputData.transport_mode}
+                                    onChange={handleInputChange}
+                                    id="transport_mode"
+                                    placeholder="Enter transport mode"
+                                    style={{
+                                      border: "1px solid #ced4da",
+                                      borderRadius: "5px",
+                                      padding: "10px",
+                                    }}
+                                  />
+                                </FormGroup>
+                  
+                                <FormGroup className="col-md-4">
+                                <Label htmlFor="shipping_method" className="col-form-label">
+                                  Shipping Agency:
+                                </Label>
+                                <Input
+                                  type="select"
+                                  name="shipping_method"
+                                  value={inputData.shipping_method}
+                                  onChange={handleInputChange}
+                                  id="shipping_method"
+                                >
+                                  <option value="">Select Shipping Agency</option>
+                                  {allShippingAgency?.data?.map((variety) => (
+                                    <option key={variety._id} value={variety.id}>
+                                      {variety.agency_name}
+                                    </option>
+                                  ))}
+                                </Input>
+                              </FormGroup>
+                  
+                              <FormGroup className="col-md-4">
+                                  <Label
+                                    for="title"
+                                    className="col-form-label font-weight-bold"
+                                    style={{ color: "#495057" }}
+                                  >
+                                   Shipping Charges
+                                  </Label>
+                                  <Input
+                                    type="number"
+                                    name="shipping_charges"
+                                    value={inputData.shipping_charges}
+                                    onChange={handleInputChange}
+                                    id="shipping_charges"
+                                    placeholder="Enter transport mode"
+                                    style={{
+                                      border: "1px solid #ced4da",
+                                      borderRadius: "5px",
+                                      padding: "10px",
+                                    }}
+                                  />
+                                </FormGroup>
                 </div>
 
                 <div

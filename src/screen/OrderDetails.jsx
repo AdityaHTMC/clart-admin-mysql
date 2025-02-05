@@ -75,12 +75,13 @@ const OrderDetails = () => {
                   )}
                 </p>
               </div>
-
+              <div className="mt-2 h6 fs-4">Item List </div>
               <Table bordered hover style={{ marginTop: "20px" }}>
                 <thead>
                   <tr>
                     <th>SL</th>
                     <th>Product</th>
+                    <th>Unit Price</th>
                     <th>Quantity</th>
                     <th>Price</th>
                   </tr>
@@ -90,9 +91,35 @@ const OrderDetails = () => {
                     <>
                       <tr>
                         <td>1</td>
-                        <td>{item?.itemName}</td>
+                        <td>{item?.breed_name}</td>
+                        <td>{item?.unit_price}</td>
                         <td>{item?.quantity} </td>
                         <td>₹{item?.total_price}</td>
+                      </tr>
+                    </>
+                  ))}
+                </tbody>
+              </Table>
+              <div className="mt-2 h6 fs-4">Packing Box List </div>
+              <Table bordered hover style={{ marginTop: "20px" }}>
+                <thead>
+                  <tr>
+                    <th>SL</th>
+                    <th>Packing Box Name</th>
+                    <th>Unit Price</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orderDetails?.data?.items?.map((item) => (
+                    <>
+                      <tr>
+                        <td>1</td>
+                        <td>{item?.breed_name}</td>
+                        <td>{item?.packing_box_price}</td>
+                        <td>{item?.packing_quantity} </td>
+                        <td>₹{item?.packing_box_total_price}</td>
                       </tr>
                     </>
                   ))}
@@ -101,9 +128,11 @@ const OrderDetails = () => {
               <div style={{ textAlign: "right", marginTop: "20px" }}>
                 <p>Total Price: ₹ {orderDetails?.data?.total_amount} </p>
                 <p>Coupon Discount: ₹0</p>
-                <p>Delivery Charge: ₹0</p>
+                <p>Delivery Charge: ₹ {orderDetails?.data?.shipping_charges}</p>
                 <h5 style={{ fontWeight: "bold" }}>
-                  Grand Total: ₹ {orderDetails?.data?.final_amount}{" "}
+                  Grand Total: ₹{" "}
+                  {(orderDetails?.data?.final_amount || 0) +
+                    (orderDetails?.data?.shipping_charges || 0)}
                 </h5>
               </div>
             </Card>
