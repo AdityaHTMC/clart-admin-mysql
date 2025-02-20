@@ -14,6 +14,7 @@ export const ColonyProvider = ({ children }) => {
     const { Authtoken } = useAuthContext()
     const [colonyData, setColonyData] = useState({ loading: false, data: [] })
     const [colonyList, setColonyList] =  useState({ loading: true, data: [], total: "", })
+    const [colonybreedList, setColonybreedList] =  useState({ loading: true, data: [], })
 
     const getColonyList = async (dataToSend) => {
         try {
@@ -35,6 +36,31 @@ export const ColonyProvider = ({ children }) => {
           }
         } catch (error) {
             setColonyList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+
+
+      const getColonyBreed = async (dataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/colony/animal/getAll`,
+            { ...dataToSend },
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setColonybreedList({
+              data: response?.data?.data || [],
+              total: response.data.total,
+              loading: false,
+            });
+          } else {
+            setColonybreedList({ data: [], loading: false });
+            toast.error(response.data.message);
+          }
+        } catch (error) {
+            setColonybreedList({ data: [], loading: false });
           toast.error(error.response?.data?.message || "Something went wrong");
         }
       };
@@ -167,7 +193,7 @@ export const ColonyProvider = ({ children }) => {
 
 
     const values = {
-        getColonyList, colonyList, newStockEntry, getAllSpecies, allSpecies, newBirthEntry, removeColonyItem, removeBirthItem, transferItem, colonyData, searchColony, birthTransferItem, getAllBreeds, allBreeds
+        getColonyList, colonyList, newStockEntry, getAllSpecies, allSpecies, newBirthEntry, removeColonyItem, removeBirthItem, transferItem, colonyData, searchColony, birthTransferItem, getAllBreeds, allBreeds,getColonyBreed,colonybreedList
     }
 
     return (

@@ -9,7 +9,7 @@ import {
   Row,
   Table,
 } from "reactstrap";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "reactstrap";
 import avtar from '../../../src/assets/profile.png'

@@ -26,6 +26,8 @@ export const CommonProvider = ({ children }) => {
     const [ allstateList , setallStateList] = useState({ loading: true, data: []  })
     const [ alldistrictList , setallDristrictList] = useState({ loading: true, data: []  })
     const [ customerDetails , setCustomerDetails] = useState({ loading: true, data: []  })
+    const [ allCultColonyList , setallCultColonyList] = useState({ loading: true, data: [], total:'' })
+    const [ allCultColonyanimal , setallCultColonyanimal] = useState({ loading: true, data: [], total:'' })
     const { Authtoken } = useAuthContext()
 
     const getMenuList = async () => {
@@ -455,9 +457,105 @@ export const CommonProvider = ({ children }) => {
         }
       };
 
+
+      const approvetransation = async (dataToSend) => {
+        try {
+            const {id} = dataToSend
+          const response = await axios.post(
+            `${base_url}/order/payment/update`,
+            {...dataToSend},
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getOrderDetails(id)
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+
+      const getColonyCultList = async (dataToSend) => {
+        try {
+          setallCultColonyList({ data: [], loading: true });
+          const response = await axios.post(
+            `${base_url}/cult/colony/list`,
+            { ...dataToSend },
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setallCultColonyList({
+              data: response?.data?.data || [],
+              total: response.data.total,
+              loading: false,
+            });
+          } else {
+            setallCultColonyList({ data: [], loading: false });
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+          setallCultColonyList({ data: [], loading: false });
+        }
+      };
+
+      const getColonyCultRemove = async (dataToSend) => {
+        try {
+          setallCultColonyanimal({ data: [], loading: true });
+          const response = await axios.post(
+            `${base_url}/colony/cult/animals`,
+            { ...dataToSend },
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setallCultColonyanimal({
+              data: response?.data?.data || [],
+              total: response.data.total,
+              loading: false,
+            });
+          } else {
+            setallCultColonyanimal({ data: [], loading: false });
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+          setallCultColonyanimal({ data: [], loading: false });
+        }
+      };
+
+      const removeCult = async (dataToSend) => {
+        try {
+          const {id} = dataToSend
+          setallCultColonyanimal({ data: [], loading: true });
+          const response = await axios.post(
+            `${base_url}/colony/item/remove/${id}`,
+            { ...dataToSend },
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            return
+          } else {
+            toast.error(response?.data?.message)
+            return null
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+          return null
+        }
+      };
+
     const values = {
         getMenuList, menuList, countryList, getCountryList, getStateList, stateList, getCityList, cityList,
-        getSmsSetting, smsData, SmsUpdateSetting, getEmailSubscribeList, mailList, getUserList, userList, switchUser, getOrderList, orderList, getOrderDetails, orderDetails, promoCode, getPromoCodeList, addPromoCode, addEvent, eventDelete, getEventList, eventList,getorgList,orgList,addCustomer,getallstateList,getallDistrictList,allstateList,alldistrictList,deleteCustomer,getCustomerDetails,customerDetails,editCustomer
+        getSmsSetting, smsData, SmsUpdateSetting, getEmailSubscribeList, mailList, getUserList, userList, switchUser, getOrderList, orderList, getOrderDetails, orderDetails, promoCode, getPromoCodeList, addPromoCode, addEvent, eventDelete, getEventList, eventList,getorgList,orgList,addCustomer,getallstateList,getallDistrictList,allstateList,alldistrictList,deleteCustomer,getCustomerDetails,customerDetails,editCustomer,approvetransation,getColonyCultList,allCultColonyList,getColonyCultRemove,allCultColonyanimal,removeCult
     }
     return (
         <AppContext.Provider value={values} >

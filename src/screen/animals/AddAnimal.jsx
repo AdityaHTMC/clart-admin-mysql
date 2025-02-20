@@ -15,7 +15,7 @@ import { useMasterContext } from "../../helper/MasterProvider";
 export const AddAnimal = () => {
     const { addProduct, getproductList } = useCategoryContext();
     const { getAllSpeciesList , allspecies} = useMasterContext();
-    const [formData, setFormData] = useState({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', species_id: '', birth_cycle: '',})
+    const [formData, setFormData] = useState({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', species_id: '', birth_cycle: '', cult:'',})
     const [selectedImage, setSelectedImage] = useState(null);
     const [multipleImages, setMultipleImages] = useState([])
     const [files, setFiles] = useState([])
@@ -56,7 +56,7 @@ export const AddAnimal = () => {
     }
 
     const onReset = () => {
-        setFormData({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', species_id: '' })
+        setFormData({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', species_id: '', cult:'' })
         setSelectedImage(null);
         setMultipleImages([])
         setFiles([])
@@ -67,6 +67,7 @@ export const AddAnimal = () => {
         if (!formData.status) return toast.info('Status name required');
         if (!formData.winning) return toast.info('Winning name required');
         if (!formData.calling) return toast.info('Culling name required');
+        if (!formData.cult) return toast.info('culled name required');
         if (!formData.species_id) return toast.info('species required');
         // if (!formData.birth_cycle) return toast.info('Birth cycle name required');
 
@@ -256,6 +257,7 @@ export const AddAnimal = () => {
                                                     <Input
                                                         type="number"
                                                         name="winning"
+                                                         min={0}
                                                         placeholder="Enter winning period in days"
                                                         value={formData.winning}
                                                         onChange={onChange}
@@ -268,8 +270,22 @@ export const AddAnimal = () => {
                                                     <Input
                                                         type="number"
                                                         name="calling"
+                                                        min={0}
                                                         placeholder="Enter calling period in days"
                                                         value={formData.calling}
+                                                        onChange={onChange}
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="title" className="col-form-label">
+                                                        Culled Period In Days :
+                                                    </Label>
+                                                    <Input
+                                                        type="number"
+                                                        name="cult"
+                                                        min={0}
+                                                        placeholder="Enter calling period in days"
+                                                        value={formData.cult}
                                                         onChange={onChange}
                                                     />
                                                 </FormGroup>

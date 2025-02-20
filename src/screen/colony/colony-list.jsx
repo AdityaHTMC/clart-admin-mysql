@@ -32,6 +32,10 @@ import TransferTabs from "../../component/colony/transfer-tabs";
 import { IconButton, Pagination, Stack, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 export const ColonyList = () => {
+
+
+
+
   const [qrOpen, setQrOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isRemove, setIsRemove] = useState(false);

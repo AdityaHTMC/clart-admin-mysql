@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // import Cookies from "js-cookie";
 import { useState } from "react";
 import { Eye, EyeOff } from "react-feather";
@@ -59,10 +60,10 @@ const LoginForm = () => {
           {isProcessing ? <Spinner size={'sm'} /> : 'Login'}
         </Button>
       </div>
-      <div className="form-footer">
+      {/* <div className="form-footer">
         <span>Or Login up with social platforms</span>
         <SocialMediaIcons />
-      </div>
+      </div> */}
     </Form>
   );
 };

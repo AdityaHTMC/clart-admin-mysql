@@ -56,6 +56,7 @@ import UnPaidOrder from './screen/OrderMenu/UnpaidOrder';
 import EditOrder from './screen/OrderMenu/EditOrder';
 import ShippingAgency from './screen/Master/ShippingAgency';
 import PendingOrder from './screen/OrderMenu/PendingOrder';
+import CultColonyList from './screen/colony/CultColonyList';
 
 
 function App() {
@@ -87,7 +88,7 @@ function App() {
           <Route path="/order-details/:id" element={<OrderDetails />} />
           <Route path="/order-edit/:id" element={<EditOrder />} />
           <Route path="/add-animal" element={<AddAnimal />} />
-
+          <Route path="/cult-colony" element={<CultColonyList />} />
           <Route path="/production-unit" element={<Unit />} />
           <Route path="/production-room" element={<RoomList />} />
           <Route path="/production-floor" element={<FloorPage />} />

@@ -17,6 +17,7 @@ export const SettingProvider = ({ children }) => {
     const [allPackingList, setallPackingList] = useState({ loading: true, data: [] });
     const [allColonyList, setallColonyList] = useState({ loading: true, data: [] });
     const [stockHistoryList, setStockHistoryList] = useState({loading: true,data: [],total: "",});
+    const [dashboardCountList, setdashboardCountList] = useState({loading: true,data: []});
     const { Authtoken } = useAuthContext()
 
     const getSettingDetails = async (body) => {
@@ -271,10 +272,31 @@ export const SettingProvider = ({ children }) => {
         }
       };
 
+      const getDashboardCount = async () => {
+        try {
+          const response = await axios.get(
+            `${base_url}/admin/dashboard/count`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setdashboardCountList({
+              data: response?.data?.data || [],
+              loading: false,
+            });
+          } else {
+            setdashboardCountList({ data: [], loading: false });
+          }
+        } catch (error) {
+          setdashboardCountList({ data: [], loading: false });
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+
     
 
     const values = {
-        getSettingDetails, storeSetting, edit_store_setting, getStoreMenu, storeMenu, reorderStoreMenu, reorderStoreSubMenu,getPurchaseList,purchaseList,getallvendorlist,allvendorList,addPurchase,getBeddingAlllist,getPackingAlllist,allBeddingList,allPackingList,getColonyAlllist,allColonyList,getStockHistoryList,stockHistoryList,addStockIssue
+        getSettingDetails, storeSetting, edit_store_setting, getStoreMenu, storeMenu, reorderStoreMenu, reorderStoreSubMenu,getPurchaseList,purchaseList,getallvendorlist,allvendorList,addPurchase,getBeddingAlllist,getPackingAlllist,allBeddingList,allPackingList,getColonyAlllist,allColonyList,getStockHistoryList,stockHistoryList,addStockIssue,getDashboardCount,dashboardCountList
     }
 
     return (

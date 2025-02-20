@@ -1,90 +1,124 @@
-import { toast } from "react-toastify"
-import { useColonyContext } from "../../helper/ColonyProvider"
-import { Button, Input, Label } from "reactstrap"
-import { useState } from "react"
-
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
+import { toast } from "react-toastify";
+import { useColonyContext } from "../../helper/ColonyProvider";
+import { Button, FormGroup, Input, Label } from "reactstrap";
+import { useEffect, useState } from "react";
+import { Autocomplete, TextField } from "@mui/material";
 
 export const RemoveEntry = ({ itemDetail, onClose, type }) => {
-    const [isProcessing, setIsProcessing] = useState(false)
-    const [entryData, setEntryData] = useState({
-        total_male: '',
-        total_female: '',
-    })
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [entryData, setEntryData] = useState({
+    total_male: "",
+    total_female: "",
+  });
 
-    const { removeColonyItem, getColonyList, removeBirthItem } = useColonyContext()
+  const {
+    removeColonyItem,
+    getColonyList,
+    removeBirthItem,
+    getColonyBreed,
+    colonybreedList,
+  } = useColonyContext();
 
-    const onChange = (e) => {
-        setEntryData({ ...entryData, [e.target.name]: e.target.value })
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  
+
+    useEffect(() => {
+      if (type === "colony") {
+        const dataToSend = {
+          colony_id: itemDetail?.id,
+          type: "General",
+        };
+        getColonyBreed(dataToSend);
+      } else {
+        const dataToSend = {
+          colony_id: itemDetail?.id,
+          type: "Children",
+        };
+        getColonyBreed(dataToSend);
+      }
+    }, []);
+
+  const onChange = (e) => {
+    setEntryData({ ...entryData, [e.target.name]: e.target.value });
+  };
+
+  const onRemove = async () => {
+   
+    const allSelectedProductIds = [
+        ...selectedProducts.map((product) => product.id),
+    ];
+
+
+      if(allSelectedProductIds?.length === 0) return toast.info("Select atleast one animal to transfer");
+
+  
+
+    setIsProcessing(true);
+    let res = {};
+    const body = {
+        colony_from: itemDetail?.id,
+        items: allSelectedProductIds
+    };
+    if (type === "colony") {
+      res = await removeColonyItem(itemDetail?.id, body);
+    } else {
+      res = await removeBirthItem(itemDetail?.id, body);
     }
-
-    const onRemove = async () => {
-        if (!entryData.total_male && !entryData.total_female) return toast.info("At least 1 total_male or total_female required")
-            
-        if(type === 'colony'){
-            if(itemDetail?.total_male < Number(entryData.total_male)){
-                toast.error("Male item can't be more than total male stock")
-                return
-            }
-            if(itemDetail?.total_female < Number(entryData.total_female)){
-                toast.error("Female item can't be more than total female stock")
-                return
-            }
-        }else {
-            if(itemDetail?.children?.total_male < Number(entryData.total_male)){
-                toast.error("Male item can't be more than total total_male stock")
-                return
-            }
-            if(itemDetail?.children?.total_female < Number(entryData.total_female)){
-                toast.error("Female item can't be more than total total_female stock")
-                return
-            }
-        }
-
-
-        setIsProcessing(true)
-        let res = {}
-        const body = {total_male : Number(entryData?.total_male) || 0, total_female : Number(entryData?.total_female) || 0}
-        if(type === 'colony'){
-            res = await removeColonyItem(itemDetail?.id, body)
-        }else {
-            res = await removeBirthItem(itemDetail?.id, body)
-        }
-        setIsProcessing(false)
-        if (res && res.success) {
-            toast.success(res.message)
-            setEntryData({
-                total_male: '',
-                total_female: '',
-            })
-            onClose(false)
-            getColonyList();
-        } else {
-            toast.error(res?.message || "Failed to create new entry!")
-        }
+    setIsProcessing(false);
+    if (res && res.success) {
+      toast.success(res.message);
+      setEntryData({
+        total_male: "",
+        total_female: "",
+      });
+      onClose(false);
+      getColonyList();
+    } else {
+      toast.error(res?.message || "Failed to create new entry!");
     }
-    return (
-        <>
-            <div style={{ maxHeight: '50vh', overflow: 'auto' }}>
-                <div>
-                    <Label htmlFor="recipient-name" className="col-form-label">
-                        No of Male :
-                    </Label>
-                    <Input type="number" name="total_male" onChange={onChange} value={entryData.total_male} required min={0} placeholder="Enter no of total_male to be remove" disabled={isProcessing} />
-                </div>
+  };
+  return (
+    <>
+      <div style={{ maxHeight: "50vh", overflow: "auto" }}>
+        
 
-                <div className="mb-2">
-                    <Label htmlFor="recipient-name" className="col-form-label">
-                        No of Female :
-                    </Label>
-                    <Input type="number" name="total_female" onChange={onChange} value={entryData.total_female} required min={0} placeholder="Enter no of total_female to be remove" disabled={isProcessing} />
-                </div>
-            </div>
-            <hr />
-            <div className="d-flex justify-content-end align-items-end">
-                <Button color="primary" size="sm" disabled={isProcessing} onClick={onRemove}>
-                    Save
-                </Button>
-            </div>
-        </>
-    )
-}
+        <div className="mb-2">
+        <FormGroup>
+            <Label for="New">Transfer Breed</Label>
+            <Autocomplete
+              sx={{ m: 1 }}
+              multiple
+              options={colonybreedList.data || []}
+              getOptionLabel={(option) => option?.id || ""}
+              value={selectedProducts}
+              onChange={(event, newValue) => setSelectedProducts(newValue)}
+              disableCloseOnSelect
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Select Breed"
+                  placeholder="Select Breed"
+                />
+              )}
+            />
+          </FormGroup>
+        </div>
+      </div>
+      <hr />
+      <div className="d-flex justify-content-end align-items-end">
+        <Button
+          color="primary"
+          size="sm"
+          disabled={isProcessing}
+          onClick={onRemove}
+        >
+          Save
+        </Button>
+      </div>
+    </>
+  );
+};

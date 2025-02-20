@@ -20,11 +20,13 @@ import {
 } from "reactstrap";
 import CommonBreadcrumb from "../component/common/bread-crumb";
 import { FaReceipt } from "react-icons/fa";
+import {
+  IoDownloadOutline} from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import { useCommonContext } from "../helper/CommonProvider";
 const OrderDetails = () => {
   const { id } = useParams();
-  const { getOrderDetails, orderDetails } = useCommonContext();
+  const { getOrderDetails, orderDetails,approvetransation } = useCommonContext();
   const [activeTab, setActiveTab] = useState("1");
   useEffect(() => {
     if (id) {
@@ -37,6 +39,36 @@ const OrderDetails = () => {
       setActiveTab(tab);
     }
   };
+
+  const handleApprove = (transactionId) => {
+    console.log("Approving transaction:", transactionId);
+
+    const dataToSend = {
+      status: "approved",
+      transaction_id: transactionId,
+      id: id,
+      order_id: orderDetails.data?.id,
+    }
+    approvetransation(dataToSend);
+  };
+
+  const handleReject = (transactionId) => {
+    console.log("Rejecting transaction:", transactionId);
+
+    const dataToSend = {
+      status: "rejected",
+      transaction_id: transactionId,
+      id: id,
+      order_id: orderDetails.data?.id,
+    }
+
+    approvetransation(dataToSend);
+  };
+
+  // Calculate total paid amount
+
+const totalPaid = orderDetails?.data?.payments?.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0) || 0;
+
 
   console.log(orderDetails, "orderDetails");
 
@@ -100,6 +132,7 @@ const OrderDetails = () => {
                   ))}
                 </tbody>
               </Table>
+
               <div className="mt-2 h6 fs-4">Packing Box List </div>
               <Table bordered hover style={{ marginTop: "20px" }}>
                 <thead>
@@ -116,24 +149,111 @@ const OrderDetails = () => {
                     <>
                       <tr>
                         <td>1</td>
-                        <td>{item?.breed_name}</td>
-                        <td>{item?.packing_box_price}</td>
-                        <td>{item?.packing_quantity} </td>
-                        <td>₹{item?.packing_box_total_price}</td>
+                        <td
+                          style={{
+                            maxWidth: "150px",
+                            wordBreak: "break-word",
+                            whiteSpace: "normal",
+                          }}
+                        >
+                          {item?.breed_name || "NA"}
+                        </td>
+
+                        <td>{item?.packing_box_price || "NA"}</td>
+                        <td>{item?.packing_quantity || "NA"} </td>
+                        <td>₹{item?.packing_box_total_price || "NA"}</td>
                       </tr>
                     </>
                   ))}
                 </tbody>
               </Table>
+              {orderDetails?.data?.payments?.length > 0 && (
+                <>
+                  <div className="mt-2 h6 fs-4">Payment Details</div>
+                  <Table bordered hover style={{ marginTop: "20px" }}>
+                    <thead>
+                      <tr>
+                        <th>Payment Mode</th>
+                        <th>Transaction Id</th>
+                        <th>Status</th>
+                        <th>Receipt</th>
+                        <th>Amount</th>
+                        <th>Payment Date</th>
+                        <th>Approve</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orderDetails?.data?.payments?.map((item) => (
+                        <tr key={item.transaction_id}>
+                          <td>{item?.payment_mode}</td>
+                          <td>{item?.transaction_id}</td>
+                          <td>{item?.payment_status}</td>
+
+                          <td>
+                            {item?.receipt ? (
+                              <a
+                                href={item.receipt}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <IoDownloadOutline size={20} />
+                              </a>
+                            ) : (
+                              <span
+                                className="text-muted"
+                                style={{ fontSize: "12px" }}
+                              >
+                                No receipt found
+                              </span>
+                            )}
+                          </td>
+
+                          <td>{item?.amount}</td>
+                          <td>{item?.payment_date}</td>
+                          <td className="d-flex flex-column align-items-center">
+                            <Button
+                              color="success"
+                              size="sm"
+                              className="rounded-pill px-2 py-1 mb-1"
+                              style={{ fontSize: "12px" }}
+                              onClick={() => handleApprove(item.transaction_id)}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="rounded-pill px-2 py-1"
+                              style={{ fontSize: "12px" }}
+                              color="primary"
+                              onClick={() => handleReject(item.transaction_id)}
+                            >
+                              Reject
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </>
+              )}
+
               <div style={{ textAlign: "right", marginTop: "20px" }}>
                 <p>Total Price: ₹ {orderDetails?.data?.total_amount} </p>
-                <p>Coupon Discount: ₹0</p>
-                <p>Delivery Charge: ₹ {orderDetails?.data?.shipping_charges}</p>
+                <p>
+                  Delivery Charge: ₹ {orderDetails?.data?.shipping_charges || 0}
+                </p>
                 <h5 style={{ fontWeight: "bold" }}>
                   Grand Total: ₹{" "}
                   {(orderDetails?.data?.final_amount || 0) +
                     (orderDetails?.data?.shipping_charges || 0)}
                 </h5>
+                <h6 style={{ fontWeight: "bold" }}>
+                  Paid Amount: ₹ {totalPaid}
+                </h6>
+                <h6 style={{ fontWeight: "bold" }}>
+                  Due Amount: ₹ {parseInt(orderDetails?.data?.due_amount) || 0}
+                </h6>
               </div>
             </Card>
           </Col>

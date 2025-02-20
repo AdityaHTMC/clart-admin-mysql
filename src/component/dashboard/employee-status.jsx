@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import { Card, CardBody, Col, Table } from "reactstrap";
 import CommonCardHeader from "../common/card-header";
 import { EmployeeStatusData } from "../../Data/Dashboard";

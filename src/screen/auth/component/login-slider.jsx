@@ -4,7 +4,7 @@ import { Card, Col, Media } from "reactstrap";
 
 const LoginSlider = () => {
   const settings = {
-    dots: true,
+    dots: false,
     infinite: true,
     speed: 500,
     arrows: false,
@@ -20,7 +20,6 @@ const LoginSlider = () => {
             <div key={i}>
               <div>
                 <h3>Welcome to Clart</h3>
-                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy.</p>
               </div>
             </div>
           ))}

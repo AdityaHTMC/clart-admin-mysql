@@ -11,7 +11,7 @@ const Footer = () => {
                 <Container fluid>
                     <Row>
                         <Col md="6" className="footer-copyright">
-                            <p className="mb-0">Clart LIMS | Copyright © {currentYear} All Rights Reserved</p>
+                            <p className="mb-0">Clart | Copyright © {currentYear} All Rights Reserved</p>
                         </Col>
                         <Col md="6">
 

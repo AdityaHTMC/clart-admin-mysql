@@ -20,7 +20,7 @@ const AddOrder = () => {
     getAddressList,
     allAddress,
   } = useCmsContext();
-  const { getAllShippingAgency,allShippingAgency} = useMasterContext()
+  const { getAllShippingAgency, allShippingAgency } = useMasterContext();
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [startDate, setStartDate] = useState("");
@@ -42,11 +42,12 @@ const AddOrder = () => {
     iiac_valid_to: "",
     total_amount: 0,
     status: "Pending",
+    order_type: "SELL",
     order_date: new Date(),
     payment_mode: "CASH",
-    transport_mode:"",
-    shipping_method:"",
-    shipping_charges:"",
+    transport_mode: "",
+    shipping_method: "",
+    shipping_charges: "",
     shipping_address: {
       first_name: "",
       last_name: "",
@@ -71,6 +72,11 @@ const AddOrder = () => {
     },
   });
 
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setInputData({ ...inputData, [name]: value });
+  };
+
   const formatDate = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
@@ -82,15 +88,15 @@ const AddOrder = () => {
     getAllAnimal();
     if (selectedCustomer?.id) {
       getAddressList(selectedCustomer?.id);
-      getAllShippingAgency()
+      getAllShippingAgency();
     }
   }, [selectedCustomer]);
 
   const handleInputChange = (e) => {
     const { name, value, dataset, type, checked } = e.target;
-  
+
     if (dataset.section) {
-      const section = dataset.section; 
+      const section = dataset.section;
       setInputData((prevData) => ({
         ...prevData,
         [section]: {
@@ -105,7 +111,6 @@ const AddOrder = () => {
       }));
     }
   };
-
 
   // useEffect(() => {
   //   if (showPackingBox && selectedAnimal && quantity > 0) {
@@ -156,16 +161,16 @@ const AddOrder = () => {
   };
 
   const handleSubmit = () => {
-    const items = orderItems.map((item) => ({
-      breed_id: parseInt(item.animalId, 10),
-      quantity: parseInt(item.quantity, 10),
-      total_price: parseFloat(item.totalPrice),
-      packing_box_quantity: parseInt(item.packingBoxNumber, 10),
-      packing_box_id: parseInt(item.packing_box_id, 10),
-      packing_box_total_price: parseFloat(item.packing_box_total_price),
-    }));
+    // const items = orderItems.map((item) => ({
+    //   breed_id: parseInt(item.animalId, 10),
+    //   quantity: parseInt(item.quantity, 10),
+    //   total_price: parseFloat(item.totalPrice),
+    //   packing_box_quantity: parseInt(item.packingBoxNumber, 10),
+    //   packing_box_id: parseInt(item.packing_box_id, 10),
+    //   packing_box_total_price: parseFloat(item.packing_box_total_price),
+    // }));
 
-    const final_amount = items.reduce((sum, item) => sum + item.total_price, 0);
+    // const final_amount = items.reduce((sum, item) => sum + item.total_price, 0);
 
     const formData = new FormData();
     orderItems.forEach((el, i) => {
@@ -187,22 +192,30 @@ const AddOrder = () => {
     });
 
     formData.append("customer_id", selectedCustomer?.id || "");
-    formData.append("total_amount", final_amount);
     formData.append("iiac_number", inputData.iiac_number);
     formData.append("transport_mode", inputData.transport_mode);
     formData.append("shipping_charges", inputData.shipping_charges);
     formData.append("shipping_method", inputData.shipping_method);
-    formData.append("iiac_valid_from", startDate ? formatDate(startDate) : null);
+    formData.append(
+      "iiac_valid_from",
+      startDate ? formatDate(startDate) : null
+    );
     formData.append("iiac_valid_to", endDate ? formatDate(endDate) : null);
-  
+
     // Append nested billing address data
     Object.keys(inputData.billing_address).forEach((key) => {
-      formData.append(`billing_address[${key}]`, inputData.billing_address[key]);
+      formData.append(
+        `billing_address[${key}]`,
+        inputData.billing_address[key]
+      );
     });
-  
+
     // Append nested shipping address data
     Object.keys(inputData.shipping_address).forEach((key) => {
-      formData.append(`shipping_address[${key}]`, inputData.shipping_address[key]);
+      formData.append(
+        `shipping_address[${key}]`,
+        inputData.shipping_address[key]
+      );
     });
 
     // Debugging: Log FormData contents properly
@@ -462,71 +475,71 @@ const AddOrder = () => {
                       }}
                     />
                   </div>
-                    <FormGroup className="col-md-4">
-                                  <Label
-                                    for="title"
-                                    className="col-form-label font-weight-bold"
-                                    style={{ color: "#495057" }}
-                                  >
-                                    Transport Mode
-                                  </Label>
-                                  <Input
-                                    type="text"
-                                    name="transport_mode"
-                                    value={inputData.transport_mode}
-                                    onChange={handleInputChange}
-                                    id="transport_mode"
-                                    placeholder="Enter transport mode"
-                                    style={{
-                                      border: "1px solid #ced4da",
-                                      borderRadius: "5px",
-                                      padding: "10px",
-                                    }}
-                                  />
-                                </FormGroup>
-                  
-                                <FormGroup className="col-md-4">
-                                <Label htmlFor="shipping_method" className="col-form-label">
-                                  Shipping Agency:
-                                </Label>
-                                <Input
-                                  type="select"
-                                  name="shipping_method"
-                                  value={inputData.shipping_method}
-                                  onChange={handleInputChange}
-                                  id="shipping_method"
-                                >
-                                  <option value="">Select Shipping Agency</option>
-                                  {allShippingAgency?.data?.map((variety) => (
-                                    <option key={variety._id} value={variety.id}>
-                                      {variety.agency_name}
-                                    </option>
-                                  ))}
-                                </Input>
-                              </FormGroup>
-                  
-                              <FormGroup className="col-md-4">
-                                  <Label
-                                    for="title"
-                                    className="col-form-label font-weight-bold"
-                                    style={{ color: "#495057" }}
-                                  >
-                                   Shipping Charges
-                                  </Label>
-                                  <Input
-                                    type="number"
-                                    name="shipping_charges"
-                                    value={inputData.shipping_charges}
-                                    onChange={handleInputChange}
-                                    id="shipping_charges"
-                                    placeholder="Enter transport mode"
-                                    style={{
-                                      border: "1px solid #ced4da",
-                                      borderRadius: "5px",
-                                      padding: "10px",
-                                    }}
-                                  />
-                                </FormGroup>
+                  <FormGroup className="col-md-4">
+                    <Label
+                      for="title"
+                      className="col-form-label font-weight-bold"
+                      style={{ color: "#495057" }}
+                    >
+                      Transport Mode
+                    </Label>
+                    <Input
+                      type="text"
+                      name="transport_mode"
+                      value={inputData.transport_mode}
+                      onChange={handleInputChange}
+                      id="transport_mode"
+                      placeholder="Enter transport mode"
+                      style={{
+                        border: "1px solid #ced4da",
+                        borderRadius: "5px",
+                        padding: "10px",
+                      }}
+                    />
+                  </FormGroup>
+
+                  <FormGroup className="col-md-4">
+                    <Label htmlFor="shipping_method" className="col-form-label">
+                      Shipping Agency:
+                    </Label>
+                    <Input
+                      type="select"
+                      name="shipping_method"
+                      value={inputData.shipping_method}
+                      onChange={handleInputChange}
+                      id="shipping_method"
+                    >
+                      <option value="">Select Shipping Agency</option>
+                      {allShippingAgency?.data?.map((variety) => (
+                        <option key={variety._id} value={variety.id}>
+                          {variety.agency_name}
+                        </option>
+                      ))}
+                    </Input>
+                  </FormGroup>
+
+                  <FormGroup className="col-md-4">
+                    <Label
+                      for="title"
+                      className="col-form-label font-weight-bold"
+                      style={{ color: "#495057" }}
+                    >
+                      Shipping Charges
+                    </Label>
+                    <Input
+                      type="number"
+                      name="shipping_charges"
+                      value={inputData.shipping_charges}
+                      onChange={handleInputChange}
+                      id="shipping_charges"
+                      placeholder="Enter transport mode"
+                      style={{
+                        border: "1px solid #ced4da",
+                        borderRadius: "5px",
+                        padding: "10px",
+                      }}
+                    />
+                  </FormGroup>
                 </div>
 
                 <div
@@ -766,8 +779,35 @@ const AddOrder = () => {
                       />
                     </FormGroup>
                   </div>
+
+                  <FormGroup className="mt-4 d-flex align-items-center">
+                    <Label className="me-3 fw-bold">Order Type</Label>
+                    <div className="form-check me-4">
+                      <Input
+                        className="form-check-input"
+                        type="radio"
+                        name="type"
+                        value="SELL"
+                        onChange={onChange}
+                        checked={inputData.order_type === "SELL"}
+                      />
+                      <Label className="form-check-label">SELL</Label>
+                    </div>
+                    <div className="form-check">
+                      <Input
+                        className="form-check-input"
+                        type="radio"
+                        name="type"
+                        value="RENT"
+                        onChange={onChange}
+                        checked={inputData.order_type === "RENT"}
+                      />
+                      <Label className="form-check-label">RENT</Label>
+                    </div>
+                  </FormGroup>
                 </div>
-                <br/>
+
+                <br />
                 <Button color="secondary" onClick={handleSubmit}>
                   Submit Order
                 </Button>
