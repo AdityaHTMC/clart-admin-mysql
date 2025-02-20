@@ -39,10 +39,8 @@ export const BeddingMaterial = () => {
   }, [materialDetail]);
 
   useEffect(() => {
-    if (material.data.length === 0 && material.loading === true) {
-      getMaterialList();
-    }
-  }, [material.data]);
+    getMaterialList();
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -160,20 +158,6 @@ export const BeddingMaterial = () => {
                 placeholder="Enter material name"
                 onChange={(e) => setTitle(e.target.value)}
                 value={title}
-                disabled={isProcessing}
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="recipient-name" className="col-form-label">
-                Stock :
-              </Label>
-              <Input
-                type="number"
-                required
-                min={0}
-                placeholder="Enter stock"
-                onChange={(e) => setStock(e.target.value)}
-                value={stock}
                 disabled={isProcessing}
               />
             </FormGroup>

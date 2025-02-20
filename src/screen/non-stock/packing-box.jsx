@@ -69,10 +69,8 @@ export const PackingBox = () => {
   };
 
   useEffect(() => {
-    if (packingBox.data.length === 0 && packingBox.loading === true) {
-      getPackingBoxList();
-    }
-  }, [packingBox.data]);
+    getPackingBoxList();
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -231,21 +229,6 @@ export const PackingBox = () => {
                 onChange={onChange}
                 value={initialData.title}
                 name="title"
-                disabled={isProcessing}
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="recipient-name" className="col-form-label">
-                Stock :
-              </Label>
-              <Input
-                type="number"
-                required
-                min={0}
-                placeholder="Enter stock"
-                onChange={onChange}
-                name="stock"
-                value={initialData.stock}
                 disabled={isProcessing}
               />
             </FormGroup>
