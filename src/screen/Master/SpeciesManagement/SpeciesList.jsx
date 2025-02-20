@@ -149,7 +149,7 @@ import CommonBreadcrumb from "../../../component/common/bread-crumb";
                       <thead>
                         <tr>
                           <th>Breed</th>
-                          <th>Type</th>
+                          
                           <th>Action</th>
                         </tr>
                       </thead>
@@ -170,7 +170,7 @@ import CommonBreadcrumb from "../../../component/common/bread-crumb";
                             speciesMasterList?.data?.map((product, index) => (
                             <tr key={index}>
                               <td>{product.species}</td>
-                              <td>{product.type}</td>
+                              
                               <td>
                                 <div className="circelBtnBx">
                                   <Button

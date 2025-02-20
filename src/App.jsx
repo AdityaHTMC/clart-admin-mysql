@@ -57,6 +57,7 @@ import EditOrder from './screen/OrderMenu/EditOrder';
 import ShippingAgency from './screen/Master/ShippingAgency';
 import PendingOrder from './screen/OrderMenu/PendingOrder';
 import CultColonyList from './screen/colony/CultColonyList';
+import AssociatedClients from './screen/AssociatedClients';
 
 
 function App() {
@@ -122,6 +123,7 @@ function App() {
           <Route path="/finance" element={<UnPaidOrder />} />
           <Route path="/shipping-management" element={<ShippingAgency />} />
           <Route path="/pending-orders" element={<PendingOrder />} />
+          <Route path="/associates" element={<AssociatedClients />} />
 
           <Route path="*" element={<NotFound />} />
 

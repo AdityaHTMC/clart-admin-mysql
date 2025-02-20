@@ -27,6 +27,7 @@ export const CommonProvider = ({ children }) => {
     const [ alldistrictList , setallDristrictList] = useState({ loading: true, data: []  })
     const [ customerDetails , setCustomerDetails] = useState({ loading: true, data: []  })
     const [ allCultColonyList , setallCultColonyList] = useState({ loading: true, data: [], total:'' })
+    const [ associatedClientsList , setassociatedClientsList] = useState({ loading: true, data: [], total:'' })
     const [ allCultColonyanimal , setallCultColonyanimal] = useState({ loading: true, data: [], total:'' })
     const { Authtoken } = useAuthContext()
 
@@ -553,9 +554,78 @@ export const CommonProvider = ({ children }) => {
         }
       };
 
+      const addAssociatedClients  = async (formDataToSend) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/client-associate/add`,
+            formDataToSend,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getAssociatedCients()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+
+      const getAssociatedCients = async () => {
+        try {
+          setassociatedClientsList({ data: [], loading: true });
+          const response = await axios.get(
+            `${base_url}/client-associates/list`,
+            { headers: { Authorization: Authtoken } }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            setassociatedClientsList({
+              data: response?.data?.data || [],
+              total: response.data.total,
+              loading: false,
+            });
+          } else {
+            setassociatedClientsList({ data: [], loading: false });
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+          setassociatedClientsList({ data: [], loading: false });
+        }
+      };
+
+      const editAssociatedClients = async (id, formData) => {
+        try {
+          const response = await axios.post(
+            `${base_url}/admin/client-associate/edit/${id}`,
+            formData,
+            {
+              headers: {
+                Authorization: Authtoken,
+              },
+            }
+          );
+          const data = response.data;
+          if (response.status === 200) {
+            toast.success(response?.data?.message);
+            getAssociatedCients()
+          } else {
+            toast.error(response?.data?.message)
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+        }
+      };
+
+
     const values = {
         getMenuList, menuList, countryList, getCountryList, getStateList, stateList, getCityList, cityList,
-        getSmsSetting, smsData, SmsUpdateSetting, getEmailSubscribeList, mailList, getUserList, userList, switchUser, getOrderList, orderList, getOrderDetails, orderDetails, promoCode, getPromoCodeList, addPromoCode, addEvent, eventDelete, getEventList, eventList,getorgList,orgList,addCustomer,getallstateList,getallDistrictList,allstateList,alldistrictList,deleteCustomer,getCustomerDetails,customerDetails,editCustomer,approvetransation,getColonyCultList,allCultColonyList,getColonyCultRemove,allCultColonyanimal,removeCult
+        getSmsSetting, smsData, SmsUpdateSetting, getEmailSubscribeList, mailList, getUserList, userList, switchUser, getOrderList, orderList, getOrderDetails, orderDetails, promoCode, getPromoCodeList, addPromoCode, addEvent, eventDelete, getEventList, eventList,getorgList,orgList,addCustomer,getallstateList,getallDistrictList,allstateList,alldistrictList,deleteCustomer,getCustomerDetails,customerDetails,editCustomer,approvetransation,getColonyCultList,allCultColonyList,getColonyCultRemove,allCultColonyanimal,removeCult,addAssociatedClients,editAssociatedClients,getAssociatedCients,associatedClientsList
     }
     return (
         <AppContext.Provider value={values} >
