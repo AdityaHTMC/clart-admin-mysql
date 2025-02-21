@@ -370,19 +370,20 @@ export const MasterProvider = ({ children }) => {
       );
       if (response.status === 200) {
         toast.success(response.data.message);
-        getPackingBoxList()
+        return response.data
       } else {
         toast.error(response.data.message);
+        return null
       }
     } catch (error) {
       return error?.response?.data || null
     }
   };
 
-  const getPackingBoxList = async () => {
+  const getPackingBoxList = async (dataToSend) => {
     try {
       setPackingBox({ ...packingBox, loading: true })
-      const { data } = await axios.post(`${base_url}/admin/packing-box/list`, {}, {
+      const { data } = await axios.post(`${base_url}/admin/packing-box/list`, {...dataToSend}, {
         headers: {
           'Authorization': Authtoken
         }

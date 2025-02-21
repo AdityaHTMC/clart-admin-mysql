@@ -20,13 +20,13 @@ import {
 } from "reactstrap";
 import CommonBreadcrumb from "../component/common/bread-crumb";
 import { FaReceipt } from "react-icons/fa";
-import {
-  IoDownloadOutline} from "react-icons/io5";
+import { IoDownloadOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import { useCommonContext } from "../helper/CommonProvider";
 const OrderDetails = () => {
   const { id } = useParams();
-  const { getOrderDetails, orderDetails,approvetransation } = useCommonContext();
+  const { getOrderDetails, orderDetails, approvetransation } =
+    useCommonContext();
   const [activeTab, setActiveTab] = useState("1");
   useEffect(() => {
     if (id) {
@@ -44,31 +44,30 @@ const OrderDetails = () => {
     console.log("Approving transaction:", transactionId);
 
     const dataToSend = {
-      status: "approved",
-      transaction_id: transactionId,
-      id: id,
-      order_id: orderDetails.data?.id,
-    }
-    approvetransation(dataToSend);
+      status: "Approved",
+      payment_id: transactionId,
+    };
+    approvetransation(id, dataToSend);
   };
 
   const handleReject = (transactionId) => {
     console.log("Rejecting transaction:", transactionId);
 
     const dataToSend = {
-      status: "rejected",
-      transaction_id: transactionId,
-      id: id,
-      order_id: orderDetails.data?.id,
-    }
+      status: "Rejected",
+      payment_id: transactionId,
+    };
 
-    approvetransation(dataToSend);
+    approvetransation(id, dataToSend);
   };
 
   // Calculate total paid amount
 
-const totalPaid = orderDetails?.data?.payments?.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0) || 0;
-
+  const totalPaid =
+    orderDetails?.data?.payments?.reduce(
+      (sum, item) => sum + (parseInt(item.amount) || 0),
+      0
+    ) || 0;
 
   console.log(orderDetails, "orderDetails");
 
@@ -211,25 +210,29 @@ const totalPaid = orderDetails?.data?.payments?.reduce((sum, item) => sum + (par
 
                           <td>{item?.amount}</td>
                           <td>{item?.payment_date}</td>
-                          <td className="d-flex flex-column align-items-center">
-                            <Button
-                              color="success"
-                              size="sm"
-                              className="rounded-pill px-2 py-1 mb-1"
-                              style={{ fontSize: "12px" }}
-                              onClick={() => handleApprove(item.transaction_id)}
-                            >
-                              Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="rounded-pill px-2 py-1"
-                              style={{ fontSize: "12px" }}
-                              color="primary"
-                              onClick={() => handleReject(item.transaction_id)}
-                            >
-                              Reject
-                            </Button>
+                          <td className="">
+                            {item.payment_status === "Pending" && (
+                              <>
+                                <Button
+                                  color="success"
+                                  size="sm"
+                                  className="rounded-pill px-2 py-1 mb-1"
+                                  style={{ fontSize: "12px" }}
+                                  onClick={() => handleApprove(item.id)}
+                                >
+                                  Approve
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  className="rounded-pill px-2 py-1"
+                                  style={{ fontSize: "12px" }}
+                                  color="primary"
+                                  onClick={() => handleReject(item.id)}
+                                >
+                                  Reject
+                                </Button>
+                              </>
+                            )}
                           </td>
                         </tr>
                       ))}

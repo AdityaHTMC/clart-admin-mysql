@@ -459,9 +459,9 @@ export const CommonProvider = ({ children }) => {
       };
 
 
-      const approvetransation = async (dataToSend) => {
+      const approvetransation = async (id,dataToSend) => {
         try {
-            const {id} = dataToSend
+           
           const response = await axios.post(
             `${base_url}/order/payment/update`,
             {...dataToSend},

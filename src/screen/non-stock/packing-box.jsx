@@ -72,6 +72,17 @@ export const PackingBox = () => {
     getPackingBoxList();
   }, []);
 
+  const onCloseModal = () => {
+    setIsOpen(false);
+    setInitialData({
+      title: "",
+      stock: "",
+      capacity: "",
+      price: "",
+      breed_id: "",
+    });
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
     if (initialData.title === "")
@@ -87,6 +98,13 @@ export const PackingBox = () => {
     if(res?.status === 200){
       setIsProcessing(false);
       setIsOpen(false);
+      setInitialData({
+        title: "",
+        stock: "",
+        capacity: "",
+        price: "",
+        breed_id: "",
+      })
       getPackingBoxList()
     }
   };
@@ -249,6 +267,21 @@ export const PackingBox = () => {
             </FormGroup>
             <FormGroup>
               <Label htmlFor="recipient-name" className="col-form-label">
+                Packing box Stock :
+              </Label>
+              <Input
+                type="number"
+                required
+                min={1}
+                placeholder="Enter packing box stock number"
+                onChange={onChange}
+                value={initialData.stock}
+                name="stock"
+                disabled={isProcessing}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="recipient-name" className="col-form-label">
                 Packing box price :
               </Label>
               <Input
@@ -294,7 +327,7 @@ export const PackingBox = () => {
                 size="sm"
                 type="button"
                 color="secondary"
-                onClick={() => setIsOpen(false)}
+                onClick={onCloseModal}
                 disabled={isProcessing}
               >
                 Close
@@ -303,6 +336,11 @@ export const PackingBox = () => {
           </Form>
         </ModalBody>
       </Modal>
+
+
+
+
+      
     </>
   );
 };

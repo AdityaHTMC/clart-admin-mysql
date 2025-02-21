@@ -19,7 +19,7 @@ import OrderDetails from './screen/OrderDetails';
 import { Unit } from './screen/production/unit';
 import { RackPage } from './screen/production/rack';
 import { BeddingMaterial } from './screen/non-stock/bedding-material';
-import { PackingBox } from './screen/non-stock/packing-box';
+
 import { AddAnimal } from './screen/animals/AddAnimal';
 import { StoreMenu } from './screen/setting/store-menu';
 import { ColonyList } from './screen/colony/colony-list';
@@ -58,6 +58,7 @@ import ShippingAgency from './screen/Master/ShippingAgency';
 import PendingOrder from './screen/OrderMenu/PendingOrder';
 import CultColonyList from './screen/colony/CultColonyList';
 import AssociatedClients from './screen/AssociatedClients';
+import PackingBox from './screen/non-stock/PackingBox';
 
 
 function App() {
