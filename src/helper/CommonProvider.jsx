@@ -17,11 +17,11 @@ export const CommonProvider = ({ children }) => {
     const [cityList, setCityList] = useState({ loading: true, data: [] })
     const [smsData, setSmsData] = useState({ loading: true, data: [] })
     const [mailList, setMailList] = useState({ loading: true, data: [] })
-    const [userList, setUserList] = useState({ loading: true, data: [] })
+    const [userList, setUserList] = useState({ loading: true, data: [] , total:'' })
     const [orderList, setOrderList] = useState({ loading: true, data: [] })
     const [orderDetails, setOrderDetails] = useState({ loading: true, data: [] })
     const [promoCode, setPromoCode] = useState({ loading: true, data: [] })
-    const [eventList, setEventList] = useState({ loading: true, data: [] })
+    const [eventList, setEventList] = useState({ loading: true, data: [] , total:'' })
     const [orgList, setOrgList] = useState({ loading: true, data: [] })
     const [ allstateList , setallStateList] = useState({ loading: true, data: []  })
     const [ alldistrictList , setallDristrictList] = useState({ loading: true, data: []  })
@@ -29,6 +29,7 @@ export const CommonProvider = ({ children }) => {
     const [ allCultColonyList , setallCultColonyList] = useState({ loading: true, data: [], total:'' })
     const [ associatedClientsList , setassociatedClientsList] = useState({ loading: true, data: [], total:'' })
     const [ allCultColonyanimal , setallCultColonyanimal] = useState({ loading: true, data: [], total:'' })
+    const [eventDetails, setEventDetails] = useState({ loading: true, data: [] , total:[]  })
     const { Authtoken } = useAuthContext()
 
     const getMenuList = async () => {
@@ -150,7 +151,7 @@ export const CommonProvider = ({ children }) => {
         try {
             const response = await axios.post(`${base_url}/admin/user/list`, {}, { headers: { 'Authorization': Authtoken } });
             if (response.status === 200) {
-                setUserList({ data: response?.data?.data || [], loading: false })
+                setUserList({ data: response?.data?.data || [], total: response.data.total ,loading: false })
             } else {
                 toast.error(response?.data?.message)
                 setUserList({ data: [], loading: false })
@@ -257,9 +258,9 @@ export const CommonProvider = ({ children }) => {
     //    Event Management
     const getEventList = async () => {
         try {
-            const response = await axios.post(`${base_url}/admin/event/list`, {}, { headers: { 'Authorization': Authtoken } });
+            const response = await axios.post(`${base_url}/admin/news-event/list`, {}, { headers: { 'Authorization': Authtoken } });
             if (response.status === 200) {
-                setEventList({ data: response?.data?.data || [], loading: false })
+                setEventList({ data: response?.data?.data || [], total: response.data.total ,loading: false })
             } else {
                 toast.error(response?.data?.message)
                 setEventList({ data: [], loading: false })
@@ -270,48 +271,81 @@ export const CommonProvider = ({ children }) => {
         }
     }
 
+    const geteventDetail = async (id) => {
+      try {
+       
+          const response = await axios.get(`${base_url}/news-event/details/${id}`,
+          { headers: { 'Authorization': Authtoken }});
+          if (response.status === 200) {
+            setEventDetails({ data: response?.data?.data || [], total: response.data.total,  loading: false })
+          } else {
+              toast.error(response?.data?.message)
+              setEventDetails({ data:[],  loading: false })
+          }
+      } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+          setEventDetails({ data:[], loading: false })
+      }
+    }
+
 
     const addEvent = async (formDataToSend) => {
         try {
             const response = await axios.post(
-                `${base_url}/admin/event/add`,
+                `${base_url}/admin/news-event/add`,
                 formDataToSend,
                 {
                     headers: {
                         'Authorization': Authtoken,
-                        'Content-Type': 'multipart/form-data'
                     }
                 }
             );
             if (response.status === 200) {
-                toast.success('Event added successfully');
+                toast.success(response?.data?.message);
                 navigate('/event-list')
             } else {
-                toast.error("Failed to add Event");
+                toast.error(response?.data?.message);
             }
         } catch (error) {
-            console.error("Error adding Event:", error);
-            toast.error("An error occurred while adding the Event");
+            
+            toast.error(error.response?.data?.message || "Something went wrong");
         }
     };
+
+
+    const editEvent = async (id,dataToSend) => {
+      try {
+          const response = await axios.post(`${base_url}/admin/news-event/update/${id}`,dataToSend,
+          { headers: { 'Authorization': Authtoken }}); 
+          if (response.status === 200) {
+            toast.success(response?.data?.message)
+             navigate('/news-events')
+          } else {
+              toast.error(response?.data?.message)
+      
+          }
+      } catch (error) {
+          toast.error(error.response?.data?.message || "Something went wrong");
+    
+      }
+    }
 
 
     const eventDelete = async (id) => {
         try {
             const response = await axios.delete(
-                `${base_url}/admin/event/delete/${id}`,
+                `${base_url}/admin/news-event/delete/${id}`,
                 { headers: { 'Authorization': Authtoken } }
             );
 
             if (response.status === 200) {
-                toast.success('Event deleted successfully');
+                toast.success(response?.data?.message);
                 getEventList();
             } else {
-                toast.error('Failed to delete Event');
+                toast.error(response?.data?.message);
             }
         } catch (error) {
-            console.error('Error deleting Event:', error);
-            toast.error('An error occurred while deleting the Event');
+            toast.error(error.response?.data?.message || "Something went wrong");
         }
     }
 
@@ -625,7 +659,7 @@ export const CommonProvider = ({ children }) => {
 
     const values = {
         getMenuList, menuList, countryList, getCountryList, getStateList, stateList, getCityList, cityList,
-        getSmsSetting, smsData, SmsUpdateSetting, getEmailSubscribeList, mailList, getUserList, userList, switchUser, getOrderList, orderList, getOrderDetails, orderDetails, promoCode, getPromoCodeList, addPromoCode, addEvent, eventDelete, getEventList, eventList,getorgList,orgList,addCustomer,getallstateList,getallDistrictList,allstateList,alldistrictList,deleteCustomer,getCustomerDetails,customerDetails,editCustomer,approvetransation,getColonyCultList,allCultColonyList,getColonyCultRemove,allCultColonyanimal,removeCult,addAssociatedClients,editAssociatedClients,getAssociatedCients,associatedClientsList
+        getSmsSetting, smsData, SmsUpdateSetting, getEmailSubscribeList, mailList, getUserList, userList, switchUser, getOrderList, orderList, getOrderDetails, orderDetails, promoCode, getPromoCodeList, addPromoCode, addEvent, eventDelete, getEventList, eventList,getorgList,orgList,addCustomer,getallstateList,getallDistrictList,allstateList,alldistrictList,deleteCustomer,getCustomerDetails,customerDetails,editCustomer,approvetransation,getColonyCultList,allCultColonyList,getColonyCultRemove,allCultColonyanimal,removeCult,addAssociatedClients,editAssociatedClients,getAssociatedCients,associatedClientsList,geteventDetail,eventDetails,editEvent
     }
     return (
         <AppContext.Provider value={values} >

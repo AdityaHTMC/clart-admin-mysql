@@ -41,8 +41,6 @@ const PackingBox = () => {
 
   const { getallproductList, allproductList } = useCategoryContext();
 
-  console.log(allproductList , 'product')
-
   const [formData, setFormData] = useState({
     title: "",
     stock: "",
@@ -52,7 +50,6 @@ const PackingBox = () => {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
   const itemperPage = 8;
 
   const totalPages =
@@ -104,7 +101,6 @@ const PackingBox = () => {
     setOpen(false);
     setFormData({
       title: "",
-   
       capacity: "",
       price: "",
       breed_id: "",
@@ -120,7 +116,6 @@ const PackingBox = () => {
     }));
   };
 
-  console.log(selectedvarity, 'selectedvarity')
 
   // Handle submit for updating the brand
   const handleSubmits = async() => {

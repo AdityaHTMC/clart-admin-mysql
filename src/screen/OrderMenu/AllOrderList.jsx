@@ -181,7 +181,7 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
                                       ).toLocaleDateString("en-GB")
                                     : ""}
                                 </td>
-                                <td> {order.iiac_number} </td>
+                                <td> {order.iiac_number || "NA"} </td>
                               <td>
                                
                                 <div className="d-flex align-items-center gap-3">

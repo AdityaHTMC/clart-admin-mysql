@@ -17,10 +17,17 @@ import { useCommonContext } from "../../helper/CommonProvider";
 import CommonBreadcrumb from "../../component/common/bread-crumb";
 import { LoadingComponent } from "../../component/common/loading";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { Pagination, Stack } from "@mui/material";
 const UserList = () => {
   const navigate = useNavigate();
 
   const { getUserList, userList,switchUser,deleteCustomer } = useCommonContext();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const itemperPage = 8;
+
+  const totalPages = userList?.total && Math.ceil(userList?.total / itemperPage);
 
   useEffect(() => {
     getUserList();
@@ -44,6 +51,10 @@ const UserList = () => {
   const handleStatusToggle = async (product) => {
     const newStatus = product.status === "Active" ? "Inactive" : "Active";
     await switchUser(product.id, newStatus); // Your API call here
+  };
+
+  const handlepagechange = (newpage) => {
+    setCurrentPage(newpage);
   };
 
   return (
@@ -121,6 +132,15 @@ const UserList = () => {
                       )}
                     </tbody>
                   </Table>
+                  <Stack className="rightPagination mt10" spacing={2}>
+                    <Pagination
+                      color="primary"
+                      count={totalPages}
+                      page={currentPage}
+                      shape="rounded"
+                      onChange={(event, value) => handlepagechange(value)}
+                    />
+                  </Stack>
                   {!userList.loading && userList?.data?.length === 0 && (
                     <p className="text-muted text-center my-4" style={{ fontSize: 14 }}>No data found</p>
                   )}

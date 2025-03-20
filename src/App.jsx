@@ -59,6 +59,9 @@ import PendingOrder from './screen/OrderMenu/PendingOrder';
 import CultColonyList from './screen/colony/CultColonyList';
 import AssociatedClients from './screen/AssociatedClients';
 import PackingBox from './screen/non-stock/PackingBox';
+import EventList from './screen/Event/EventList';
+import EditEvent from './screen/Event/EditEvent';
+import StockTable from './screen/OrderMenu/StockTable';
 
 
 function App() {
@@ -115,6 +118,9 @@ function App() {
           <Route path="/vendor-management" element={<VendorManagement />} />
           <Route path="/all-orders" element={<AllOrderList/>} />
           <Route path="/add-orders" element={<AddOrder/>} />
+          <Route path="/event-list" element={<EventList/>} />
+          <Route path="/edit-event/:id" element={<EditEvent/>} />
+          <Route path="/stock-table" element={<StockTable/>} />
           
           <Route path="/permission-management" element={<PermissionList />} />
           <Route path="/role-management" element={<RoleList />} />

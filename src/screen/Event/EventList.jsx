@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import CommonBreadcrumb from "../component/common/bread-crumb";
+
 import {
   Badge,
   Button,
@@ -9,36 +9,29 @@ import {
   CardBody,
   Col,
   Container,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
   Row,
   Table,
+  UncontrolledTooltip,
 } from "reactstrap";
 import { useEffect, useState } from "react";
-import { useCategoryContext } from "../helper/CategoryProvider";
 import { useNavigate } from "react-router-dom";
-import { AiOutlineDelete } from "react-icons/ai";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
-import { HexColorPicker } from "react-colorful";
-// Register the necessary Chart.js components
-
-
 import { Spinner } from "reactstrap";
-import { useCommonContext } from "../helper/CommonProvider";
-import avtar from "../../src/assets/profile.png";
-import { BsFillEyeFill } from "react-icons/bs";
 import Switch from "@mui/material/Switch";
+import { useCommonContext } from "../../helper/CommonProvider";
+import CommonBreadcrumb from "../../component/common/bread-crumb";
+import { Pagination, Stack } from "@mui/material";
 
 const EventList = () => {
   const navigate = useNavigate();
 
   const { getEventList, eventList,eventDelete } = useCommonContext();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const itemperPage = 8;
+
+  const totalPages = eventList?.total && Math.ceil(eventList?.total / itemperPage);
 
   const onOpenModal = () => {
     navigate("/addEvent");
@@ -64,6 +57,10 @@ const EventList = () => {
     }
   };
 
+  const handlepagechange = (newpage) => {
+    setCurrentPage(newpage);
+  };
+
   return (
     <>
       <CommonBreadcrumb title="Event List" parent="Physical" />
@@ -74,7 +71,7 @@ const EventList = () => {
               {/* <CommonCardHeader title="Product Sub Categoty" /> */}
               <CardBody>
                 <div className="btn-popup pull-right">
-                  <Button color="primary" onClick={onOpenModal}>  
+                  <Button color="primary" onClick={onOpenModal}>
                     Add Event
                   </Button>
                 </div>
@@ -122,9 +119,43 @@ const EventList = () => {
                                   }}
                                 />
                               </td>
-                              <td>{event?.title}</td>
-                              <td>{new Date(event.date).toLocaleDateString("en-GB")}</td>
-                              <td>{event?.location}</td>
+                              {/* <td>{event?.title}</td> */}
+                              <td id={`title-${index}`}>
+                                {event?.title
+                                  ? event.title.length > 35
+                                    ? `${event.title.slice(0, 35)}...`
+                                    : event.title
+                                  : "NA"}
+                                {event?.title?.length > 15 && (
+                                  <UncontrolledTooltip
+                                    placement="top"
+                                    target={`title-${index}`}
+                                  >
+                                    {event.title}
+                                  </UncontrolledTooltip>
+                                )}
+                              </td>
+                              <td>
+                                {new Date(event.date).toLocaleDateString(
+                                  "en-GB"
+                                )}
+                              </td>
+
+                              <td id={`location-${index}`}>
+                                {event?.location
+                                  ? event.location.length > 35
+                                    ? `${event.location.slice(0, 35)}...`
+                                    : event.location
+                                  : "NA"}
+                                {event?.location?.length > 35 && (
+                                  <UncontrolledTooltip
+                                    placement="top"
+                                    target={`location-${index}`}
+                                  >
+                                    {event.location}
+                                  </UncontrolledTooltip>
+                                )}
+                              </td>
 
                               <td>
                                 <Switch
@@ -156,6 +187,15 @@ const EventList = () => {
                         )}
                       </tbody>
                     </Table>
+                    <Stack className="rightPagination mt10" spacing={2}>
+                    <Pagination
+                      color="primary"
+                      count={totalPages}
+                      page={currentPage}
+                      shape="rounded"
+                      onChange={(event, value) => handlepagechange(value)}
+                    />
+                  </Stack>
                   </div>
                 </div>
               </CardBody>
