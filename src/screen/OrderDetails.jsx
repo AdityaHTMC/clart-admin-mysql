@@ -242,14 +242,12 @@ const OrderDetails = () => {
               )}
 
               <div style={{ textAlign: "right", marginTop: "20px" }}>
-                <p>Total Price: ₹ {orderDetails?.data?.total_amount} </p>
                 <p>
                   Delivery Charge: ₹ {orderDetails?.data?.shipping_charges || 0}
                 </p>
                 <h5 style={{ fontWeight: "bold" }}>
                   Grand Total: ₹{" "}
-                  {(orderDetails?.data?.final_amount || 0) +
-                    (orderDetails?.data?.shipping_charges || 0)}
+                  {(orderDetails?.data?.final_amount || 0)}
                 </h5>
                 <h6 style={{ fontWeight: "bold" }}>
                   Paid Amount: ₹ {totalPaid}

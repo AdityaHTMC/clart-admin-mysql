@@ -1,74 +1,80 @@
 /* eslint-disable no-unused-vars */
-import { Fragment } from 'react'
-import './App.css'
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Route, Routes } from 'react-router-dom'
-import { ToastContainer } from 'react-toastify'
-import Login from './screen/auth/Login'
-import DashboardContainer from './screen/Home'
+import { Fragment } from "react";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import Login from "./screen/auth/Login";
+import DashboardContainer from "./screen/Home";
 
-import CommonLayout from './component/common/common-layout'
-import { useAuthContext } from './helper/AuthProvider'
-import BannerList from './screen/setting/BannerList'
-import FaqList from './screen/FaqList'
-import CmsList from './screen/CmsList'
-import SmsSettings from './screen/SmsSettings'
-import SubscribeEmail from './screen/SubscribeEmail'
-import SubCategoryList from './screen/SubCategoryList'
-import OrderDetails from './screen/OrderDetails';
-import { Unit } from './screen/production/unit';
-import { RackPage } from './screen/production/rack';
-import { BeddingMaterial } from './screen/non-stock/bedding-material';
+import CommonLayout from "./component/common/common-layout";
+import { useAuthContext } from "./helper/AuthProvider";
+import BannerList from "./screen/setting/BannerList";
+import FaqList from "./screen/FaqList";
+import CmsList from "./screen/CmsList";
+import SmsSettings from "./screen/SmsSettings";
+import SubscribeEmail from "./screen/SubscribeEmail";
+import SubCategoryList from "./screen/SubCategoryList";
+import OrderDetails from "./screen/OrderDetails";
+import { Unit } from "./screen/production/unit";
+import { RackPage } from "./screen/production/rack";
+import { BeddingMaterial } from "./screen/non-stock/bedding-material";
 
-import { AddAnimal } from './screen/animals/AddAnimal';
-import { StoreMenu } from './screen/setting/store-menu';
-import { ColonyList } from './screen/colony/colony-list';
-import { NotFound } from './screen/404';
-import { FloorPage } from './screen/production/floor';
-import EmailSettings from './screen/EmailSettings';
-import WhatsAppSettings from './screen/WhatsAppSettings';
-import NotificationSettings from './screen/NotificationSettings';
-import PaymentMethods from './screen/PaymentMethods';
-import StoreSettings from './screen/StoreSettings';
-import StateList from './screen/LocationManagement/StateList';
-import DistrictList from './screen/LocationManagement/DistrictList';
-import OrgType from './screen/Master/OrgType/OrgType';
-import Organization from './screen/Organization/Organization';
-import UserList from './screen/Customer/UserList';
-import AddUser from './screen/Customer/AddUser';
-import EditUser from './screen/Customer/EditUser';
-import CityList from './screen/LocationManagement/CityList';
-import SpeciesList from './screen/Master/SpeciesManagement/SpeciesList';
-import OrderStatusList from './screen/Master/OrderStatus';
-import RoomList from './screen/production/RoomList';
-import AnimalList from './screen/animals/AnimalList';
-import EditAnimal from './screen/animals/EditAnimal';
-import ReviewsList from './screen/animals/ReviewsList';
-import VendorManagement from './screen/StockManagement/VendorManagement';
-import AllOrderList from './screen/OrderMenu/AllOrderList';
-import AddOrder from './screen/OrderMenu/AddOrder';
-import PermissionList from './screen/SubAdmin/PermissionList';
-import RoleList from './screen/SubAdmin/RoleList';
-import UserManagementList from './screen/SubAdmin/UserManagementList';
-import PurchaseStock from './screen/non-stock/PurchaseStock';
-import StockReport from './screen/non-stock/StockReport';
-import UnPaidOrder from './screen/OrderMenu/UnpaidOrder';
-import EditOrder from './screen/OrderMenu/EditOrder';
-import ShippingAgency from './screen/Master/ShippingAgency';
-import PendingOrder from './screen/OrderMenu/PendingOrder';
-import CultColonyList from './screen/colony/CultColonyList';
-import AssociatedClients from './screen/AssociatedClients';
-import PackingBox from './screen/non-stock/PackingBox';
-import EventList from './screen/Event/EventList';
-import EditEvent from './screen/Event/EditEvent';
-import StockTable from './screen/OrderMenu/StockTable';
-
+import { AddAnimal } from "./screen/animals/AddAnimal";
+import { StoreMenu } from "./screen/setting/store-menu";
+import { ColonyList } from "./screen/colony/colony-list";
+import { NotFound } from "./screen/404";
+import { FloorPage } from "./screen/production/floor";
+import EmailSettings from "./screen/EmailSettings";
+import WhatsAppSettings from "./screen/WhatsAppSettings";
+import NotificationSettings from "./screen/NotificationSettings";
+import PaymentMethods from "./screen/PaymentMethods";
+import StoreSettings from "./screen/StoreSettings";
+import StateList from "./screen/LocationManagement/StateList";
+import DistrictList from "./screen/LocationManagement/DistrictList";
+import OrgType from "./screen/Master/OrgType/OrgType";
+import Organization from "./screen/Organization/Organization";
+import UserList from "./screen/Customer/UserList";
+import AddUser from "./screen/Customer/AddUser";
+import EditUser from "./screen/Customer/EditUser";
+import CityList from "./screen/LocationManagement/CityList";
+import SpeciesList from "./screen/Master/SpeciesManagement/SpeciesList";
+import OrderStatusList from "./screen/Master/OrderStatus";
+import RoomList from "./screen/production/RoomList";
+import AnimalList from "./screen/animals/AnimalList";
+import EditAnimal from "./screen/animals/EditAnimal";
+import ReviewsList from "./screen/animals/ReviewsList";
+import VendorManagement from "./screen/StockManagement/VendorManagement";
+import AllOrderList from "./screen/OrderMenu/AllOrderList";
+import AddOrder from "./screen/OrderMenu/AddOrder";
+import PermissionList from "./screen/SubAdmin/PermissionList";
+import RoleList from "./screen/SubAdmin/RoleList";
+import UserManagementList from "./screen/SubAdmin/UserManagementList";
+import PurchaseStock from "./screen/non-stock/PurchaseStock";
+import StockReport from "./screen/non-stock/StockReport";
+import UnPaidOrder from "./screen/OrderMenu/UnpaidOrder";
+import EditOrder from "./screen/OrderMenu/EditOrder";
+import ShippingAgency from "./screen/Master/ShippingAgency";
+import PendingOrder from "./screen/OrderMenu/PendingOrder";
+import CultColonyList from "./screen/colony/CultColonyList";
+import AssociatedClients from "./screen/AssociatedClients";
+import PackingBox from "./screen/non-stock/PackingBox";
+import EventList from "./screen/Event/EventList";
+import EditEvent from "./screen/Event/EditEvent";
+import StockTable from "./screen/OrderMenu/StockTable";
+import LocationManagement from "./screen/LocationManagement/LocationList";
+import AddEvent from "./screen/Event/AddEvent";
+import Inventory from "./screen/animals/Inventory";
+import { Man } from "@mui/icons-material";
+import ManagerList from "./screen/Master/manager/ManagerList";
+import AddManager from "./screen/Master/manager/AddManager";
+import EditManager from "./screen/Master/manager/EditManager";
 
 function App() {
-  const { initialLoading } = useAuthContext()
+  const { initialLoading } = useAuthContext();
 
   if (initialLoading) {
-    return null
+    return null;
   }
 
   return (
@@ -76,9 +82,11 @@ function App() {
       <Routes>
         <Route element={<CommonLayout />}>
           <Route path="/" element={<DashboardContainer />} />
-          <Route path="/breed-management" element={<SpeciesList />} />
-          <Route path="/animal-list" element={<AnimalList/>} />
-          <Route path="/product-edit/:id" element={<EditAnimal/>} />
+          <Route path="/species-management" element={<SpeciesList />} />
+          <Route path="/animal-list" element={<AnimalList />} />
+          <Route path="/inventory" element={<Inventory />} />
+
+          <Route path="/product-edit/:id" element={<EditAnimal />} />
           <Route path="/banner-list" element={<BannerList />} />
           <Route path="/cms" element={<CmsList />} />
           <Route path="/faqs" element={<FaqList />} />
@@ -103,12 +111,16 @@ function App() {
           <Route path="/colony-management" element={<ColonyList />} />
           <Route path="/email-settings" element={<EmailSettings />} />
           <Route path="/whatsapp-settings" element={<WhatsAppSettings />} />
-          <Route path="/notification-settings" element={<NotificationSettings />} />
+          <Route
+            path="/notification-settings"
+            element={<NotificationSettings />}
+          />
           <Route path="/payment-methods" element={<PaymentMethods />} />
           <Route path="/store-settings" element={<StoreSettings />} />
           <Route path="/store-menu" element={<StoreMenu />} />
           <Route path="/cms-list" element={<CmsList />} />
-          <Route path="/location-management" element={<StateList />} />
+          <Route path="/location-management" element={<LocationManagement />} />
+          <Route path="/state-management/:id" element={<StateList />} />
           <Route path="/district-management/:id" element={<DistrictList />} />
           <Route path="/faq-management" element={<FaqList />} />
           <Route path="/org-type" element={<OrgType />} />
@@ -116,12 +128,13 @@ function App() {
           <Route path="/order-status" element={<OrderStatusList />} />
           <Route path="/animal-reviews" element={<ReviewsList />} />
           <Route path="/vendor-management" element={<VendorManagement />} />
-          <Route path="/all-orders" element={<AllOrderList/>} />
-          <Route path="/add-orders" element={<AddOrder/>} />
-          <Route path="/event-list" element={<EventList/>} />
-          <Route path="/edit-event/:id" element={<EditEvent/>} />
-          <Route path="/stock-table" element={<StockTable/>} />
-          
+          <Route path="/all-orders" element={<AllOrderList />} />
+          <Route path="/add-orders" element={<AddOrder />} />
+          <Route path="/addEvent" element={<AddEvent />} />
+          <Route path="/event-list" element={<EventList />} />
+          <Route path="/edit-event/:id" element={<EditEvent />} />
+          <Route path="/stock-table" element={<StockTable />} />
+
           <Route path="/permission-management" element={<PermissionList />} />
           <Route path="/role-management" element={<RoleList />} />
           <Route path="/user-management" element={<UserManagementList />} />
@@ -134,12 +147,15 @@ function App() {
 
           <Route path="*" element={<NotFound />} />
 
+          <Route path="/manager-management" element={<ManagerList />} />
+          <Route path="/add-manager" element={<AddManager />} />
+          <Route path="/manager-edit/:id" element={<EditManager />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>
       <ToastContainer />
     </Fragment>
-  )
+  );
 }
 
-export default App
+export default App;

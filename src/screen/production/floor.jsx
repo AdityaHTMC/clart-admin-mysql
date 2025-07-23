@@ -20,7 +20,7 @@ import {
 import CommonBreadcrumb from "../../component/common/bread-crumb";
 import { useMasterContext } from "../../helper/MasterProvider";
 import { useEffect, useState } from "react";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { LoadingComponent } from "../../component/common/loading";
 import { toast } from "react-toastify";
 import { Pagination, Stack } from "@mui/material";
@@ -33,6 +33,7 @@ export const FloorPage = () => {
     edit_floor,
     getAllRoom,
     allRoom,
+    deleteFloor,
   } = useMasterContext();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -54,9 +55,6 @@ export const FloorPage = () => {
     setFloorData({ ...floorData, [e.target.name]: e.target.value });
   };
 
-
-
-
   useEffect(() => {
     const dataToSend = {
       page: currentPage,
@@ -72,7 +70,6 @@ export const FloorPage = () => {
   }, [isOpen, isEditing, allRoom]);
 
   useEffect(() => {
-    console.log(floorDetail);
     setFloorData({
       title: floorDetail?.title || "",
       room_id: floorDetail?.room_id || "",
@@ -90,6 +87,7 @@ export const FloorPage = () => {
       res = await edit_floor(floorDetail.id, {
         title: floorData.title,
         direction: floorData.direction,
+        room_id: floorData.room_id,
       });
     } else {
       res = await create_floor(floorData);
@@ -101,7 +99,11 @@ export const FloorPage = () => {
   const handlepagechange = (newpage) => {
     setCurrentPage(newpage);
   };
-
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you wish to delete this item?")) {
+      deleteFloor(id);
+    }
+  };
   return (
     <>
       <CommonBreadcrumb title="Floor Management" parent="Home" />
@@ -148,7 +150,7 @@ export const FloorPage = () => {
                             <td className="text-center">{item?.room_title}</td>
                             <td className="text-center">{item?.total_racks}</td>
                             <td className="d-flex gap-2 justify-content-end align-items-center">
-                              <Badge
+                              {/* <Badge
                                 color="danger"
                                 style={{ cursor: "pointer" }}
                                 onClick={() => {
@@ -158,7 +160,28 @@ export const FloorPage = () => {
                                 }}
                               >
                                 <FaEdit style={{ fontSize: 14 }} />
-                              </Badge>
+                              </Badge> */}
+                              <div className="circelBtnBx">
+                                <Button
+                                  className="btn"
+                                  color="link"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => {
+                                    setIsEditing(true);
+                                    setFloorDetail(item);
+                                    setIsOpen(true);
+                                  }}
+                                >
+                                  <FaEdit />
+                                </Button>
+                                <Button
+                                  className="btn"
+                                  color="link"
+                                  onClick={() => handleDelete(item.id)}
+                                >
+                                  <FaTrashAlt />
+                                </Button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -215,6 +238,7 @@ export const FloorPage = () => {
                 </Input>
               </FormGroup>
             )}
+          
             <FormGroup>
               <Label htmlFor="recipient-name" className="col-form-label">
                 Floor name :

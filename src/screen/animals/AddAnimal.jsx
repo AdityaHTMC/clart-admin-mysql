@@ -15,7 +15,11 @@ import { useMasterContext } from "../../helper/MasterProvider";
 export const AddAnimal = () => {
     const { addProduct, getproductList } = useCategoryContext();
     const { getAllSpeciesList , allspecies} = useMasterContext();
-    const [formData, setFormData] = useState({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', species_id: '', birth_cycle: '', cult:'',})
+    const [formData, setFormData] = useState({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '',
+
+        suckling_period :"", post_weaning_period :"", young_period:"", buck_period:"", doe_period:"", culled_period:"",
+         
+         status: '', species_id: '', birth_cycle: '',})
     const [selectedImage, setSelectedImage] = useState(null);
     const [multipleImages, setMultipleImages] = useState([])
     const [files, setFiles] = useState([])
@@ -56,7 +60,7 @@ export const AddAnimal = () => {
     }
 
     const onReset = () => {
-        setFormData({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', winning: '', calling: '', status: '', species_id: '', cult:'' })
+        setFormData({ title: '', description: '', species_for: 'Lab', gov_price: '', non_gov_price: '', status: '', species_id: '',suckling_period :"", post_weaning_period :"", young_period:"", buck_period:"", doe_period:"", culled_period:"", birth_cycle: '' })
         setSelectedImage(null);
         setMultipleImages([])
         setFiles([])
@@ -65,11 +69,15 @@ export const AddAnimal = () => {
     const onProductAdd = async () => {
         if (!formData.title) return toast.info('Animal name required');
         if (!formData.status) return toast.info('Status name required');
-        if (!formData.winning) return toast.info('Winning name required');
-        if (!formData.calling) return toast.info('Culling name required');
-        if (!formData.cult) return toast.info('culled name required');
+        if (!formData.suckling_period ) return toast.info('Suckling Period  is required');
+                if (!formData.post_weaning_period  ) return toast.info('Post Weaning Period  is required');
+        if (!formData.young_period ) return toast.info('young Period  is required');
+        if (!formData.buck_period ) return toast.info('Bulk Period  is required');
+
+        if (!formData.doe_period) return toast.info('Deo Period  is required');
+        if (!formData.culled_period) return toast.info('culled Period is  required');
         if (!formData.species_id) return toast.info('species required');
-        // if (!formData.birth_cycle) return toast.info('Birth cycle name required');
+         if (!formData.birth_cycle) return toast.info('Birth cycle name required');
 
         var filesArr = [...files]
         if (file) {
@@ -182,25 +190,28 @@ export const AddAnimal = () => {
                                                         ))}
                                                     </Input>
                                                 </FormGroup>
-                                                {/* <FormGroup>
-                                                    <Label htmlFor="species_for" className="col-form-label">
-                                                        Life Stage :
+                                          
+                                                   <FormGroup>
+                                                    <Label htmlFor="birth_cycle" className="col-form-label">
+                                                      Birth Cycle :
                                                     </Label>
                                                     <select
-                                                        className="form-select"
+                                                    className="form-select"
                                                         id="birth_cycle"
                                                         name="birth_cycle"
                                                         value={formData.birth_cycle}
                                                         onChange={onChange}
                                                     >
-                                                        <option value="''">-- Select --</option>
-                                                        <option value="Kid">Kid</option>
-                                                        <option value="Young">Young</option>
-                                                        <option value="Male">Male</option>
-                                                        <option value="Female">Female</option>
-                                                    </select>
+  <option value="">-- Select Period Type --</option>
+<option value="suckling_period">Suckling Period</option>
+<option value="post_weaning_period">Post Weaning Period</option>
+<option value="young_period">Young Period</option>
+<option value="buck_period">Buck Period (Male Maturity)</option>
+<option value="doe_period">Doe Period (Female Maturity)</option>
+<option value="culled_period">Culled Period</option>
 
-                                                </FormGroup> */}
+                                                    </select>
+                                                </FormGroup>
                                             </div>
                                         </Card>
                                     </Col>
@@ -238,41 +249,69 @@ export const AddAnimal = () => {
                                                         </small>
                                                     </div>
                                                 </FormGroup>
-                                                <FormGroup>
-                                                    <Label htmlFor="birth_cycle" className="col-form-label">
-                                                      Birth Cycle :
-                                                    </Label>
-                                                    <Input
-                                                        type="text"
-                                                        name="birth_cycle"
-                                                        placeholder="Enter Birth Cycle"
-                                                        value={formData.birth_cycle}
-                                                        onChange={onChange}
-                                                    />
-                                                </FormGroup>
+                                             
                                                 <FormGroup>
                                                     <Label htmlFor="title" className="col-form-label">
-                                                        Winning Period In Days :
+                                                        Suckling Period In Days :
                                                     </Label>
                                                     <Input
                                                         type="number"
-                                                        name="winning"
+                                                        name="suckling_period"
                                                          min={0}
-                                                        placeholder="Enter winning period in days"
-                                                        value={formData.winning}
+                                                        placeholder="Enter suckling period in days"
+                                                        value={formData.suckling_period}
                                                         onChange={onChange}
                                                     />
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="title" className="col-form-label">
-                                                        Culling Period In Days :
+                                                         Post Weaning Period In Days :
                                                     </Label>
                                                     <Input
                                                         type="number"
-                                                        name="calling"
+                                                        name="post_weaning_period"
                                                         min={0}
-                                                        placeholder="Enter calling period in days"
-                                                        value={formData.calling}
+                                                        placeholder="Enter post weaning period in days"
+                                                        value={formData.post_weaning_period}
+                                                        onChange={onChange}
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="title" className="col-form-label">
+                                                         Young Period In Days :
+                                                    </Label>
+                                                    <Input
+                                                        type="number"
+                                                        name="young_period"
+                                                        min={0}
+                                                        placeholder="Enter Young period in days"
+                                                        value={formData.young_period}
+                                                        onChange={onChange}
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="title" className="col-form-label">
+                                                        Buck Period In Days :
+                                                    </Label>
+                                                    <Input
+                                                        type="number"
+                                                        name="buck_period"
+                                                        min={0}
+                                                        placeholder="Enter Buck period in days"
+                                                        value={formData.buck_period}
+                                                        onChange={onChange}
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="title" className="col-form-label">
+                                                        Doe Period In Days :
+                                                    </Label>
+                                                    <Input
+                                                        type="number"
+                                                        name="doe_period"
+                                                        min={0}
+                                                        placeholder="Enter deo period in days"
+                                                        value={formData.doe_period}
                                                         onChange={onChange}
                                                     />
                                                 </FormGroup>
@@ -282,10 +321,10 @@ export const AddAnimal = () => {
                                                     </Label>
                                                     <Input
                                                         type="number"
-                                                        name="cult"
+                                                        name="culled_period"
                                                         min={0}
                                                         placeholder="Enter calling period in days"
-                                                        value={formData.cult}
+                                                        value={formData.culled_period}
                                                         onChange={onChange}
                                                     />
                                                 </FormGroup>

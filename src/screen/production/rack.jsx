@@ -21,7 +21,7 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
 import { useMasterContext } from "../../helper/MasterProvider";
 import { useEffect, useState } from "react";
 import { LoadingComponent } from "../../component/common/loading";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { Pagination, Stack } from "@mui/material";
 
@@ -32,7 +32,7 @@ export const RackPage = () => {
     getAllFloor,
     allFloor,
     create_rack,
-    edit_rack,
+    edit_rack,deleteRack
   } = useMasterContext();
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -43,7 +43,7 @@ export const RackPage = () => {
   const itemperPage = 8;
 
   const totalPages =
-  rackList?.total && Math.ceil(rackList?.total / itemperPage);
+    rackList?.total && Math.ceil(rackList?.total / itemperPage);
 
   const [state, setState] = useState({
     title: "",
@@ -52,8 +52,6 @@ export const RackPage = () => {
     type: "sell",
   });
   const [floor, setFloor] = useState("");
-
-
 
   useEffect(() => {
     const dataToSend = {
@@ -90,6 +88,9 @@ export const RackPage = () => {
       res = await edit_rack(rackDetail.id, {
         title: state.title,
         type: state.type,
+        col_no: state.col_no,
+        rows_no: state.rows_no,
+        floor_id: floor,
       });
     } else {
       res = await create_rack({ ...state, floor_id: floor });
@@ -109,6 +110,12 @@ export const RackPage = () => {
     setCurrentPage(newpage);
   };
 
+  const handleDelete = async(id) => {
+    if(window.confirm('Are you sure you want to delete this rack?'))
+    {
+    deleteRack(id)
+    }
+  }
 
   return (
     <>
@@ -160,7 +167,7 @@ export const RackPage = () => {
                             <td className="text-center">{item?.rows_no}</td>
                             <td className="text-center">{item?.col_no}</td>
                             <td className="d-flex gap-2 align-items-center justify-content-end">
-                              <Badge
+                              {/* <Badge
                                 color="danger"
                                 style={{ cursor: "pointer" }}
                                 onClick={() => {
@@ -170,7 +177,28 @@ export const RackPage = () => {
                                 }}
                               >
                                 <FaEdit style={{ fontSize: 14 }} />
-                              </Badge>
+                              </Badge> */}
+                              <div className="circelBtnBx">
+                                <Button
+                                  className="btn"
+                                  color="link"
+                                  style={{ cursor: "pointer" }}
+                                onClick={() => {
+                                  setIsEditing(true);
+                                  setIsOpen(true);
+                                  setRackDetail(item);
+                                }}
+                                >
+                                  <FaEdit />
+                                </Button>
+                                <Button
+                                  className="btn"
+                                  color="link"
+                                  onClick={() => handleDelete(item.id)}
+                                >
+                                  <FaTrashAlt />
+                                </Button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -230,6 +258,24 @@ export const RackPage = () => {
                 </Input>
               </FormGroup>
             )}
+            {/* <FormGroup>
+              <Label for="exampleSelect">Select Floor</Label>
+              <Input
+                id="exampleSelect"
+                name="floor"
+                value={floor}
+                disabled={isProcessing}
+                onChange={(e) => setFloor(e.target.value)}
+                type="select"
+              >
+                <option value={""}>select floor</option>
+                {allFloor.map((rm) => (
+                  <option key={rm.id} value={rm.id}>
+                    {rm.title} ({rm.ref})
+                  </option>
+                ))}
+              </Input>
+            </FormGroup> */}
             <FormGroup>
               <Label htmlFor="recipient-name" className="col-form-label">
                 Rack Name :
@@ -262,6 +308,21 @@ export const RackPage = () => {
                 />
               </FormGroup>
             )}
+              {/* <FormGroup>
+                <Label htmlFor="" className="col-form-label">
+                  Rows
+                </Label>
+                <Input
+                  type="number"
+                  required
+                  placeholder="Enter rows_no"
+                  min={1}
+                  onChange={onChange}
+                  name="rows_no"
+                  value={state.rows_no}
+                  disabled={isProcessing}
+                />
+              </FormGroup> */}
             {!isEditing && (
               <FormGroup>
                 <Label htmlFor="" className="col-form-label">
@@ -279,6 +340,21 @@ export const RackPage = () => {
                 />
               </FormGroup>
             )}
+             {/* <FormGroup>
+                <Label htmlFor="" className="col-form-label">
+                  Columns
+                </Label>
+                <Input
+                  type="number"
+                  required
+                  placeholder="Enter col_no"
+                  min={1}
+                  onChange={onChange}
+                  name="col_no"
+                  value={state.col_no}
+                  disabled={isProcessing}
+                />
+              </FormGroup> */}
             <FormGroup className="m-checkbox-inline mb-0 custom-radio-ml d-flex radio-animated">
               <Label className="d-block">
                 <Input

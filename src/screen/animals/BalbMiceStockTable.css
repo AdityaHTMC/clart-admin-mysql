@@ -1,0 +1,29 @@
+.stock-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.stock-table {
+  min-width: 2200px;
+  border-collapse: collapse;
+}
+
+.stock-table th,
+.stock-table td {
+  white-space: nowrap;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.vertical-header {
+  writing-mode: vertical-lr;
+  text-align: center;
+  vertical-align: middle;
+}

@@ -3,41 +3,38 @@ import React, { useEffect, useState } from "react";
 import { useCommonContext } from "../../helper/CommonProvider";
 import { useParams } from "react-router-dom";
 import CommonBreadcrumb from "../../component/common/bread-crumb";
-import { Badge, Button, FormGroup, Input, Label, Spinner } from "reactstrap";
+import { Badge, Button, Card, CardBody, CardFooter, Col, FormGroup, Input, Label } from "reactstrap";
 import { useCmsContext } from "../../helper/CmsProvider";
-import { FaCircleXmark } from "react-icons/fa6";
 import { GoTrash } from "react-icons/go";
-import DatePicker from "react-datepicker";
 import { useMasterContext } from "../../helper/MasterProvider";
+import { Download, Trash } from "react-feather";
+import { toast } from "react-toastify";
+import { parse } from "@fortawesome/fontawesome-svg-core";
 const EditOrder = () => {
   const { id } = useParams();
   const { getOrderDetails, orderDetails } = useCommonContext();
   const {
-    getCustomerDetail,
-    allCustomer,
     getpackingBox,
-    packingbox,
     getAllAnimal,
     allanimal,
-    createNewOrder,EditOrder
+    EditOrder
   } = useCmsContext();
 
-  const { getAllShippingAgency,allShippingAgency} = useMasterContext()
+  const { getAllShippingAgency, allShippingAgency } = useMasterContext()
 
   useEffect(() => {
     if (id) {
       getOrderDetails(id);
       getAllShippingAgency()
+      getAllAnimal()
     }
   }, [id]);
-  console.log(packingbox, "packingbox");
 
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [editItem, setEditItem] = useState(false);
 
   const [orderItems, setOrderItems] = useState([
     {
+      id: "",
       breed_id: "",
       quantity: 1,
       unit_price: 0,
@@ -47,25 +44,31 @@ const EditOrder = () => {
       packing_box_total_price: 0,
       packing_box_name: "",
       packing_box_price: 0,
+      age_from: "",
+      age_to: "",
+      age_unit: "",
+      weight_to: "",
+      weight_from: "",
+      weight_unit: "",
+      packing_box_required: false,
     },
   ]);
 
   const [inputData, setInputData] = useState({
-    iiac_number: "",
-    iiac_valid_from: "",
-    iiac_valid_to: "",
     total_amount: 0,
     status: "Pending",
     order_date: new Date(),
     payment_mode: "CASH",
-    transport_mode:"",
-    shipping_method:"",
-    shipping_charges:"",
+    vehicle_required: false,
+    transport_mode: "",
+    shipping_method: "",
+    shipping_charges: "",
     shipping_address: {
       first_name: "",
       last_name: "",
       phone_number: "",
       email: "",
+      country: "",
       state: "",
       city: "",
       postal_code: "",
@@ -77,6 +80,7 @@ const EditOrder = () => {
       last_name: "",
       phone_number: "",
       email: "",
+      country: "",
       state: "",
       city: "",
       postal_code: "",
@@ -88,13 +92,11 @@ const EditOrder = () => {
   useEffect(() => {
     if (orderDetails) {
       setInputData({
-        iiac_number: orderDetails.data.iiac_number || "",
-        iiac_valid_from: orderDetails.data.iiac_valid_from || "",
-        iiac_valid_to: orderDetails.data.iiac_valid_to || "",
         total_amount: orderDetails.data.total_amount || 0,
         status: orderDetails.data.status || "Pending",
         order_date: new Date(orderDetails.data.order_date),
         payment_mode: orderDetails.data.payment_mode || "CASH",
+        vehicle_required: orderDetails.data.vehicle_required === 1 ? true : false,
         transport_mode: orderDetails.data.transport_mode || "",
         shipping_method: orderDetails.data.shipping_method || "",
         shipping_charges: orderDetails.data.shipping_charges || "",
@@ -103,6 +105,7 @@ const EditOrder = () => {
           last_name: orderDetails.data.shipping_address?.last_name || "",
           phone_number: orderDetails.data.shipping_address?.phone_number || "",
           email: orderDetails.data.shipping_address?.email || "",
+          country: orderDetails.data.shipping_address?.country || "",
           state: orderDetails.data.shipping_address?.state || "",
           city: orderDetails.data.shipping_address?.city || "",
           postal_code: orderDetails.data.shipping_address?.postal_code || "",
@@ -116,6 +119,7 @@ const EditOrder = () => {
           last_name: orderDetails.data.billing_address?.last_name || "",
           phone_number: orderDetails.data.billing_address?.phone_number || "",
           email: orderDetails.data.billing_address?.email || "",
+          country: orderDetails.data.billing_address?.country || "",
           state: orderDetails.data.billing_address?.state || "",
           city: orderDetails.data.billing_address?.city || "",
           postal_code: orderDetails.data.billing_address?.postal_code || "",
@@ -127,21 +131,48 @@ const EditOrder = () => {
       });
 
       if (orderDetails.data.items) {
-        setOrderItems(orderDetails.data.items);
+        const items = orderDetails.data.items.map((item, index) => ({
+          ...item,
+          [`criteria${index}`]: item.age_unit ? "AGE" : item?.weight_unit ? "WEIGHT" : "",
+          [`purpose-${index}`]: item.purpose,
+          packing_box_required: !!item?.packing_box_id
+        }));
+        setOrderItems(items);
       }
     }
   }, [orderDetails]);
 
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
+  const PackingBoxCheck = (ord_items, item, index) => {
+    const updatedItems = [...ord_items]
+    if (item && item?.packing_box_required && item?.breed_id && item?.quantity) {
+      getpackingBox(item?.breed_id, item?.quantity).then((res) => {
+        updatedItems[index].packing_quantity = res?.expected_quantity;
+        updatedItems[index].packing_box_name = res?.title;
+        updatedItems[index].packing_box_price = res?.price;
+        updatedItems[index].packing_box_id = res?.id;
+        // updatedItems[index].packing_box_required = !!res?.id;
+        updatedItems[index].packing_box_total_price =
+          res?.price * res?.expected_quantity;
+        if (!res?.id) {
+          toast.info("No packing box found for this animal")
+        }
+      });
+    } else {
+      updatedItems[index].packing_quantity = 0;
+      updatedItems[index].packing_box_name = '';
+      updatedItems[index].packing_box_required = false;
+      updatedItems[index].packing_box_price = 0;
+      updatedItems[index].packing_box_id = null;
+      updatedItems[index].packing_box_total_price = 0;
+    }
+    setOrderItems(updatedItems);
+  }
 
-  useEffect(() => {
-    getAllAnimal();
-  }, []);
+  const onCriteriaChange = (criteria, index) => {
+    const updatedItems = [...orderItems]
+    updatedItems[index][`criteria${index}`] = criteria;
+    setOrderItems(updatedItems);
+  }
 
   const handleInputChange = (e) => {
     const { name, value, dataset, type, checked } = e.target;
@@ -171,7 +202,8 @@ const EditOrder = () => {
     if (
       field === "breed_id" ||
       field === "quantity" ||
-      field === "unit_price"
+      field === "unit_price" ||
+      field === "packing_box_required"
     ) {
       const animal = allanimal?.data?.find(
         (a) => a.id === parseInt(updatedItems[index].breed_id)
@@ -191,31 +223,23 @@ const EditOrder = () => {
 
       // Update total price
       updatedItems[index].total_price = unit_price * quantity;
-
-      // Fetch packing box details only when breed_id or quantity changes
+      console.log(field)
       if (
-        (field === "breed_id" || field === "quantity") &&
+        (field === "breed_id" || field === "packing_box_required" || field === "quantity") &&
         animal &&
         quantity > 0
       ) {
-        getpackingBox(animal.id, quantity).then((res) => {
-          updatedItems[index].packing_quantity = res?.expected_quantity;
-          updatedItems[index].packing_box_name = res?.title;
-          updatedItems[index].packing_box_price = res?.price;
-          updatedItems[index].packing_box_id = res?.id;
-          updatedItems[index].packing_box_total_price =
-            res?.price * res?.expected_quantity;
-          setOrderItems(updatedItems);
-        });
+        const itme = { packing_box_required: updatedItems[index]?.packing_box_required || false, quantity, breed_id: animal.id }
+        PackingBoxCheck(updatedItems, itme, index)
       }
     }
 
-      // Calculate Packing Box Total Price when Packing Box Number changes
-  if (field === "packing_quantity") {
-    const packing_quantity = parseInt(value) || 0;
-    const packing_box_price = parseFloat(updatedItems[index].packing_box_price) || 0;
-    updatedItems[index].packing_box_total_price = packing_box_price * packing_quantity;
-  }
+    // Calculate Packing Box Total Price when Packing Box Number changes
+    if (field === "packing_quantity" || field === "packing_box_price") {
+      const packing_quantity = updatedItems[index].packing_quantity || 0;
+      const packing_box_price = parseFloat(updatedItems[index].packing_box_price) || 0;
+      updatedItems[index].packing_box_total_price = packing_box_price * packing_quantity;
+    }
 
     setOrderItems(updatedItems);
   };
@@ -238,54 +262,110 @@ const EditOrder = () => {
     setOrderItems(updatedItems);
   };
 
-  const handleSubmit = () => {
-    const items = orderItems.map((item) => ({
-      breed_id: parseInt(item.animalId, 10),
-      quantity: parseInt(item.quantity, 10),
-      unit_price: parseFloat(item.unit_price),
-      total_price: parseFloat(item.total_price),
-      packing_box_quantity: parseInt(item.packing_quantity, 10),
-      packing_box_id: parseInt(item.packing_box_id, 10),
-      packing_box_total_price: parseFloat(item.packing_box_total_price),
-    }));
+  const validateOrder = () => {
+    let isCheck = true
+    for (let i = 0; i < orderItems.length; i++) {
+      const item = orderItems[i];
 
-    const final_amount = items.reduce((sum, item) => sum + item.total_price, 0);
+      if (!item.breed_id || !item.quantity || !item.unit_price) {
+        toast.info("Breed id, quanity or unit price is required")
+        isCheck = false;
+        break;
+      }
+
+      if (item?.packing_box_id && (!item.packing_quantity || !item.packing_box_price)) {
+        isCheck = false;
+        toast.info("Packing box quanity and price required")
+        break;
+      }
+
+      if (item[`criteria${i}`] === "AGE") {
+        if ((!item?.age_from && item.age_from != "0") || !item.age_to || !item.age_unit) {
+          isCheck = false;
+          toast.info("Age from to and its unit required")
+          break;
+        }
+      } else {
+        if ((!item?.weight_from && item.weight_from != "0") || !item.weight_to || !item.weight_unit) {
+          isCheck = false;
+          toast.info("weight from to and its unit required")
+          break;
+        }
+      }
+      const male_count = item?.male_ratio ? parseInt(item?.male_ratio) : 0
+      const female_count = item?.female_ratio ? parseInt(item?.female_ratio) : 0
+      const total_cont = male_count + female_count
+      if (item?.sex === "BOTH" && total_cont !== parseInt(item?.quantity)) {
+        isCheck = false;
+        toast.info("quantity is not matched with male female ratio")
+        break;
+      }
+
+      if (!item[`purpose-${i}`]) {
+        toast.info("Purpose required for each item");
+        isCheck = false;
+        break;
+      }
+
+      if (!item?.ieac_file) {
+        toast.info("IEAC file required for each item");
+        isCheck = false;
+        break;
+      }
+    }
+
+    return isCheck
+  }
+
+  const handleSubmit = () => {
+
+    const isValid = validateOrder()
+    if (!isValid) return
 
     const formData = new FormData();
 
-    if (editItem == true) {
-      orderItems.forEach((el, i) => {
-        formData.append(`items[${i}][breed_id]`, parseInt(el.breed_id, 10));
-        formData.append(`items[${i}][quantity]`, parseInt(el.quantity, 10));
-        formData.append(`items[${i}][total_price]`, parseFloat(el.total_price));
-        formData.append(
-          `items[${i}][packing_quantity]`,
-          parseInt(el.packing_quantity, 10)
-        );
-        formData.append(
-          `items[${i}][packing_box_id]`,
-          parseInt(el.packing_box_id, 10)
-        );
-        formData.append(
-          `items[${i}][packing_box_total_price]`,
-          parseFloat(el.packing_box_total_price)
-        );
-      });
-    }
+    orderItems.forEach((el, i) => {
+      if (el.id) {
+        formData.append(`items[${i}][item_id]`, parseInt(el.id, 10));
+      }
+      formData.append(`items[${i}][breed_id]`, parseInt(el.breed_id, 10));
+      formData.append(`items[${i}][quantity]`, parseInt(el.quantity, 10));
+      formData.append(`items[${i}][total_price]`, parseFloat(el.total_price));
+      formData.append(`items[${i}][packing_box_quantity]`, parseInt(el.packing_quantity, 10));
+      formData.append(`items[${i}][packing_box_id]`, parseInt(el.packing_box_id, 10));
+      formData.append(`items[${i}][packing_box_total_price]`, parseFloat(el.packing_box_total_price));
 
-    // formData.append("total_amount", final_amount);
-    formData.append("iiac_number", inputData.iiac_number);
+      if (el[`criteria${i}`] === 'WEIGHT') {
+        formData.append(`items[${i}][weight_from]`, el.weight_from);
+        formData.append(`items[${i}][weight_to]`, el.weight_to);
+        formData.append(`items[${i}][weight_unit]`, el.weight_unit);
+      }
+      if (el[`criteria${i}`] === 'AGE') {
+        formData.append(`items[${i}][age_from]`, el.age_from);
+        formData.append(`items[${i}][age_to]`, el.age_to);
+        formData.append(`items[${i}][age_unit]`, el.age_unit);
+      }
+      formData.append(`items[${i}][sex]`, el?.sex);
+      formData.append(`items[${i}][male_ratio]`, el?.sex === "MALE" ? el.quantity : el?.male_ratio);
+      formData.append(`items[${i}][female_ratio]`, el?.sex === "FEMALE" ? el.quantity : el?.female_ratio);
 
-    formData.append(
-      "iiac_valid_from",
-      startDate ? formatDate(startDate) : null
-    );
-    formData.append("iiac_valid_to", endDate ? formatDate(endDate) : null);
+      formData.append(`items[${i}][purpose]`, el?.purpose);
+      formData.append(`items[${i}][expected_date]`, el?.expected_date);
+      formData.append(`items[${i}][delivery_schedule]`, el?.delivery_schedule);
+      if (typeof el.ieac_file === 'string') {
+        formData.append(`items[${i}][ieac_file]`, el?.ieac_file);
+      } else {
+        formData.append(`items[${i}][ieac_file__${i}]`, el?.ieac_file[0]);
+      }
+    });
+
+
     formData.append("transport_mode", inputData.transport_mode);
     formData.append("shipping_charges", inputData.shipping_charges);
     formData.append("shipping_method", inputData.shipping_method);
+    formData.append("vehicle_required", inputData.vehicle_required === true ? 1 : 0);
     formData.append("order_id", orderDetails.data.id);
-    
+
     // Append nested billing address data
     Object.keys(inputData.billing_address).forEach((key) => {
       formData.append(
@@ -303,9 +383,9 @@ const EditOrder = () => {
     });
 
     // Debugging: Log FormData contents properly
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
+    // for (const [key, value] of formData.entries()) {
+    //   console.log(`${key}: ${value}`);
+    // }
 
     // Send the formData via API
     EditOrder(formData);
@@ -370,68 +450,373 @@ const EditOrder = () => {
 
                   <FormGroup className="col-md-3">
                     <Label>Total Price</Label>
-                    <Input type="text" value={item.total_price} readOnly />
+                    <Input type="text" value={item.total_price} readOnly disabled />
                   </FormGroup>
+
+                  <FormGroup check className="col-md-12 mb-2 mx-2">
+                    <Input
+                      id="checkbox2"
+                      type="checkbox"
+                      checked={item?.packing_box_required || false}
+                      onChange={(e) => handleItemChange(index, 'packing_box_required', e.target.checked)}
+                    />
+                    {' '}
+                    <Label check>
+                      Add Packing Box
+                    </Label>
+                  </FormGroup>
+
+                  {item?.packing_box_required && item?.packing_box_id && (
+                    <>
+                      <FormGroup className="col-md-3">
+                        <Label>Packing Box Name</Label>
+                        <Input
+                          type="text"
+                          value={item.packing_box_name}
+                          style={{ backgroundColor: "#f8f9fa" }}
+                        />
+                      </FormGroup>
+
+                      <FormGroup className="col-md-3">
+                        <Label>Packing Box Number</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.packing_quantity}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "packing_quantity",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </FormGroup>
+
+                      <FormGroup className="col-md-3">
+                        <Label>Packing Box Price(unit)</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.packing_box_price}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "packing_box_price",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </FormGroup>
+
+                      <FormGroup className="col-md-3">
+                        <Label>Packing Box Total Price</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.packing_box_total_price}
+                          disabled
+                        />
+                      </FormGroup>
+                    </>
+                  )}
+
+                  <FormGroup
+                    row
+                    tag="fieldset"
+                    className="col-md-12"
+                  >
+                    <Col sm={10} className="d-flex gap-3">
+                      <FormGroup check>
+                        <Input
+                          name={`criteria-age-${index}`}
+                          type="radio"
+                          checked={item[`criteria${index}`] === "AGE"}
+                          onChange={() => onCriteriaChange("AGE", index)}
+                        />
+                        {' '}
+                        <Label check>
+                          By Age
+                        </Label>
+                      </FormGroup>
+                      <FormGroup check>
+                        <Input
+                          name={`criteria-weight-${index}`}
+                          type="radio"
+                          checked={item[`criteria${index}`] === "WEIGHT"}
+                          onChange={() => onCriteriaChange("WEIGHT", index)}
+                        />
+                        {' '}
+                        <Label check>
+                          By Weight
+                        </Label>
+                      </FormGroup>
+                    </Col>
+                  </FormGroup>
+
+                  {item[`criteria${index}`] === "AGE" && (
+                    <>
+                      <FormGroup className="col-md-4">
+                        <Label>Age From</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={item.age_from}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "age_from",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </FormGroup>
+
+                      <FormGroup className="col-md-4">
+                        <Label>Age To</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.age_to}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "age_to",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </FormGroup>
+
+                      <FormGroup className="col-md-4">
+                        <Label for="age_unit">Age Unit</Label>
+                        <Input type="select" name="age_unit" id="age_unit" value={item.age_unit} onChange={(e) =>
+                          handleItemChange(
+                            index,
+                            "age_unit",
+                            e.target.value
+                          )
+                        } required>
+                          <option value="">Select</option>
+                          <option value="DAY">Days</option>
+                          <option value="MONTH">Months</option>
+                          <option value="YEAR">Years</option>
+                        </Input>
+                      </FormGroup>
+                    </>
+                  )}
+
+                  {item[`criteria${index}`] === "WEIGHT" && (
+                    <>
+                      <FormGroup className="col-md-4">
+                        <Label>Weight From</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={item.weight_from}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "weight_from",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </FormGroup>
+
+                      <FormGroup className="col-md-4">
+                        <Label>Weight To</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.weight_to}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "weight_to",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </FormGroup>
+
+                      <FormGroup className="col-md-4">
+                        <Label for="weight_unit">Weight Unit</Label>
+                        <Input type="select" name="weight_unit" id="weight_unit" value={item.weight_unit} onChange={(e) =>
+                          handleItemChange(
+                            index,
+                            "weight_unit",
+                            e.target.value
+                          )
+                        } required>
+                          <option value="">Select</option>
+                          <option value="KG">Kilograms</option>
+                          <option value="G">Grams</option>
+                        </Input>
+                      </FormGroup>
+                    </>
+                  )}
+
+                  <Col md={4}>
+                    <FormGroup>
+                      <Label for="sex">Sex Required</Label>
+                      <Input type="select" name="sex" id="sex" value={item.sex} onChange={(e) =>
+                        handleItemChange(
+                          index,
+                          "sex",
+                          e.target.value
+                        )
+                      } required>
+                        <option value="">Select</option>
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                        <option value="BOTH">Both</option>
+                      </Input>
+                    </FormGroup>
+                  </Col>
+                  {item.sex === 'BOTH' ? (
+                    <>
+                      <Col md={4}>
+                        <FormGroup>
+                          <Label for="male_ratio">Male Ratio</Label>
+                          <Input type="number" name="male_ratio" id="male_ratio" value={item.male_ratio} onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "male_ratio",
+                              e.target.value
+                            )} min={0} />
+                        </FormGroup>
+                      </Col>
+                      <Col md={4}>
+                        <FormGroup>
+                          <Label for="female_ratio">Female Ratio</Label>
+                          <Input type="number" name="female_ratio" id="female_ratio" value={item.female_ratio} onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "female_ratio",
+                              e.target.value
+                            )} min={0} />
+                        </FormGroup>
+                      </Col>
+                    </>
+                  ) : <div className="col-md-8"></div>}
+
+                  <FormGroup
+                    row
+                    tag="fieldset"
+                    className="col-md-3"
+                  >
+                    <div>
+                      <Label>Purpose</Label>
+                      <Col sm={10} className="d-flex" style={{ flexDirection: 'column' }}>
+                        <FormGroup check>
+                          <Input
+                            name={`purpose-${index}`}
+                            type="radio"
+                            checked={item[`purpose-${index}`] === "BREEDING"}
+                            onChange={(e) =>
+                              handleItemChange(
+                                index,
+                                `purpose-${index}`,
+                                "BREEDING"
+                              )}
+                          />
+                          {' '}
+                          <Label check>
+                            Breeding
+                          </Label>
+                        </FormGroup>
+                        <FormGroup check>
+                          <Input
+                            name={`purpose-${index}`}
+                            type="radio"
+                            checked={item[`purpose-${index}`] === "EXPERIMENTAL"}
+                            onChange={() =>
+                              handleItemChange(
+                                index,
+                                `purpose-${index}`,
+                                "EXPERIMENTAL"
+                              )}
+                          />
+                          {' '}
+                          <Label check>
+                            Experimental
+                          </Label>
+                        </FormGroup>
+                      </Col>
+                    </div>
+                  </FormGroup>
+
+
                   <FormGroup className="col-md-3">
-                    <Label>Packing Box Name</Label>
+                    <Label>Expected Date</Label>
+                    <Input
+                      type="date"
+                      value={item.expected_date ? item.expected_date?.split("T")[0] : ""}
+                      onChange={(e) =>
+                        handleItemChange(
+                          index,
+                          "expected_date",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </FormGroup>
+
+                  <FormGroup className="col-md-3">
+                    <Label>Schedule delivary</Label>
                     <Input
                       type="text"
-                      value={item.packing_box_name}
-                      style={{ backgroundColor: "#f8f9fa" }}
-                    />
-                  </FormGroup>
-                  <FormGroup className="col-md-3">
-                    <Label>Packing Box Number</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={item.packing_quantity}
+                      value={item.delivery_schedule}
                       onChange={(e) =>
                         handleItemChange(
                           index,
-                          "packing_quantity",
+                          "delivery_schedule",
                           e.target.value
                         )
                       }
                     />
                   </FormGroup>
 
-                  <FormGroup className="col-md-3">
-                    <Label>Packing Box Price(unit)</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={item.packing_box_price}
-                      onChange={(e) =>
-                        handleItemChange(
-                          index,
-                          "packing_box_price",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </FormGroup>
+                  {item?.ieac_file && typeof item.ieac_file === "string" && (
+                    <div className="col-md-3">
+                      <Card className="mb-0">
+                        <CardBody className="p-2 mb-0">
+                          {item?.ieac_file?.split('/')?.pop()}
+                        </CardBody>
+                        <CardFooter className="d-flex gap-2 p-2">
+                          <a href={item.ieac_file} target="_blank" className="badge btn-sm badge-primary" download style={{ color: "#fff" }}>
+                            <Download size={16} />
+                          </a>
+                          <Badge size="sm" color="danger" style={{ cursor: "pointer" }} onClick={(e) =>
+                            handleItemChange(
+                              index,
+                              "ieac_file",
+                              ''
+                            )
+                          }>
+                            <Trash size={16} />
+                          </Badge>
+                        </CardFooter>
+                      </Card>
+                    </div>
+                  )}
+                  {(!item?.ieac_file || typeof item?.ieac_file === "object") && (
+                    <FormGroup className="col-md-3">
+                      <Label>Ieac File</Label>
+                      <Input
+                        type="file"
+                        // value={item.ieac_file}
+                        accept=".pdf"
+                        onChange={(e) => handleItemChange(index, 'ieac_file', Array.from(e.target.files))}
+                      />
+                    </FormGroup>
+                  )}
 
-                  <FormGroup className="col-md-3">
-                    <Label>Packing Box Total Price</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={item.packing_box_total_price}
-                      onChange={(e) =>
-                        handleItemChange(
-                          index,
-                          "packing_box_total_price",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </FormGroup>
-
-                  <FormGroup className="col-md-2 d-flex align-items-end">
-                    <Button color="danger" onClick={() => removeItemRow(index)}>
-                      <GoTrash style={{ fontSize: 15, color: "#000" }} />
-                    </Button>
+                  <FormGroup className="col-md-12 d-flex align-items-end">
+                    <Badge color="danger" onClick={() => removeItemRow(index)} style={{ cursor: 'pointer' }}>
+                      <GoTrash style={{ fontSize: 15, color: "#fff" }} />
+                    </Badge>
                   </FormGroup>
                 </div>
               ))}
@@ -448,67 +833,6 @@ const EditOrder = () => {
                   className="col-form-label font-weight-bold"
                   style={{ color: "#495057" }}
                 >
-                  IIAC Number <span className="text-danger">*</span>
-                </Label>
-                <Input
-                  type="text"
-                  name="iiac_number"
-                  value={inputData.iiac_number}
-                  onChange={handleInputChange}
-                  id="iiac_number"
-                  placeholder="Enter IIAC Number"
-                  style={{
-                    border: "1px solid #ced4da",
-                    borderRadius: "5px",
-                    padding: "10px",
-                  }}
-                />
-              </FormGroup>
-              <div className="col-md-4">
-                <Label
-                  for="iiac_valid_from"
-                  className="col-form-label font-weight-bold"
-                >
-                  IIAC Valid From Date
-                </Label>
-                <DatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                  placeholderText="Select Start Date"
-                  className="form-control"
-                  style={{
-                    border: "1px solid #ced4da",
-                    borderRadius: "5px",
-                    padding: "10px",
-                  }}
-                />
-              </div>
-              <div className="col-md-4">
-                <Label
-                  for="iiac_valid_to"
-                  className="col-form-label font-weight-bold"
-                >
-                  IIAC Valid To Date
-                </Label>
-                <DatePicker
-                  selected={endDate}
-                  onChange={(date) => setEndDate(date)}
-                  placeholderText="Select End Date"
-                  className="form-control"
-                  style={{
-                    border: "1px solid #ced4da",
-                    borderRadius: "5px",
-                    padding: "10px",
-                  }}
-                />
-              </div>
-
-              <FormGroup className="col-md-4">
-                <Label
-                  for="title"
-                  className="col-form-label font-weight-bold"
-                  style={{ color: "#495057" }}
-                >
                   Transport Mode
                 </Label>
                 <Input
@@ -518,41 +842,36 @@ const EditOrder = () => {
                   onChange={handleInputChange}
                   id="transport_mode"
                   placeholder="Enter transport mode"
-                  style={{
-                    border: "1px solid #ced4da",
-                    borderRadius: "5px",
-                    padding: "10px",
-                  }}
                 />
               </FormGroup>
 
               <FormGroup className="col-md-4">
-              <Label htmlFor="shipping_method" className="col-form-label">
-                Shipping Agency:
-              </Label>
-              <Input
-                type="select"
-                name="shipping_method"
-                value={inputData.shipping_method}
-                onChange={handleInputChange}
-                id="shipping_method"
-              >
-                <option value="">Select Shipping Agency</option>
-                {allShippingAgency?.data?.map((variety) => (
-                  <option key={variety._id} value={variety.id}>
-                    {variety.agency_name}
-                  </option>
-                ))}
-              </Input>
-            </FormGroup>
+                <Label htmlFor="shipping_method" className="col-form-label">
+                  Shipping Agency:
+                </Label>
+                <Input
+                  type="select"
+                  name="shipping_method"
+                  value={inputData.shipping_method}
+                  onChange={handleInputChange}
+                  id="shipping_method"
+                >
+                  <option value="">Select Shipping Agency</option>
+                  {allShippingAgency?.data?.map((variety) => (
+                    <option key={variety._id} value={variety.id}>
+                      {variety.agency_name}
+                    </option>
+                  ))}
+                </Input>
+              </FormGroup>
 
-            <FormGroup className="col-md-4">
+              <FormGroup className="col-md-4">
                 <Label
                   for="title"
                   className="col-form-label font-weight-bold"
                   style={{ color: "#495057" }}
                 >
-                 Shipping Charges
+                  Shipping Charges
                 </Label>
                 <Input
                   type="number"
@@ -561,12 +880,25 @@ const EditOrder = () => {
                   onChange={handleInputChange}
                   id="shipping_charges"
                   placeholder="Enter transport mode"
-                  style={{
-                    border: "1px solid #ced4da",
-                    borderRadius: "5px",
-                    padding: "10px",
-                  }}
                 />
+              </FormGroup>
+
+              <FormGroup className="col-md-4">
+                <div className="d-flex gap-2">
+                  <Input
+                    id="exampleCheckbox"
+                    name="vehicle_required"
+                    type="checkbox"
+                    checked={inputData.vehicle_required}
+                    onChange={handleInputChange}
+                  />
+                  <Label
+                    check
+                    for="exampleCheckbox"
+                  >
+                    Vehicle Required
+                  </Label>
+                </div>
               </FormGroup>
 
             </div>
@@ -627,6 +959,18 @@ const EditOrder = () => {
                     data-section="billing_address"
                     onChange={handleInputChange}
                     placeholder="Enter Email"
+                    style={{ borderRadius: "5px" }}
+                  />
+                </FormGroup>
+                <FormGroup className="col-md-4">
+                  <Label>Country</Label>
+                  <Input
+                    type="text"
+                    name="country"
+                    value={inputData.billing_address.country}
+                    data-section="billing_address"
+                    onChange={handleInputChange}
+                    placeholder="Enter country"
                     style={{ borderRadius: "5px" }}
                   />
                 </FormGroup>
@@ -742,6 +1086,18 @@ const EditOrder = () => {
                     data-section="shipping_address"
                     onChange={handleInputChange}
                     placeholder="Enter Email"
+                    style={{ borderRadius: "5px" }}
+                  />
+                </FormGroup>
+                <FormGroup className="col-md-4">
+                  <Label>Country</Label>
+                  <Input
+                    type="text"
+                    name="country"
+                    value={inputData.shipping_address.country}
+                    data-section="shipping_address"
+                    onChange={handleInputChange}
+                    placeholder="Enter Country"
                     style={{ borderRadius: "5px" }}
                   />
                 </FormGroup>

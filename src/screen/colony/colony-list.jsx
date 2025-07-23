@@ -31,11 +31,9 @@ import { BiTransfer } from "react-icons/bi";
 import TransferTabs from "../../component/colony/transfer-tabs";
 import { IconButton, Pagination, Stack, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import HistoryTabs from "../../component/colony/HistoryTabs";
+import ViewTabs from "../../component/colony/ViewTabs";
 export const ColonyList = () => {
-
-
-
-
   const [qrOpen, setQrOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isRemove, setIsRemove] = useState(false);
@@ -45,8 +43,10 @@ export const ColonyList = () => {
   const { getColonyList, colonyList } = useColonyContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const itemperPage = 8;
+  const [isHistory, setIsHistory] = useState(false);
+  const [isview, setIsView] = useState(false);
 
+  const itemperPage = 8;
   const totalPages =
     colonyList?.total && Math.ceil(colonyList?.total / itemperPage);
 
@@ -57,8 +57,8 @@ export const ColonyList = () => {
       keyword_search: searchTerm,
     };
     getColonyList(dataToSend);
-  }, [currentPage,searchTerm]);
-
+  }, [currentPage, searchTerm]);
+  // console.log(colonyList)
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -66,7 +66,6 @@ export const ColonyList = () => {
   const handlepagechange = (newpage) => {
     setCurrentPage(newpage);
   };
-
   return (
     <>
       <CommonBreadcrumb title="Colony Management" parent="Home" />
@@ -76,9 +75,13 @@ export const ColonyList = () => {
             <Card>
               <CardBody>
                 <div id="basicScenario" className="product-physical">
-                <form
+                  <form
                     className="searchBx"
-                    style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: "20px",
+                    }}
                   >
                     <TextField
                       id="search-box"
@@ -122,7 +125,7 @@ export const ColonyList = () => {
                               {item?.rack_title || "N/A"}{" "}
                             </td>
                             <td className="text-center">
-                              <Badge color="danger">
+                              <Badge color="primary">
                                 {item?.breed_name || "N/A"}
                               </Badge>
                             </td>
@@ -137,7 +140,9 @@ export const ColonyList = () => {
                             <td className="text-center">
                               <Badge
                                 color={
-                                  item?.use_for === "Lab" ? "danger" : "success"
+                                  item?.use_for === "Lab"
+                                    ? "primary"
+                                    : "success"
                                 }
                                 style={{ textTransform: "capitalize" }}
                               >
@@ -269,7 +274,13 @@ export const ColonyList = () => {
                                       </DropdownItem>
                                     )}
 
-                                    <DropdownItem className="d-flex gap-2 align-items-center">
+
+                                    <DropdownItem className="d-flex gap-2 align-items-center"
+                                       onClick={() => {
+                                        setIsView(true);
+                                        setItemDetail(item);
+                                      }}
+                                    >
                                       <Badge
                                         color="danger"
                                         style={{ cursor: "pointer" }}
@@ -283,6 +294,28 @@ export const ColonyList = () => {
                                         }}
                                       >
                                         View Details
+                                      </span>
+                                    </DropdownItem>
+                                    <DropdownItem
+                                      className="d-flex gap-2 align-items-center"
+                                      onClick={() => {
+                                        setIsHistory(true);
+                                        setItemDetail(item);
+                                      }}
+                                    >
+                                      <Badge
+                                        color="danger"
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        <FaEye size={14} />
+                                      </Badge>
+                                      <span
+                                        style={{
+                                          fontSize: 14,
+                                          fontWeight: 500,
+                                        }}
+                                      >
+                                        History
                                       </span>
                                     </DropdownItem>
                                   </DropdownMenu>
@@ -381,6 +414,36 @@ export const ColonyList = () => {
         </ModalHeader>
         <ModalBody>
           <TransferTabs onClose={setIsTransfer} itemDetail={itemDetail} />
+        </ModalBody>
+      </Modal>
+      <Modal>
+        <ModalHeader toggle={() => setIsOpen(false)}>
+          <h5 className="modal-title f-w-600" id="exampleModalLabel2">
+            Colony #{itemDetail?.ref}
+          </h5>
+        </ModalHeader>
+        <ModalBody>
+          <EntryTabs onClose={setIsOpen} itemDetail={itemDetail} />
+        </ModalBody>
+      </Modal>
+      <Modal isOpen={isview} toggle={setIsView} >
+        <ModalHeader toggle={() => setIsView(false)}>
+          <h5 className="modal-title f-w-600" id="exampleModalLabel2">
+            Colony #{itemDetail?.ref}
+          </h5>
+        </ModalHeader>
+        <ModalBody>
+          <ViewTabs onClose={setIsView} itemDetail={itemDetail} />
+        </ModalBody>
+      </Modal>
+      <Modal isOpen={isHistory} toggle={setIsHistory} style={{ maxWidth: "90%" }}>
+        <ModalHeader toggle={() => setIsHistory(false)}>
+          <h5 className="modal-title f-w-600" id="exampleModalLabel2">
+            Colony #{itemDetail?.ref}
+          </h5>
+        </ModalHeader>
+        <ModalBody>
+          <HistoryTabs onClose={setIsHistory} itemDetail={itemDetail} />
         </ModalBody>
       </Modal>
     </>

@@ -131,7 +131,7 @@ import CommonBreadcrumb from "../../../component/common/bread-crumb";
   
     return (
       <>
-        <CommonBreadcrumb title="Breed List"  />
+        <CommonBreadcrumb title="Species List"  />
         <Container fluid>
           <Row>
             <Col sm="12">
@@ -140,7 +140,7 @@ import CommonBreadcrumb from "../../../component/common/bread-crumb";
                 <CardBody>
                   <div className="btn-popup pull-right">
                     <Button color="primary" onClick={onOpenModal}>
-                      Add Breed
+                      Add Species
                     </Button>
                   </div>
                   <div className="clearfix"></div>
@@ -148,7 +148,7 @@ import CommonBreadcrumb from "../../../component/common/bread-crumb";
                     <Table striped responsive>
                       <thead>
                         <tr>
-                          <th>Breed</th>
+                          <th>Species</th>
                           
                           <th>Action</th>
                         </tr>

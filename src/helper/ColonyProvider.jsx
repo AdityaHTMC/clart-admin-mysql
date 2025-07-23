@@ -15,7 +15,7 @@ export const ColonyProvider = ({ children }) => {
     const [colonyData, setColonyData] = useState({ loading: false, data: [] })
     const [colonyList, setColonyList] =  useState({ loading: true, data: [], total: "", })
     const [colonybreedList, setColonybreedList] =  useState({ loading: true, data: [], })
-
+const [colonyHistory, setColonyHistory] = useState({ loading: true, data: [], total: "" })
     const getColonyList = async (dataToSend) => {
         try {
           const response = await axios.post(
@@ -190,10 +190,30 @@ export const ColonyProvider = ({ children }) => {
             return error?.response?.data || null
         }
     }
-
+  const getColonyHistory = async (body) => {
+        try {
+            const { data } = await axios.post(`${base_url}/colony/history`, body, {
+                headers: {
+                    'Authorization': Authtoken
+                }
+            })
+            if (data.status === 200) {
+                setColonyHistory({
+                    data: data.data || [],
+                    total: data.total,
+                    loading: false,
+                });
+            } else {
+                setColonyHistory({ data: [], loading: false });
+                toast.error(data.message);
+            }
+        } catch (error) {
+            return error?.response?.data || null
+        }
+    }
 
     const values = {
-        getColonyList, colonyList, newStockEntry, getAllSpecies, allSpecies, newBirthEntry, removeColonyItem, removeBirthItem, transferItem, colonyData, searchColony, birthTransferItem, getAllBreeds, allBreeds,getColonyBreed,colonybreedList
+        getColonyList, colonyList, newStockEntry, getAllSpecies, allSpecies, newBirthEntry, removeColonyItem, removeBirthItem, transferItem, colonyData, searchColony, birthTransferItem, getAllBreeds, allBreeds,getColonyBreed,colonybreedList,getColonyHistory, colonyHistory, setColonyHistory
     }
 
     return (

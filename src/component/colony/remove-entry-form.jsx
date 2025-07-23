@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Autocomplete, TextField } from "@mui/material";
 
 export const RemoveEntry = ({ itemDetail, onClose, type }) => {
+  console.log(itemDetail, "itemDetail in remove entry");
   const [isProcessing, setIsProcessing] = useState(false);
   const [entryData, setEntryData] = useState({
     total_male: "",
@@ -21,46 +22,41 @@ export const RemoveEntry = ({ itemDetail, onClose, type }) => {
     getColonyBreed,
     colonybreedList,
   } = useColonyContext();
-
   const [selectedProducts, setSelectedProducts] = useState([]);
-  
 
-    useEffect(() => {
-      if (type === "colony") {
-        const dataToSend = {
-          colony_id: itemDetail?.id,
-          type: "General",
-        };
-        getColonyBreed(dataToSend);
-      } else {
-        const dataToSend = {
-          colony_id: itemDetail?.id,
-          type: "Children",
-        };
-        getColonyBreed(dataToSend);
-      }
-    }, []);
+  useEffect(() => {
+    if (type === "colony") {
+      const dataToSend = {
+        colony_id: itemDetail?.id,
+        type: "General",
+      };
+      getColonyBreed(dataToSend);
+    } else {
+      const dataToSend = {
+        colony_id: itemDetail?.id,
+        type: "Children",
+      };
+      getColonyBreed(dataToSend);
+    }
+  }, []);
 
   const onChange = (e) => {
     setEntryData({ ...entryData, [e.target.name]: e.target.value });
   };
 
   const onRemove = async () => {
-   
     const allSelectedProductIds = [
-        ...selectedProducts.map((product) => product.id),
+      ...selectedProducts.map((product) => product.id),
     ];
 
-
-      if(allSelectedProductIds?.length === 0) return toast.info("Select atleast one animal to transfer");
-
-  
+    if (allSelectedProductIds?.length === 0)
+      return toast.info("Select atleast one animal to transfer");
 
     setIsProcessing(true);
     let res = {};
     const body = {
-        colony_from: itemDetail?.id,
-        items: allSelectedProductIds
+      colony_from: itemDetail?.id,
+      items: allSelectedProductIds,
     };
     if (type === "colony") {
       res = await removeColonyItem(itemDetail?.id, body);
@@ -83,16 +79,16 @@ export const RemoveEntry = ({ itemDetail, onClose, type }) => {
   return (
     <>
       <div style={{ maxHeight: "50vh", overflow: "auto" }}>
-        
-
         <div className="mb-2">
-        <FormGroup>
-            <Label for="New">Transfer Breed</Label>
+          <FormGroup>
+            <Label for="New">Remove Breed</Label>
             <Autocomplete
               sx={{ m: 1 }}
               multiple
               options={colonybreedList.data || []}
-              getOptionLabel={(option) => option?.id || ""}
+              getOptionLabel={(option) =>
+                option ? `${option.id} - ${option.sex}` : ""
+              }
               value={selectedProducts}
               onChange={(event, newValue) => setSelectedProducts(newValue)}
               disableCloseOnSelect

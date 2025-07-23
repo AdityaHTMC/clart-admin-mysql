@@ -86,7 +86,6 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
     const navigatOrderEdit = (id) => {
       Navigate(`/order-edit/${id}`);
     };
-  
     return (
       <>
         <CommonBreadcrumb title="All Orders" parent="" />

@@ -33,17 +33,26 @@ import { useAuthContext } from "../../helper/AuthProvider";
 const RoomList = () => {
   const navigate = useNavigate();
 
-  const { getRoomList, roomList, create_room, edit_room, getAllUnit, allUnit } =
-    useMasterContext();
+  const {
+    getRoomList,
+    roomList,
+    create_room,
+    edit_room,
+    getAllUnit,
+    allUnit,
+    getAllManagerList,
+    managerList,
+    deleteRoom,
+  } = useMasterContext();
 
-    const { subAdminList, getSubAdminList } = useAuthContext()
+  const { subAdminList, getSubAdminList } = useAuthContext();
 
-    const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
 
   const [formData, setFormData] = useState({
     title: "",
     unit_id: "",
-    managers: "",
+    managers: [],
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,15 +68,15 @@ const RoomList = () => {
   const [selectedvarity, setSelectedvarity] = useState({
     title: "",
     unit_id: "",
-    managers: "",
+    managers: [],
     id: "",
   });
- 
+
   useEffect(() => {
     // getSubAdminList();
     getAllUnit();
+    getAllManagerList();
   }, []);
-
   useEffect(() => {
     const dataToSend = {
       page: currentPage,
@@ -88,19 +97,19 @@ const RoomList = () => {
   const onCloseModal2 = () => {
     setModalOpen(false);
     setSelectedvarity({
-        title: "",
-        unit_id: "",
-        managers: "",
-        id: "",
+      title: "",
+      unit_id: "",
+      managers: "",
+      id: "",
     });
   };
 
   const onCloseModal = () => {
     setOpen(false);
     setFormData({
-        title: "",
-        unit_id: "",
-        managers: "",
+      title: "",
+      unit_id: "",
+      managers: [],
     });
   };
 
@@ -116,18 +125,20 @@ const RoomList = () => {
   // Handle submit for updating the brand
   const handleSubmits = () => {
     const dataToSend = {
-        title: selectedvarity.title,
-        unit_id: selectedvarity.unit_id,
-        managers: selectedvarity.managers,
-        id: selectedvarity.id,
+      title: selectedvarity.title,
+      unit_id: selectedvarity.unit_id,
+      managers: selectedvarity.managers,
+      id: selectedvarity.id,
     };
+    console.log(dataToSend);
+
     edit_room(dataToSend);
     onCloseModal2();
   };
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you wish to delete this item?")) {
-      // DeleteDoc(id);
+      deleteRoom(id);
     }
   };
 
@@ -142,6 +153,7 @@ const RoomList = () => {
 
   // Handle form submission
   const handleSubmit = () => {
+    console.log(formData);
     create_room(formData);
     onCloseModal();
   };
@@ -149,7 +161,6 @@ const RoomList = () => {
   const handlepagechange = (newpage) => {
     setCurrentPage(newpage);
   };
-
   return (
     <>
       <CommonBreadcrumb title="Rooms Management List" />
@@ -174,7 +185,7 @@ const RoomList = () => {
                         <th className="text-center">Unit Name</th>
                         <th className="text-center">TOTAL Floors</th>
                         <th className="text-center">TOTAL Managers</th>
-                        <th >ACTION</th>
+                        <th>ACTION</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -204,7 +215,7 @@ const RoomList = () => {
                               {product?.total_floor}
                             </td>
                             <td className="text-center">
-                              {product?.managers?.length || 0}
+                              {product?.total_manager}
                             </td>
                             <td>
                               <div className="circelBtnBx">
@@ -255,7 +266,7 @@ const RoomList = () => {
           <Form>
             <FormGroup>
               <Label htmlFor="title" className="col-form-label">
-               Room Name
+                Room Name
               </Label>
               <Input
                 type="text"
@@ -266,25 +277,30 @@ const RoomList = () => {
               />
             </FormGroup>
             <FormGroup>
-                <Label for="New">Add Manager</Label>
-                <Autocomplete
-                  sx={{ m: 1 }}
-                  multiple
-                  options={subAdminList?.data || []}
-                  getOptionLabel={(option) => option?.email || ""}
-                  value={selectedProducts}
-                  onChange={(event, newValue) => setSelectedProducts(newValue)}
-                  disableCloseOnSelect
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label="Select Manager"
-                      placeholder="Select Manager"
-                    />
-                  )}
-                />
-              </FormGroup>
+              <Label for="New">Add Manager</Label>
+              <Autocomplete
+                sx={{ m: 1 }}
+                multiple
+                options={managerList?.data || []}
+                getOptionLabel={(option) => option?.email || ""}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={
+                  Array.isArray(formData.managers) ? formData.managers : []
+                }
+                onChange={(event, newValue) =>
+                  setFormData((prev) => ({ ...prev, managers: newValue }))
+                }
+                disableCloseOnSelect
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Select Manager"
+                    placeholder="Select Manager"
+                  />
+                )}
+              />
+            </FormGroup>
             <FormGroup>
               <Label htmlFor="unit_id" className="col-form-label">
                 Unit:
@@ -323,10 +339,10 @@ const RoomList = () => {
           </h5>
         </ModalHeader>
         <ModalBody style={{ maxHeight: "450px", overflowY: "auto" }}>
-        <Form>
+          <Form>
             <FormGroup>
               <Label htmlFor="title" className="col-form-label">
-               Room Name
+                Room Name
               </Label>
               <Input
                 type="text"
@@ -336,26 +352,67 @@ const RoomList = () => {
                 id="title"
               />
             </FormGroup>
+
             <FormGroup>
-                <Label for="New">Add Manager</Label>
-                <Autocomplete
-                  sx={{ m: 1 }}
-                  multiple
-                  options={subAdminList?.data || []}
-                  getOptionLabel={(option) => option?.email || ""}
-                  value={selectedProducts}
-                  onChange={(event, newValue) => setSelectedProducts(newValue)}
-                  disableCloseOnSelect
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label="Select Manager"
-                      placeholder="Select Manager"
-                    />
-                  )}
-                />
-              </FormGroup>
+              <Label for="New">Add Manager</Label>
+              <Autocomplete
+                sx={{ m: 1 }}
+                multiple
+                options={managerList?.data || []}
+                getOptionLabel={(option) => option?.email || ""}
+                isOptionEqualToValue={(option, value) =>
+                  option?.id === value?.id
+                }
+                value={selectedvarity.managers}
+                onChange={(event, newValue) =>
+                  setSelectedvarity((prev) => ({ ...prev, managers: newValue }))
+                }
+                disableCloseOnSelect
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <span
+                      key={option.id}
+                      {...getTagProps({ index })}
+                      style={{
+                        background: "#e0f7fa",
+                        borderRadius: "16px",
+                        padding: "4px 10px",
+                        margin: "2px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      {option.email}
+                      <span
+                        style={{
+                          marginLeft: 8,
+                          cursor: "pointer",
+                          fontWeight: "bold",
+                        }}
+                        onClick={() => {
+                          const newValue = [...selectedvarity.managers];
+                          newValue.splice(index, 1);
+                          setSelectedvarity((prev) => ({
+                            ...prev,
+                            managers: newValue,
+                          }));
+                        }}
+                      >
+                        ✕
+                      </span>
+                    </span>
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Select Manager"
+                    placeholder="Select Manager"
+                  />
+                )}
+              />
+            </FormGroup>
             <FormGroup>
               <Label htmlFor="unit_id" className="col-form-label">
                 Unit:

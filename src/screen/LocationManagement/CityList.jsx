@@ -25,7 +25,6 @@ import {
   import { FaTrashAlt } from "react-icons/fa";
   import { FaArrowLeft } from "react-icons/fa";
   import { Spinner } from "reactstrap";
-  import ReactQuill from "react-quill";
   import "react-quill/dist/quill.snow.css";
 
 import { Pagination, Stack } from "@mui/material";
@@ -170,8 +169,8 @@ import CommonBreadcrumb from "../../component/common/bread-crumb";
                     }}
                     onClick={() => navigate(-1)} 
                   >
-                    <FaArrowLeft size={20} color="#007bff" />
-                    <span style={{ marginLeft: "5px", color: "#007bff" }}>
+                    <FaArrowLeft size={16} color="#808080" />
+                    <span style={{ marginLeft: "8px", color: "#808080"}}>
                       Back
                     </span>
                   </div>

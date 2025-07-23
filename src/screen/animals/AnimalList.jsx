@@ -41,7 +41,6 @@ const AnimalList = () => {
     getproductList(dataToSend);
   }, [currentPage, searchTerm]);
 
-
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -66,7 +65,7 @@ const AnimalList = () => {
   const handlepagechange = (newpage) => {
     setCurrentPage(newpage);
   };
-
+  console.log("productList", productList);
   return (
     <>
       <CommonBreadcrumb title="Animal List" />
@@ -119,13 +118,17 @@ const AnimalList = () => {
                       className="table-responsive"
                     >
                       <Table hover responsive bordered className="align-middle">
-                        <thead >
+                        <thead>
                           <tr>
                             <th>Product Image</th>
                             <th className="text-center">Breed</th>
-                            <th className="text-center">Species</th>
-                            <th className="text-center">Winning Period</th>
-                            <th className="text-center">Culling Period</th>
+                            <th className="text-center">Species</th>{" "}
+                            <th className="text-center">Suckling Period</th>
+                            <th className="text-center">Post Weaning Period</th>
+                            <th className="text-center">Young Period</th>
+                            <th className="text-center">Buck Period</th>
+                            <th className="text-center">Deo Period</th>
+                            <th className="text-center">Culled Period</th>
                             <th className="text-center">For</th>
                             <th className="text-center">Gov Price</th>
                             <th className="text-center">Non Gov Price</th>
@@ -174,11 +177,28 @@ const AnimalList = () => {
                                 </td>
                                 <td className="text-center">
                                   {" "}
-                                  {product.winning}{" "}
+                                  {product.suckling_period}{" "}
                                 </td>
                                 <td className="text-center">
                                   {" "}
-                                  {product.calling}{" "}
+                                  {product.post_weaning_period}{" "}
+                                </td>
+                                <td className="text-center">
+                                  {" "}
+                                  {product.young_period}{" "}
+                                </td>
+                                <td className="text-center">
+                                  {" "}
+                                  {product.buck_period}{" "}
+                                </td>
+                                <td className="text-center">
+                                  {" "}
+                                  {product.doe_period}{" "}
+                                </td>
+                                <td className="text-center">
+                                  {" "}
+                                  {product.culled_period}
+                                  {" "}
                                 </td>
                                 <td className="text-center">
                                   <Badge>{product.species_for}</Badge>
